@@ -25,6 +25,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	Tutorial.done = true  # fight-logic tests skip the lesson; _test_tutorial runs it on its own
 	_test_bomb()
 	await _test_player()
 	await _test_arena()
@@ -33,6 +34,8 @@ func _run() -> void:
 	await _test_phase_extras()
 	await _test_skip_phase()
 	await _test_pause()
+	await _test_stage()
+	await _test_tutorial()
 	await _test_title()
 	if _errors.count:
 		printerr("%d engine/script error(s) during tests" % _errors.count)
@@ -161,8 +164,9 @@ func _test_phase_extras() -> void:
 	check([boss.next_attack(), boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"slam", &"bombs", &"laser", &"bombs"], "phase 2 adds the laser")
 	check(boss.anim.has_animation(&"laser"), "laser animation exists")
 	boss.phase_changed.emit(2)
-	var arena_anim: AnimationPlayer = game.get_node("Arena/ArenaAnim")
-	check(arena_anim.current_animation == "break_platforms", "phase 3 breaks the platforms")
+	var stage: Stage = game.get_node("Arena")
+	check(stage.panels[7].collapsed and stage.panels[14].collapsed, "phase 3 opens the pits")
+	check(not stage.debris_timer.is_stopped(), "phase 3 starts the falling rubble")
 	game.queue_free()
 	await process_frame
 
@@ -201,6 +205,66 @@ func _test_pause() -> void:
 	game.queue_free()
 	await process_frame
 	paused = false
+
+
+func _test_stage() -> void:
+	var game: Node2D = load("res://scenes/game.tscn").instantiate()
+	root.add_child(game)
+	await process_frame
+	var stage: Stage = game.get_node("Arena")
+	var player: Player = game.get_node("Player")
+	check(stage.panels.size() == 16, "the floor is 16 panels across a 2560 px arena")
+	check(stage.panels[4].belt_speed > 0.0 and stage.panels[11].belt_speed < 0.0, "conveyors push both ways")
+	var belt_before: float = stage.panels[4].belt_speed
+	stage.set_phase(1)
+	check(stage.panels[4].belt_speed == -belt_before, "conveyors reverse on a phase change")
+	player.global_position = Vector2(240, 598)
+	stage.zap_near_player()
+	var panel: FloorPanel = stage.panel_at(240)
+	check(panel.zapping and panel.warn.visible, "a zap starts with warning stripes under the player")
+	await create_timer(FloorPanel.WARN_TIME + 0.15).timeout
+	check(panel.zap.visible and not panel.zap_shape.disabled, "then the panel goes live")
+	stage.panels[7].collapse()
+	var hp_before := player.hp
+	player.invuln.stop()
+	player.global_position = Vector2(1200, 900)
+	await physics_frame
+	await physics_frame
+	check(player.hp == hp_before - 1 and player.global_position.y < 700 and not stage.panel_at(player.global_position.x).collapsed, "a pit costs a heart and respawns the player on solid floor")
+	game.queue_free()
+	await process_frame
+	Engine.time_scale = 1.0
+
+
+func _test_tutorial() -> void:
+	Tutorial.done = false
+	Tutorial.seen = {}
+	var game: Node2D = load("res://scenes/game.tscn").instantiate()
+	root.add_child(game)
+	var boss: Boss = game.get_node("Boss")
+	var hud: HUD = game.get_node("HUD")
+	var tutorial: Tutorial = game.get_node("Tutorial")
+	await create_timer(2.3).timeout
+	check(boss.holding and hud.coach_label.visible, "the tutorial starts with the king holding still and a big instruction")
+	Input.action_press("move_right")
+	await create_timer(0.8).timeout
+	Input.action_release("move_right")
+	await create_timer(0.8).timeout
+	Input.action_press("jump")
+	await physics_frame
+	await physics_frame
+	Input.action_release("jump")
+	await create_timer(1.5).timeout
+	check(is_instance_valid(tutorial._practice), "walking then jumping brings out a practice bomb")
+	var skip := InputEventAction.new()
+	skip.action = "skip_tutorial"
+	skip.pressed = true
+	Input.parse_input_event(skip)
+	await create_timer(0.3).timeout
+	check(Tutorial.done and not boss.holding, "Enter skips the rest and the fight starts")
+	game.queue_free()
+	await process_frame
+	Engine.time_scale = 1.0
 
 
 func _test_title() -> void:

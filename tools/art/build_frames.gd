@@ -7,7 +7,7 @@ extends SceneTree
 const P = preload("res://tools/art/pal.gd")
 const ART := "res://assets/art/"
 
-# sheet path -> [frame size, {animation: [first frame, frame count, fps, loop]}]
+# sheet path -> [frame size, {animation: [png, frame count, fps, loop, optional first frame]}]
 const SHEETS := {
 	"hero/hero_frames.tres": [Vector2i(20, 22), {
 		"idle": ["hero/hero_idle.png", 4, 5.0, true],
@@ -25,11 +25,20 @@ const SHEETS := {
 	"fx/dust_frames.tres": [Vector2i(16, 8), {"play": ["fx/dust.png", 5, 16.0, false]}],
 	"fx/poof_frames.tres": [Vector2i(28, 28), {"play": ["fx/poof.png", 6, 14.0, false]}],
 	"fx/shockwave_frames.tres": [Vector2i(20, 14), {"roll": ["fx/shockwave.png", 3, 12.0, true]}],
-	"fx/laser_warn_frames.tres": [Vector2i(320, 3), {"march": ["fx/laser_warn.png", 2, 12.0, true]}],
-	"fx/laser_beam_frames.tres": [Vector2i(320, 12), {"crackle": ["fx/laser_beam.png", 3, 20.0, true]}],
+	"fx/laser_warn_frames.tres": [Vector2i(640, 3), {"march": ["fx/laser_warn.png", 2, 12.0, true]}],
+	"fx/laser_beam_frames.tres": [Vector2i(640, 12), {"crackle": ["fx/laser_beam.png", 3, 20.0, true]}],
 	"boss/eye_frames.tres": [Vector2i(20, 20), {"look": ["boss/eye.png", 2, 1.5, true]}],
 	"boss/core_frames.tres": [Vector2i(32, 32), {"pulse": ["boss/core.png", 4, 8.0, true]}],
 	"boss/target_frames.tres": [Vector2i(44, 44), {"blink": ["boss/target.png", 2, 3.0, true]}],
+	"world/gear_frames.tres": [Vector2i(104, 104), {"turn": ["world/gear.png", 6, 6.0, true]}],
+	"world/banner_frames.tres": [Vector2i(20, 68), {"sway": ["world/banner.png", 4, 3.0, true]}],
+	"world/torch_frames.tres": [Vector2i(12, 26), {"flicker": ["world/torch.png", 4, 10.0, true]}],
+	"world/crowd_frames.tres": [Vector2i(480, 26), {"idle": ["world/crowd.png", 2, 2.5, true, 0], "cheer": ["world/crowd.png", 2, 8.0, true, 2]}],
+	"world/belt_frames.tres": [Vector2i(40, 20), {"roll": ["world/belt.png", 4, 12.0, true]}],
+	"world/warn_frames.tres": [Vector2i(40, 6), {"blink": ["world/warn.png", 2, 8.0, true]}],
+	"world/zap_frames.tres": [Vector2i(40, 16), {"crackle": ["world/zap.png", 3, 18.0, true]}],
+	"world/lift_frames.tres": [Vector2i(50, 12), {"hover": ["world/lift.png", 2, 10.0, true]}],
+	"world/debris_frames.tres": [Vector2i(14, 12), {"tumble": ["world/debris.png", 2, 8.0, true]}],
 }
 
 
@@ -45,7 +54,8 @@ func _initialize() -> void:
 			frames.add_animation(anim)
 			frames.set_animation_speed(anim, spec[2])
 			frames.set_animation_loop_mode(anim, SpriteFrames.LOOP_LINEAR if spec[3] else SpriteFrames.LOOP_NONE)
-			for i in spec[1]:
+			var first: int = spec[4] if spec.size() > 4 else 0
+			for i in range(first, first + spec[1]):
 				var region := AtlasTexture.new()
 				region.atlas = sheet
 				region.region = Rect2(i * size.x, 0, size.x, size.y)

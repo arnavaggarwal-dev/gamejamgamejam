@@ -4,11 +4,13 @@ extends CharacterBody2D
 
 signal hp_changed(hp: int)
 signal died
+signal fell_in_pit
 
 const MAX_HP := 3
 const COYOTE_TIME := 0.1
 const JUMP_BUFFER := 0.12
 const FLOOR_Y := 640.0
+const PIT_Y := 820.0  # below the floor: fell through a collapsed panel
 const AIM_DOTS := 14
 const AIM_STEP := 0.06
 const DUST := preload("res://scenes/fx/dust.tscn")
@@ -49,6 +51,9 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	if _dead:
+		return
+	if global_position.y > PIT_Y:
+		fell_in_pit.emit()
 		return
 	var dir := Input.get_axis("move_left", "move_right")
 	velocity.x = move_toward(velocity.x, dir * speed, accel * delta)

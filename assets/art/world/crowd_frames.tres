@@ -1,0 +1,44 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/world/crowd.png" id="1_k33tf"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3eqbe"]
+atlas = ExtResource("1_k33tf")
+region = Rect2(960, 0, 480, 26)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_24chv"]
+atlas = ExtResource("1_k33tf")
+region = Rect2(1440, 0, 480, 26)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ebly2"]
+atlas = ExtResource("1_k33tf")
+region = Rect2(0, 0, 480, 26)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0xncn"]
+atlas = ExtResource("1_k33tf")
+region = Rect2(480, 0, 480, 26)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3eqbe")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_24chv")
+}],
+"loop": 1,
+"name": &"cheer",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ebly2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0xncn")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 2.5
+}]

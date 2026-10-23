@@ -1,0 +1,25 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/world/lift.png" id="1_5wk15"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xp2fj"]
+atlas = ExtResource("1_5wk15")
+region = Rect2(0, 0, 50, 12)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_psu88"]
+atlas = ExtResource("1_5wk15")
+region = Rect2(50, 0, 50, 12)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xp2fj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_psu88")
+}],
+"loop": 1,
+"name": &"hover",
+"speed": 10.0
+}]

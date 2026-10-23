@@ -151,8 +151,8 @@ static func shockwave_frames() -> Array:
 static func laser_warn_frames() -> Array:
 	var frames := []
 	for f in 2:
-		var c = Canvas.new(320, 3)
-		for x in 320:
+		var c = Canvas.new(640, 3)
+		for x in 640:
 			if (x + f * 5) % 10 < 6:
 				c.vline(x, 0, 2, P.SALMON)
 				c.px(x, 1, P.CREAM)
@@ -166,14 +166,14 @@ static func laser_beam_frames() -> Array:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 11
 	for f in 3:
-		var c = Canvas.new(320, 12)
-		for x in 320:
+		var c = Canvas.new(640, 12)
+		for x in 640:
 			var top := 2 - rng.randi_range(0, 1)
 			var bottom := 9 + rng.randi_range(0, 1)
 			c.vline(x, top, bottom, P.PINK)
 			c.vline(x, top + 2, bottom - 2, P.CREAM)
 			if rng.randf() < 0.08:
 				c.px(x, top - 1, P.PINK)
-		c.glow_disc(312, 6, 6.0 + f % 2, [P.PINK, P.CREAM, P.CREAM])
+		c.glow_disc(632, 6, 6.0 + f % 2, [P.PINK, P.CREAM, P.CREAM])
 		frames.append(c)
 	return frames

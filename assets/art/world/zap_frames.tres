@@ -1,0 +1,32 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/world/zap.png" id="1_fnbju"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_db7q4"]
+atlas = ExtResource("1_fnbju")
+region = Rect2(0, 0, 40, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b3f5k"]
+atlas = ExtResource("1_fnbju")
+region = Rect2(40, 0, 40, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8s54g"]
+atlas = ExtResource("1_fnbju")
+region = Rect2(80, 0, 40, 16)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_db7q4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b3f5k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8s54g")
+}],
+"loop": 1,
+"name": &"crackle",
+"speed": 18.0
+}]

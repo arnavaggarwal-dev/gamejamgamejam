@@ -2,7 +2,7 @@
 
 [ext_resource type="FontFile" path="res://assets/art/ui/kilowatt.fnt" id="1_anb6c"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rj24j"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_anb6c"]
 content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
@@ -19,7 +19,7 @@ expand_margin_top = 8.0
 expand_margin_right = 8.0
 expand_margin_bottom = 8.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jixw0"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rj24j"]
 content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
@@ -31,7 +31,7 @@ border_width_right = 4
 border_width_bottom = 4
 border_color = Color(0.1764706, 0.15294118, 0.1882353, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dai4r"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jixw0"]
 content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
@@ -43,7 +43,7 @@ border_width_right = 4
 border_width_bottom = 4
 border_color = Color(0.1764706, 0.15294118, 0.1882353, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ef2td"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dai4r"]
 content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
@@ -55,7 +55,7 @@ border_width_right = 4
 border_width_bottom = 4
 border_color = Color(0.1764706, 0.15294118, 0.1882353, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_12pha"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ef2td"]
 content_margin_left = 48.0
 content_margin_top = 32.0
 content_margin_right = 48.0
@@ -67,7 +67,7 @@ border_width_right = 4
 border_width_bottom = 4
 border_color = Color(0.9882353, 0.9843137, 0.9882353, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e72w4"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_12pha"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -79,7 +79,7 @@ border_width_right = 4
 border_width_bottom = 4
 border_color = Color(0.1764706, 0.15294118, 0.1882353, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mk1u8"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e72w4"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -98,14 +98,14 @@ Button/colors/font_color = Color(0.1764706, 0.15294118, 0.1882353, 1)
 Button/colors/font_focus_color = Color(0.1764706, 0.15294118, 0.1882353, 1)
 Button/colors/font_hover_color = Color(0.1764706, 0.15294118, 0.1882353, 1)
 Button/colors/font_pressed_color = Color(0.1764706, 0.15294118, 0.1882353, 1)
-Button/styles/focus = SubResource("StyleBoxFlat_rj24j")
-Button/styles/hover = SubResource("StyleBoxFlat_jixw0")
-Button/styles/normal = SubResource("StyleBoxFlat_dai4r")
-Button/styles/pressed = SubResource("StyleBoxFlat_ef2td")
+Button/styles/focus = SubResource("StyleBoxFlat_anb6c")
+Button/styles/hover = SubResource("StyleBoxFlat_rj24j")
+Button/styles/normal = SubResource("StyleBoxFlat_jixw0")
+Button/styles/pressed = SubResource("StyleBoxFlat_dai4r")
 Label/colors/font_color = Color(0.9882353, 0.9843137, 0.9882353, 1)
 Label/colors/font_shadow_color = Color(0.1764706, 0.15294118, 0.1882353, 1)
 Label/constants/shadow_offset_x = 4
 Label/constants/shadow_offset_y = 4
-PanelContainer/styles/panel = SubResource("StyleBoxFlat_12pha")
-ProgressBar/styles/background = SubResource("StyleBoxFlat_e72w4")
-ProgressBar/styles/fill = SubResource("StyleBoxFlat_mk1u8")
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_ef2td")
+ProgressBar/styles/background = SubResource("StyleBoxFlat_12pha")
+ProgressBar/styles/fill = SubResource("StyleBoxFlat_e72w4")

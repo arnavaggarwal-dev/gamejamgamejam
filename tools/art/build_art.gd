@@ -29,9 +29,37 @@ func _initialize() -> void:
 
 
 func _world() -> void:
-	_save_sheet("world/background.png", [World.background()])
-	_save_sheet("world/floor.png", [World.floor_strip()])
+	var sky = World.sky()
+	var clouds = World.clouds()
+	var wall = World.wall()
+	_save_sheet("world/sky.png", [sky])
+	_save_sheet("world/clouds.png", [clouds])
+	_save_sheet("world/wall.png", [wall])
+	# Flattened 320-wide backdrop for the title screen (and the mockup).
+	var bg = Canvas.new(320, 180)
+	for x in [0, 160]:
+		bg.blit(sky, x, 0)
+		bg.blit(clouds, x, 30)
+	bg.blit(wall, 0, 0)
+	_save_sheet("world/background.png", [bg])
+	var tile = World.floor_tile()
+	var floor_strip = Canvas.new(350, 20)
+	for x in range(0, 350, 40):
+		floor_strip.blit(tile, x, 0)
+	_save_sheet("world/floor.png", [floor_strip])
+	_save_sheet("world/floor_tile.png", [tile])
+	_save_sheet("world/belt.png", World.belt_frames())
+	_save_sheet("world/warn.png", World.warn_frames())
+	_save_sheet("world/zap.png", World.zap_frames())
 	_save_sheet("world/platform.png", [World.platform()])
+	_save_sheet("world/lift.png", World.lift_frames())
+	_save_sheet("world/debris.png", World.debris_frames())
+	_save_sheet("world/gear.png", World.gear_frames())
+	_save_sheet("world/banner.png", World.banner_frames())
+	_save_sheet("world/torch.png", World.torch_frames())
+	_save_sheet("world/glow.png", [World.glow()])
+	_save_sheet("world/crowd.png", World.crowd_frames())
+	_save_sheet("world/railing.png", [World.railing()])
 
 
 func _fx() -> void:

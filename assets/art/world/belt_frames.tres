@@ -1,0 +1,39 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/world/belt.png" id="1_jvpl4"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7h6dg"]
+atlas = ExtResource("1_jvpl4")
+region = Rect2(0, 0, 40, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qn2dg"]
+atlas = ExtResource("1_jvpl4")
+region = Rect2(40, 0, 40, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iiblu"]
+atlas = ExtResource("1_jvpl4")
+region = Rect2(80, 0, 40, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lrqe7"]
+atlas = ExtResource("1_jvpl4")
+region = Rect2(120, 0, 40, 20)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7h6dg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qn2dg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_iiblu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lrqe7")
+}],
+"loop": 1,
+"name": &"roll",
+"speed": 12.0
+}]

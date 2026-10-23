@@ -2,17 +2,28 @@
 
 [ext_resource type="Script" path="res://scenes/game.gd" id="1_game"]
 [ext_resource type="Script" path="res://scenes/camera.gd" id="2_cam"]
-[ext_resource type="PackedScene" path="res://scenes/boss/boss.tscn" id="5_boss"]
-[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="3_player"]
-[ext_resource type="Texture2D" path="res://assets/art/world/background.png" id="4_bg"]
-[ext_resource type="Texture2D" path="res://assets/art/world/floor.png" id="10_floor"]
-[ext_resource type="Texture2D" path="res://assets/art/world/platform.png" id="11_platform"]
-[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="6_hud"]
-[ext_resource type="PackedScene" path="res://scenes/fx/film_filter.tscn" id="7_film"]
-[ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="12_pause"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
-size = Vector2(1400, 80)
+[ext_resource type="PackedScene" path="res://scenes/boss/boss.tscn" id="3_boss"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="4_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="5_hud"]
+[ext_resource type="PackedScene" path="res://scenes/fx/film_filter.tscn" id="6_film"]
+[ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="7_pause"]
+[ext_resource type="PackedScene" path="res://scenes/stage/floor_panel.tscn" id="8_panel"]
+[ext_resource type="PackedScene" path="res://scenes/stage/lift.tscn" id="9_lift"]
+[ext_resource type="Texture2D" path="res://assets/art/world/platform.png" id="10_platform"]
+[ext_resource type="Script" path="res://scenes/stage/stage.gd" id="11_stage"]
+[ext_resource type="Script" path="res://scenes/stage/backdrop.gd" id="12_backdrop"]
+[ext_resource type="Texture2D" path="res://assets/art/world/wall.png" id="13_wall"]
+[ext_resource type="Texture2D" path="res://assets/art/world/sky.png" id="14_sky"]
+[ext_resource type="Texture2D" path="res://assets/art/world/clouds.png" id="15_clouds"]
+[ext_resource type="SpriteFrames" path="res://assets/art/world/gear_frames.tres" id="16_gear"]
+[ext_resource type="SpriteFrames" path="res://assets/art/world/banner_frames.tres" id="17_banner"]
+[ext_resource type="SpriteFrames" path="res://assets/art/world/torch_frames.tres" id="18_torch"]
+[ext_resource type="Texture2D" path="res://assets/art/world/glow.png" id="19_glow"]
+[ext_resource type="SpriteFrames" path="res://assets/art/world/crowd_frames.tres" id="20_crowd"]
+[ext_resource type="Texture2D" path="res://assets/art/world/railing.png" id="21_railing"]
+[ext_resource type="Script" path="res://scenes/stage/scroll.gd" id="22_scroll"]
+[ext_resource type="Script" path="res://scenes/tutorial.gd" id="23_tutorial"]
+[ext_resource type="SpriteFrames" path="res://assets/art/fx/arrow_frames.tres" id="24_arrow"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall"]
 size = Vector2(40, 1400)
@@ -20,109 +31,242 @@ size = Vector2(40, 1400)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_platform"]
 size = Vector2(200, 24)
 
-[sub_resource type="Animation" id="Animation_break"]
-resource_name = "break_platforms"
-length = 1.0
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("PlatformL/CollisionShape2D:disabled")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("PlatformR/CollisionShape2D:disabled")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("PlatformL:position")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.15, 1),
-"transitions": PackedFloat32Array(1, 2, 1),
-"update": 0,
-"values": [Vector2(220, 480), Vector2(220, 492), Vector2(200, 900)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("PlatformR:position")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.15, 1),
-"transitions": PackedFloat32Array(1, 2, 1),
-"update": 0,
-"values": [Vector2(820, 480), Vector2(820, 492), Vector2(840, 900)]
-}
-tracks/4/type = "value"
-tracks/4/imported = false
-tracks/4/enabled = true
-tracks/4/path = NodePath("PlatformL:rotation")
-tracks/4/interp = 1
-tracks/4/loop_wrap = true
-tracks/4/keys = {
-"times": PackedFloat32Array(0.15, 1),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [0.0, 1.0]
-}
-tracks/5/type = "value"
-tracks/5/imported = false
-tracks/5/enabled = true
-tracks/5/path = NodePath("PlatformR:rotation")
-tracks/5/interp = 1
-tracks/5/loop_wrap = true
-tracks/5/keys = {
-"times": PackedFloat32Array(0.15, 1),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [0.0, -1.0]
-}
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_arena"]
+[sub_resource type="Curve2D" id="Curve2D_slide"]
 _data = {
-&"break_platforms": SubResource("Animation_break")
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 480, 0)
 }
+point_count = 2
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_game")
 
-[node name="Background" type="Sprite2D" parent="."]
-position = Vector2(640, 360)
-scale = Vector2(4, 4)
-texture = ExtResource("4_bg")
+[node name="Backdrop" type="Node2D" parent="."]
+script = ExtResource("12_backdrop")
 
-[node name="Boss" parent="." node_paths=PackedStringArray("projectiles") instance=ExtResource("5_boss")]
+[node name="SkyLayer" type="Parallax2D" parent="Backdrop"]
+scroll_scale = Vector2(0.25, 1)
+
+[node name="Sky" type="Sprite2D" parent="Backdrop/SkyLayer"]
+texture_repeat = 2
+scale = Vector2(4, 4)
+texture = ExtResource("14_sky")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 600, 180)
+
+[node name="Clouds" type="Sprite2D" parent="Backdrop/SkyLayer"]
+texture_repeat = 2
+position = Vector2(0, 112)
+scale = Vector2(4, 4)
+texture = ExtResource("15_clouds")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 600, 60)
+script = ExtResource("22_scroll")
+
+[node name="WallLayer" type="Parallax2D" parent="Backdrop"]
+scroll_scale = Vector2(0.5, 1)
+
+[node name="Wall" type="Sprite2D" parent="Backdrop/WallLayer"]
+scale = Vector2(4, 4)
+texture = ExtResource("13_wall")
+centered = false
+
+[node name="Gear" type="AnimatedSprite2D" parent="Backdrop/WallLayer"]
+position = Vector2(960, 304)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("16_gear")
+animation = &"turn"
+autoplay = "turn"
+
+[node name="Banner1" type="AnimatedSprite2D" parent="Backdrop/WallLayer"]
+position = Vector2(408, 160)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("17_banner")
+animation = &"sway"
+autoplay = "sway"
+
+[node name="Banner2" type="AnimatedSprite2D" parent="Backdrop/WallLayer"]
+position = Vector2(1512, 160)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("17_banner")
+animation = &"sway"
+autoplay = "sway"
+frame = 2
+
+[node name="Glow1" type="Sprite2D" parent="Backdrop/WallLayer"]
+position = Vector2(80, 216)
+scale = Vector2(4, 4)
+texture = ExtResource("19_glow")
+
+[node name="Torch1" type="AnimatedSprite2D" parent="Backdrop/WallLayer" groups=["torches"]]
+position = Vector2(80, 232)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("18_torch")
+animation = &"flicker"
+autoplay = "flicker"
+frame = 1
+
+[node name="Glow2" type="Sprite2D" parent="Backdrop/WallLayer"]
+position = Vector2(480, 216)
+scale = Vector2(4, 4)
+texture = ExtResource("19_glow")
+
+[node name="Torch2" type="AnimatedSprite2D" parent="Backdrop/WallLayer" groups=["torches"]]
+position = Vector2(480, 232)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("18_torch")
+animation = &"flicker"
+autoplay = "flicker"
+frame = 2
+
+[node name="Glow3" type="Sprite2D" parent="Backdrop/WallLayer"]
+position = Vector2(720, 216)
+scale = Vector2(4, 4)
+texture = ExtResource("19_glow")
+
+[node name="Torch3" type="AnimatedSprite2D" parent="Backdrop/WallLayer" groups=["torches"]]
+position = Vector2(720, 232)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("18_torch")
+animation = &"flicker"
+autoplay = "flicker"
+frame = 3
+
+[node name="Glow4" type="Sprite2D" parent="Backdrop/WallLayer"]
+position = Vector2(1208, 216)
+scale = Vector2(4, 4)
+texture = ExtResource("19_glow")
+
+[node name="Torch4" type="AnimatedSprite2D" parent="Backdrop/WallLayer" groups=["torches"]]
+position = Vector2(1208, 232)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("18_torch")
+animation = &"flicker"
+autoplay = "flicker"
+frame = 0
+
+[node name="Glow5" type="Sprite2D" parent="Backdrop/WallLayer"]
+position = Vector2(1436, 216)
+scale = Vector2(4, 4)
+texture = ExtResource("19_glow")
+
+[node name="Torch5" type="AnimatedSprite2D" parent="Backdrop/WallLayer" groups=["torches"]]
+position = Vector2(1436, 232)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("18_torch")
+animation = &"flicker"
+autoplay = "flicker"
+frame = 1
+
+[node name="Glow6" type="Sprite2D" parent="Backdrop/WallLayer"]
+position = Vector2(1840, 216)
+scale = Vector2(4, 4)
+texture = ExtResource("19_glow")
+
+[node name="Torch6" type="AnimatedSprite2D" parent="Backdrop/WallLayer" groups=["torches"]]
+position = Vector2(1840, 232)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("18_torch")
+animation = &"flicker"
+autoplay = "flicker"
+frame = 2
+
+[node name="Crowd" type="AnimatedSprite2D" parent="Backdrop/WallLayer"]
+position = Vector2(0, 496)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("20_crowd")
+animation = &"idle"
+autoplay = "idle"
+centered = false
+
+[node name="Railing" type="Sprite2D" parent="Backdrop/WallLayer"]
+position = Vector2(0, 564)
+scale = Vector2(4, 4)
+texture = ExtResource("21_railing")
+centered = false
+
+[node name="CheerTimer" type="Timer" parent="Backdrop"]
+one_shot = true
+
+[node name="Motes" type="CPUParticles2D" parent="Backdrop"]
+position = Vector2(1280, 360)
+amount = 70
+lifetime = 10.0
+preprocess = 10.0
+emission_shape = 3
+emission_rect_extents = Vector2(1280, 360)
+direction = Vector2(0, -1)
+spread = 180.0
+gravity = Vector2(0, -6)
+initial_velocity_min = 4.0
+initial_velocity_max = 12.0
+scale_amount_min = 4.0
+scale_amount_max = 4.0
+color = Color(0.988, 0.984, 0.988, 0.55)
+
+[node name="Boss" parent="." node_paths=PackedStringArray("projectiles") instance=ExtResource("3_boss")]
 projectiles = NodePath("../Projectiles")
 
 [node name="Arena" type="Node2D" parent="."]
+script = ExtResource("11_stage")
 
-[node name="Floor" type="StaticBody2D" parent="Arena"]
-position = Vector2(640, 680)
+[node name="Void" type="ColorRect" parent="Arena"]
+offset_top = 640.0
+offset_right = 2560.0
+offset_bottom = 720.0
+mouse_filter = 2
+color = Color(0.176, 0.153, 0.188, 1)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/Floor"]
-shape = SubResource("RectangleShape2D_floor")
+[node name="Floor" type="Node2D" parent="Arena"]
 
-[node name="Art" type="Sprite2D" parent="Arena/Floor"]
-scale = Vector2(4, 4)
-texture = ExtResource("10_floor")
+[node name="Panel0" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(80, 680)
+
+[node name="Panel1" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(240, 680)
+
+[node name="Panel2" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(400, 680)
+
+[node name="Panel3" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(560, 680)
+
+[node name="Panel4" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(720, 680)
+
+[node name="Panel5" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(880, 680)
+
+[node name="Panel6" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(1040, 680)
+
+[node name="Panel7" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(1200, 680)
+
+[node name="Panel8" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(1360, 680)
+
+[node name="Panel9" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(1520, 680)
+
+[node name="Panel10" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(1680, 680)
+
+[node name="Panel11" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(1840, 680)
+
+[node name="Panel12" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(2000, 680)
+
+[node name="Panel13" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(2160, 680)
+
+[node name="Panel14" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(2320, 680)
+
+[node name="Panel15" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(2480, 680)
 
 [node name="WallL" type="StaticBody2D" parent="Arena"]
 position = Vector2(-20, 360)
@@ -131,63 +275,102 @@ position = Vector2(-20, 360)
 shape = SubResource("RectangleShape2D_wall")
 
 [node name="WallR" type="StaticBody2D" parent="Arena"]
-position = Vector2(1300, 360)
+position = Vector2(2580, 360)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/WallR"]
 shape = SubResource("RectangleShape2D_wall")
 
-[node name="PlatformL" type="StaticBody2D" parent="Arena"]
-position = Vector2(220, 480)
+[node name="PlatL" type="StaticBody2D" parent="Arena"]
+position = Vector2(360, 480)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/PlatformL"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/PlatL"]
 shape = SubResource("RectangleShape2D_platform")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/PlatformL"]
+[node name="Art" type="Sprite2D" parent="Arena/PlatL"]
 scale = Vector2(4, 4)
-texture = ExtResource("11_platform")
+texture = ExtResource("10_platform")
 
-[node name="PlatformM" type="StaticBody2D" parent="Arena"]
-position = Vector2(540, 400)
+[node name="PlatML" type="StaticBody2D" parent="Arena"]
+position = Vector2(980, 500)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/PlatformM"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/PlatML"]
 shape = SubResource("RectangleShape2D_platform")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/PlatformM"]
+[node name="Art" type="Sprite2D" parent="Arena/PlatML"]
 scale = Vector2(4, 4)
-texture = ExtResource("11_platform")
+texture = ExtResource("10_platform")
 
-[node name="PlatformR" type="StaticBody2D" parent="Arena"]
-position = Vector2(820, 480)
+[node name="PlatM" type="StaticBody2D" parent="Arena"]
+position = Vector2(1180, 380)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/PlatformR"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/PlatM"]
 shape = SubResource("RectangleShape2D_platform")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/PlatformR"]
+[node name="Art" type="Sprite2D" parent="Arena/PlatM"]
 scale = Vector2(4, 4)
-texture = ExtResource("11_platform")
+texture = ExtResource("10_platform")
 
-[node name="ArenaAnim" type="AnimationPlayer" parent="Arena"]
-libraries = {
-&"": SubResource("AnimationLibrary_arena")
-}
+[node name="PlatR" type="StaticBody2D" parent="Arena"]
+position = Vector2(2250, 480)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/PlatR"]
+shape = SubResource("RectangleShape2D_platform")
+one_way_collision = true
+
+[node name="Art" type="Sprite2D" parent="Arena/PlatR"]
+scale = Vector2(4, 4)
+texture = ExtResource("10_platform")
+
+[node name="Piston" parent="Arena" instance=ExtResource("9_lift")]
+position = Vector2(760, 560)
+
+[node name="Slider" parent="Arena" instance=ExtResource("9_lift")]
+position = Vector2(1500, 470)
+curve = SubResource("Curve2D_slide")
+
+[node name="Hazards" type="Node2D" parent="Arena"]
+
+[node name="ZapTimer" type="Timer" parent="Arena"]
+
+[node name="DebrisTimer" type="Timer" parent="Arena"]
 
 [node name="Projectiles" type="Node2D" parent="."]
 
-[node name="Player" parent="." instance=ExtResource("3_player")]
+[node name="Player" parent="." instance=ExtResource("4_player")]
 position = Vector2(200, 598)
 
 [node name="RespawnPoint" type="Marker2D" parent="."]
 position = Vector2(200, 598)
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera2D" type="Camera2D" parent="." node_paths=PackedStringArray("target")]
 position = Vector2(640, 360)
+limit_left = 0
+limit_top = 0
+limit_right = 2560
+limit_bottom = 720
+position_smoothing_enabled = true
+position_smoothing_speed = 6.0
 script = ExtResource("2_cam")
+target = NodePath("../Player")
 
-[node name="HUD" parent="." instance=ExtResource("6_hud")]
+[node name="Tutorial" type="Node" parent="."]
+script = ExtResource("23_tutorial")
 
-[node name="PauseMenu" parent="." instance=ExtResource("12_pause")]
+[node name="CoreArrow" type="AnimatedSprite2D" parent="Tutorial"]
+visible = false
+z_index = 6
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("24_arrow")
+animation = &"bob"
+autoplay = "bob"
 
-[node name="FilmFilter" parent="." instance=ExtResource("7_film")]
+[node name="HUD" parent="." instance=ExtResource("5_hud")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("7_pause")]
+
+[node name="FilmFilter" parent="." instance=ExtResource("6_film")]
+
+[connection signal="timeout" from="Backdrop/CheerTimer" to="Backdrop/WallLayer/Crowd" method="play" binds= [&"idle"]]

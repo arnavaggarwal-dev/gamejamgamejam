@@ -1,0 +1,61 @@
+[gd_scene format=3]
+
+[ext_resource type="SpriteFrames" path="res://assets/art/world/lift_frames.tres" id="1_frames"]
+
+[sub_resource type="Curve2D" id="Curve2D_rise"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -240)
+}
+point_count = 2
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lift"]
+size = Vector2(200, 24)
+
+[sub_resource type="Animation" id="Animation_glide"]
+resource_name = "glide"
+length = 5.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Follow:progress_ratio")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 2.5, 5),
+"transitions": PackedFloat32Array(-2, -2, 1),
+"update": 0,
+"values": [0.0, 1.0, 0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_lift"]
+_data = {
+&"glide": SubResource("Animation_glide")
+}
+
+[node name="Lift" type="Path2D"]
+curve = SubResource("Curve2D_rise")
+
+[node name="Follow" type="PathFollow2D" parent="."]
+rotates = false
+loop = false
+
+[node name="Body" type="AnimatableBody2D" parent="Follow"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Follow/Body"]
+shape = SubResource("RectangleShape2D_lift")
+one_way_collision = true
+
+[node name="Art" type="AnimatedSprite2D" parent="Follow/Body"]
+position = Vector2(0, 12)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("1_frames")
+animation = &"hover"
+autoplay = "hover"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+callback_mode_process = 0
+libraries = {
+&"": SubResource("AnimationLibrary_lift")
+}
+autoplay = "glide"

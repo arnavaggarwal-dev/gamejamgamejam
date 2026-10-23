@@ -1,0 +1,25 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/world/debris.png" id="1_c1ka0"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kbgry"]
+atlas = ExtResource("1_c1ka0")
+region = Rect2(0, 0, 14, 12)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h3w8x"]
+atlas = ExtResource("1_c1ka0")
+region = Rect2(14, 0, 14, 12)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kbgry")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h3w8x")
+}],
+"loop": 1,
+"name": &"tumble",
+"speed": 8.0
+}]

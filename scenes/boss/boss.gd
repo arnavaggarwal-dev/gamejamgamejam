@@ -7,6 +7,7 @@ extends Node2D
 signal health_changed(hits_left: int, hits_total: int)
 signal phase_changed(phase: int)  # 0-based: the second phase emits 1
 signal defeated
+signal attack_started(attack: StringName)
 
 enum State { INTRO, IDLE, ATTACK, STAGGER, PHASE_SHIFT, DEAD }
 
@@ -25,11 +26,22 @@ const PHASES := [
 
 @export var projectiles: Node2D
 
+# The king rides a rail behind the arena: between attacks he slides to stay RAIL_LEAD px
+# right of the player. Boss.position.x offsets the whole rig (torso rests at local x 1080).
+const RAIL_MIN := 0.0
+const RAIL_MAX := 1280.0
+const RAIL_LEAD := 560.0
+const RAIL_SPEED := 260.0
+const TORSO_X := 1080.0
+const ARENA_W := 2560.0
+
 var state := State.INTRO
 var phase := 0
 var hp := HITS_PER_PHASE
 var _attack_index := 0
 var _rest_pose := {}
+var _rail_dust := 0.0
+var holding := false  ## tutorial: idle (and hittable) but never start an attack
 
 @onready var rig: Node2D = $Rig
 @onready var head: Node2D = $Rig/Head
@@ -55,6 +67,23 @@ func _ready() -> void:
 
 func start_fight() -> void:
 	_play(&"intro", State.INTRO)
+
+
+## Rides the rail toward the player while resting, so attacks always land near them.
+func _physics_process(delta: float) -> void:
+	if state != State.IDLE:
+		return
+	var player := get_tree().get_first_node_in_group("player") as Node2D
+	if player == null:
+		return
+	var goal := clampf(player.global_position.x + RAIL_LEAD - TORSO_X, RAIL_MIN, RAIL_MAX)
+	var before := position.x
+	position.x = move_toward(position.x, goal, RAIL_SPEED * delta)
+	if absf(position.x - before) > 0.1:
+		_rail_dust -= delta
+		if _rail_dust <= 0.0:
+			_rail_dust = 0.2
+			_fx(DUST_SCENE, Vector2($Rig/Torso.global_position.x + randf_range(-150.0, 150.0), FLOOR_Y - 16.0))
 
 
 func hits_total() -> int:
@@ -87,6 +116,13 @@ func take_hit() -> bool:
 	return true
 
 
+## Ends the tutorial hold: attacks resume after a short beat.
+func release() -> void:
+	holding = false
+	if state == State.IDLE:
+		rest_timer.start(0.6)
+
+
 func restart_phase() -> void:
 	if state == State.DEAD:
 		return
@@ -110,7 +146,7 @@ func skip_phase() -> void:
 func aim_slam() -> void:
 	var player := get_tree().get_first_node_in_group("player") as Node2D
 	var x := player.global_position.x if player else 400.0
-	slam_anchor.position.x = clampf(x, 80.0, 880.0)
+	slam_anchor.global_position.x = clampf(x, 80.0, ARENA_W - 80.0)
 
 
 func slam_impact() -> void:
@@ -204,8 +240,10 @@ func _on_animation_finished(_anim_name: StringName) -> void:
 
 
 func _on_rest_timer_timeout() -> void:
-	if state == State.IDLE:
-		_play(next_attack(), State.ATTACK)
+	if state == State.IDLE and not holding:
+		var attack := next_attack()
+		attack_started.emit(attack)
+		_play(attack, State.ATTACK)
 
 
 func _on_weak_point_body_entered(body: Node2D) -> void:

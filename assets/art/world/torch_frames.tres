@@ -1,0 +1,39 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/world/torch.png" id="1_t6e1l"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sqhwj"]
+atlas = ExtResource("1_t6e1l")
+region = Rect2(0, 0, 12, 26)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wvshd"]
+atlas = ExtResource("1_t6e1l")
+region = Rect2(12, 0, 12, 26)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dxv0c"]
+atlas = ExtResource("1_t6e1l")
+region = Rect2(24, 0, 12, 26)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6hosj"]
+atlas = ExtResource("1_t6e1l")
+region = Rect2(36, 0, 12, 26)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sqhwj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wvshd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dxv0c")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6hosj")
+}],
+"loop": 1,
+"name": &"flicker",
+"speed": 10.0
+}]

@@ -386,7 +386,7 @@ tracks/3/keys = {
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_beam"]
-size = Vector2(1280, 30)
+size = Vector2(2560, 30)
 
 [sub_resource type="Animation" id="Animation_laser"]
 resource_name = "laser"
@@ -607,7 +607,8 @@ shape = SubResource("RectangleShape2D_fist")
 disabled = true
 
 [node name="LaserLow" type="Node2D" parent="."]
-position = Vector2(640, 612)
+top_level = true
+position = Vector2(1280, 612)
 
 [node name="Warn" type="AnimatedSprite2D" parent="LaserLow"]
 visible = false
@@ -633,7 +634,8 @@ shape = SubResource("RectangleShape2D_beam")
 disabled = true
 
 [node name="LaserHigh" type="Node2D" parent="."]
-position = Vector2(640, 440)
+top_level = true
+position = Vector2(1280, 440)
 
 [node name="Warn" type="AnimatedSprite2D" parent="LaserHigh"]
 visible = false
