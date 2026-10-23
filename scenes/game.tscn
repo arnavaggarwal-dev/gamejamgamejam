@@ -24,6 +24,11 @@
 [ext_resource type="Script" path="res://scenes/stage/scroll.gd" id="22_scroll"]
 [ext_resource type="Script" path="res://scenes/tutorial.gd" id="23_tutorial"]
 [ext_resource type="SpriteFrames" path="res://assets/art/fx/arrow_frames.tres" id="24_arrow"]
+[ext_resource type="Shader" path="res://assets/shaders/spotlight.gdshader" id="25_spot"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_spot"]
+shader = ExtResource("25_spot")
+shader_parameter/amount = 0.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall"]
 size = Vector2(40, 1400)
@@ -364,6 +369,16 @@ target = NodePath("../Player")
 
 [node name="Tutorial" type="Node" parent="."]
 script = ExtResource("23_tutorial")
+
+[node name="Spotlight" type="ColorRect" parent="Tutorial"]
+visible = false
+z_index = 50
+material = SubResource("ShaderMaterial_spot")
+offset_left = -200.0
+offset_top = -400.0
+offset_right = 2760.0
+offset_bottom = 1200.0
+mouse_filter = 2
 
 [node name="CoreArrow" type="AnimatedSprite2D" parent="Tutorial"]
 visible = false

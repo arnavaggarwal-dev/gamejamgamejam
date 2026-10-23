@@ -281,6 +281,8 @@ func _test_tutorial() -> void:
 	var tutorial: Tutorial = game.get_node("Tutorial")
 	await create_timer(2.3).timeout
 	check(boss.holding and hud.coach_label.visible, "the tutorial starts with the king holding still and a big instruction")
+	var player: Player = game.get_node("Player")
+	check(tutorial.spotlight.visible and player.z_index > tutorial.spotlight.z_index, "the lesson greys out everything but the hero")
 	Input.action_press("move_right")
 	await create_timer(0.8).timeout
 	Input.action_release("move_right")
@@ -296,12 +298,14 @@ func _test_tutorial() -> void:
 	Input.action_release("dash")
 	await create_timer(1.2).timeout
 	check(is_instance_valid(tutorial._practice), "walking, jumping then dashing brings out a practice bomb")
+	check(tutorial._practice.z_index > tutorial.spotlight.z_index, "the practice bomb stays in colour")
 	var skip := InputEventAction.new()
 	skip.action = "skip_tutorial"
 	skip.pressed = true
 	Input.parse_input_event(skip)
-	await create_timer(0.3).timeout
+	await create_timer(0.4).timeout
 	check(Tutorial.done and not boss.holding, "Enter skips the rest and the fight starts")
+	check(not tutorial.spotlight.visible and player.z_index < tutorial.spotlight.z_index, "skipping lifts the grey-out")
 	game.queue_free()
 	await process_frame
 	Engine.time_scale = 1.0

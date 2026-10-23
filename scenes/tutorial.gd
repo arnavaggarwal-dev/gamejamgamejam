@@ -7,6 +7,7 @@ extends Node
 const BOMB := preload("res://scenes/boss/bomb.tscn")
 const STEP_PAUSE := 0.7
 const ARROW_ABOVE_CORE := Vector2(0, -110)
+const LIFT := 60  # z added to whatever the current step is about, above the Spotlight (z 50)
 
 static var done := false  # once per session, so restarts go straight to the fight
 static var seen := {}  # tip keys already shown this session
@@ -21,8 +22,10 @@ var _skip := false
 var _practice: Bomb
 var _start_x := 0.0
 var _hits_before := 0
+var _lifted: Array[CanvasItem] = []
 
 @onready var core_arrow: AnimatedSprite2D = $CoreArrow
+@onready var spotlight: ColorRect = $Spotlight
 
 
 func setup(p: Player, b: Boss, h: HUD, s: Stage, proj: Node2D) -> void:
@@ -46,6 +49,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func run() -> void:
 	hud.show_hint("ENTER: SKIP TUTORIAL")
 	_start_x = player.global_position.x
+	_focus([player])
 	await _step("WALK WITH THE  ARROW KEYS", _walked)
 	await _step("JUMP WITH  Z", _jumped)
 	await _step("DASH WITH  C", _dashed)
@@ -55,8 +59,10 @@ func run() -> void:
 	await _step("PRESS  X  TO PICK IT UP", _holding_bomb)
 	_hits_before = boss.hits_left()
 	core_arrow.show()
+	_focus([player, _practice, boss.get_node("Rig/Core"), core_arrow])
 	await _step("THROW IT AT THE GLOWING CORE!\nFACE THE KING AND PRESS  X", _hit_core)
 	core_arrow.hide()
+	_focus([])
 	if not _skip:
 		hud.coach("YES!!  THAT'S HOW YOU HURT HIM.\nNOW DODGE HIS ATTACKS.  GO!")
 		await get_tree().create_timer(2.6, false).timeout
@@ -108,10 +114,30 @@ func _spawn_practice_bomb() -> void:
 	_practice.global_position = Vector2(clampf(player.global_position.x + 220.0 * player.facing, 120.0, 2440.0), 610.0)
 	_practice.get_node("FuseTimer").stop()
 	_practice.get_node("AnimationPlayer").stop()
+	if not _lifted.is_empty():
+		_focus(_lifted + [_practice])  # the lesson is now about the bomb too
+
+
+## Greys out the world except `nodes`, lifted above the Spotlight; an empty list clears it.
+func _focus(nodes: Array) -> void:
+	for n in _lifted:
+		if is_instance_valid(n):
+			n.z_index -= LIFT
+	_lifted.clear()
+	for n in nodes:
+		if is_instance_valid(n):
+			n.z_index += LIFT
+			_lifted.append(n)
+	spotlight.show()
+	var fade := create_tween()
+	fade.tween_property(spotlight, "material:shader_parameter/amount", 1.0 if _lifted else 0.0, 0.25)
+	if _lifted.is_empty():
+		fade.tween_callback(spotlight.hide)
 
 
 func _finish() -> void:
 	done = true
+	_focus([])
 	hud.coach("")
 	hud.show_hint("")
 	core_arrow.hide()
