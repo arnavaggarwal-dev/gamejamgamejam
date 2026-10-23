@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" path="res://assets/art/world/platform.png" id="11_platform"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="6_hud"]
 [ext_resource type="PackedScene" path="res://scenes/fx/film_filter.tscn" id="7_film"]
+[ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="12_pause"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
 size = Vector2(1400, 80)
@@ -186,5 +187,7 @@ position = Vector2(640, 360)
 script = ExtResource("2_cam")
 
 [node name="HUD" parent="." instance=ExtResource("6_hud")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("12_pause")]
 
 [node name="FilmFilter" parent="." instance=ExtResource("7_film")]

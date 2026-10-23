@@ -85,7 +85,7 @@ text = "START"
 layout_mode = 2
 theme_override_colors/font_color = Color(0.859, 0.851, 0.569, 1)
 text = "A/D MOVE   SPACE JUMP
-J GRAB + THROW   HOLD W TO LOB"
+J GRAB/THROW   W+J LOB   ESC PAUSE"
 horizontal_alignment = 1
 
 [node name="FilmFilter" parent="." instance=ExtResource("2_film")]

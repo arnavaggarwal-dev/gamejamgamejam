@@ -32,6 +32,7 @@ func _run() -> void:
 	await _test_game_wiring()
 	await _test_phase_extras()
 	await _test_skip_phase()
+	await _test_pause()
 	await _test_title()
 	if _errors.count:
 		printerr("%d engine/script error(s) during tests" % _errors.count)
@@ -181,6 +182,25 @@ func _test_skip_phase() -> void:
 	game.queue_free()
 	await process_frame
 	Engine.time_scale = 1.0
+
+
+func _test_pause() -> void:
+	var game: Node2D = load("res://scenes/game.tscn").instantiate()
+	root.add_child(game)
+	await process_frame
+	var menu: PauseMenu = game.get_node("PauseMenu")
+	var press := InputEventAction.new()
+	press.action = "pause"
+	press.pressed = true
+	Input.parse_input_event(press)
+	await process_frame
+	check(paused and menu.visible, "pause key freezes the fight and shows the menu")
+	check(menu.fullscreen.text.begins_with("FULLSCREEN: "), "fullscreen button shows its state")
+	menu.resume.pressed.emit()
+	check(not paused and not menu.visible, "resume unfreezes and hides the menu")
+	game.queue_free()
+	await process_frame
+	paused = false
 
 
 func _test_title() -> void:
