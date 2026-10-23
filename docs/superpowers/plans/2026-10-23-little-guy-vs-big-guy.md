@@ -615,8 +615,8 @@ const JUMP_BUFFER := 0.12
 
 @export var speed := 330.0
 @export var accel := 2600.0
-@export var gravity := 1800.0
-@export var jump_velocity := -640.0
+@export var gravity := 2000.0
+@export var jump_velocity := -900.0  # apex ~202 px clears the 172 px side platforms
 @export var throw_velocity := Vector2(620, -760)  # tune in the Task 6 playtest
 @export var lob_velocity := Vector2(300, -900)  # used while aim_up is held
 
@@ -3091,7 +3091,7 @@ texture = ExtResource("art_bomb")
 
 - [ ] **Step 4: Run tests**
 
-Run the test commands. Expected: 21 `PASS` lines, `0 failure(s)`, no `ERROR:` lines about missing resources.
+Run the test commands. Expected: 23 `PASS` lines, `0 failure(s)`, no `ERROR:` lines about missing resources.
 
 - [ ] **Step 5: User check (F5)**
 
@@ -3208,7 +3208,7 @@ autoplay = true
 
 - [ ] **Step 6: Run tests**
 
-Run the test commands. Expected: 21 `PASS` lines, `0 failure(s)`.
+Run the test commands. Expected: 23 `PASS` lines, `0 failure(s)`.
 
 - [ ] **Step 7: User check (F5)**
 
