@@ -1,0 +1,32 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/fx/bomb.png" id="1_8il4y"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a6gff"]
+atlas = ExtResource("1_8il4y")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hp0w7"]
+atlas = ExtResource("1_8il4y")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hh3nb"]
+atlas = ExtResource("1_8il4y")
+region = Rect2(32, 0, 16, 16)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a6gff")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hp0w7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hh3nb")
+}],
+"loop": 1,
+"name": &"fuse",
+"speed": 12.0
+}]

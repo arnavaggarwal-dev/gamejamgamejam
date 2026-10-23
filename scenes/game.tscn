@@ -4,38 +4,11 @@
 [ext_resource type="Script" path="res://scenes/camera.gd" id="2_cam"]
 [ext_resource type="PackedScene" path="res://scenes/boss/boss.tscn" id="5_boss"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="3_player"]
-[ext_resource type="Material" path="res://assets/shaders/boil_material.tres" id="4_boil"]
+[ext_resource type="Texture2D" path="res://assets/art/world/background.png" id="4_bg"]
+[ext_resource type="Texture2D" path="res://assets/art/world/floor.png" id="10_floor"]
+[ext_resource type="Texture2D" path="res://assets/art/world/platform.png" id="11_platform"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="6_hud"]
 [ext_resource type="PackedScene" path="res://scenes/fx/film_filter.tscn" id="7_film"]
-
-[sub_resource type="Gradient" id="Gradient_sky"]
-offsets = PackedFloat32Array(0, 1)
-colors = PackedColorArray(0.573, 0.71, 0.859, 1, 0.725, 0.569, 0.863, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_sky"]
-gradient = SubResource("Gradient_sky")
-width = 1280
-height = 720
-fill_from = Vector2(0, 0)
-fill_to = Vector2(0, 1)
-
-[sub_resource type="Gradient" id="Gradient_floor"]
-offsets = PackedFloat32Array(0, 1)
-colors = PackedColorArray(0.427, 0.631, 0.427, 1, 0.427, 0.631, 0.427, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_floor"]
-gradient = SubResource("Gradient_floor")
-width = 1400
-height = 80
-
-[sub_resource type="Gradient" id="Gradient_platform"]
-offsets = PackedFloat32Array(0, 1)
-colors = PackedColorArray(0.62, 0.412, 0.42, 1, 0.62, 0.412, 0.42, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_platform"]
-gradient = SubResource("Gradient_platform")
-width = 200
-height = 24
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
 size = Vector2(1400, 80)
@@ -132,7 +105,8 @@ script = ExtResource("1_game")
 
 [node name="Background" type="Sprite2D" parent="."]
 position = Vector2(640, 360)
-texture = SubResource("GradientTexture2D_sky")
+scale = Vector2(4, 4)
+texture = ExtResource("4_bg")
 
 [node name="Boss" parent="." node_paths=PackedStringArray("projectiles") instance=ExtResource("5_boss")]
 projectiles = NodePath("../Projectiles")
@@ -146,8 +120,8 @@ position = Vector2(640, 680)
 shape = SubResource("RectangleShape2D_floor")
 
 [node name="Art" type="Sprite2D" parent="Arena/Floor"]
-material = ExtResource("4_boil")
-texture = SubResource("GradientTexture2D_floor")
+scale = Vector2(4, 4)
+texture = ExtResource("10_floor")
 
 [node name="WallL" type="StaticBody2D" parent="Arena"]
 position = Vector2(-20, 360)
@@ -169,8 +143,8 @@ shape = SubResource("RectangleShape2D_platform")
 one_way_collision = true
 
 [node name="Art" type="Sprite2D" parent="Arena/PlatformL"]
-material = ExtResource("4_boil")
-texture = SubResource("GradientTexture2D_platform")
+scale = Vector2(4, 4)
+texture = ExtResource("11_platform")
 
 [node name="PlatformM" type="StaticBody2D" parent="Arena"]
 position = Vector2(540, 400)
@@ -180,8 +154,8 @@ shape = SubResource("RectangleShape2D_platform")
 one_way_collision = true
 
 [node name="Art" type="Sprite2D" parent="Arena/PlatformM"]
-material = ExtResource("4_boil")
-texture = SubResource("GradientTexture2D_platform")
+scale = Vector2(4, 4)
+texture = ExtResource("11_platform")
 
 [node name="PlatformR" type="StaticBody2D" parent="Arena"]
 position = Vector2(820, 480)
@@ -191,8 +165,8 @@ shape = SubResource("RectangleShape2D_platform")
 one_way_collision = true
 
 [node name="Art" type="Sprite2D" parent="Arena/PlatformR"]
-material = ExtResource("4_boil")
-texture = SubResource("GradientTexture2D_platform")
+scale = Vector2(4, 4)
+texture = ExtResource("11_platform")
 
 [node name="ArenaAnim" type="AnimationPlayer" parent="Arena"]
 libraries = {

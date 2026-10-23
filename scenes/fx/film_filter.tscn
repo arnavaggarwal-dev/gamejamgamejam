@@ -4,11 +4,8 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_film"]
 shader = ExtResource("1_film")
-shader_parameter/fade = 0.15
-shader_parameter/tint = Vector3(1, 0.94, 0.82)
-shader_parameter/grain = 0.07
-shader_parameter/flicker = 0.04
-shader_parameter/vignette = 0.9
+shader_parameter/tint = Color(0.176, 0.153, 0.188, 1)
+shader_parameter/strength = 0.35
 
 [node name="FilmFilter" type="CanvasLayer"]
 layer = 20

@@ -2,7 +2,7 @@ class_name Boss
 extends Node2D
 ## King Kilowatt. Cycles a fixed attack pattern per phase; only thrown bombs hurt him.
 ## Attacks live in the AnimationPlayer: value tracks move the rig and toggle hitboxes,
-## method tracks call aim_slam / slam_impact / spawn_bomb / laser_fire / shake at the right frames.
+## method tracks call aim_slam / slam_impact / spawn_bomb / laser_fire / death_boom / shake at the right frames.
 
 signal health_changed(hits_left: int, hits_total: int)
 signal phase_changed(phase: int)  # 0-based: the second phase emits 1
@@ -14,6 +14,9 @@ const HITS_PER_PHASE := 3
 const FLOOR_Y := 640.0
 const BOMB_SCENE := preload("res://scenes/boss/bomb.tscn")
 const SHOCKWAVE_SCENE := preload("res://scenes/boss/shockwave.tscn")
+const SPARK_SCENE := preload("res://scenes/fx/spark.tscn")
+const EXPLOSION_SCENE := preload("res://scenes/fx/explosion.tscn")
+const DUST_SCENE := preload("res://scenes/fx/dust.tscn")
 const PHASES := [
 	{attacks = [&"slam", &"bombs"], speed = 1.0, rest = 1.2},
 	{attacks = [&"slam", &"bombs", &"laser", &"bombs"], speed = 1.2, rest = 0.9},
@@ -76,6 +79,7 @@ func take_hit() -> bool:
 	hp -= 1
 	health_changed.emit(hits_left(), hits_total())
 	get_tree().call_group("camera", "hitstop", 0.08)
+	_fx(SPARK_SCENE, $Rig/Core.global_position)
 	if hp <= 0:
 		_advance_phase()
 	else:
@@ -107,6 +111,7 @@ func slam_impact() -> void:
 		wave.direction = dir
 		_spawn_parent().add_child(wave)
 		wave.global_position = Vector2(slam_anchor.global_position.x, FLOOR_Y)
+		_fx(DUST_SCENE, Vector2(slam_anchor.global_position.x + dir * 72.0, FLOOR_Y - 16.0))
 
 
 func spawn_bomb() -> void:
@@ -118,6 +123,19 @@ func spawn_bomb() -> void:
 
 func laser_fire() -> void:
 	shake(6.0)
+
+
+## A chain of blasts across the king's body while he goes down.
+func death_boom() -> void:
+	shake(16.0)
+	var torso: Vector2 = $Rig/Torso.global_position
+	_fx(EXPLOSION_SCENE, torso + Vector2(randf_range(-150.0, 150.0), randf_range(-220.0, 120.0)))
+
+
+func _fx(scene: PackedScene, at: Vector2) -> void:
+	var fx: Node2D = scene.instantiate()
+	_spawn_parent().add_child(fx)
+	fx.global_position = at
 
 
 func shake(amount: float) -> void:

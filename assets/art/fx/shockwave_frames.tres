@@ -1,0 +1,32 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/fx/shockwave.png" id="1_wmfav"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rc508"]
+atlas = ExtResource("1_wmfav")
+region = Rect2(0, 0, 20, 14)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cnxuw"]
+atlas = ExtResource("1_wmfav")
+region = Rect2(20, 0, 20, 14)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nbes1"]
+atlas = ExtResource("1_wmfav")
+region = Rect2(40, 0, 20, 14)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rc508")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cnxuw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nbes1")
+}],
+"loop": 1,
+"name": &"roll",
+"speed": 12.0
+}]

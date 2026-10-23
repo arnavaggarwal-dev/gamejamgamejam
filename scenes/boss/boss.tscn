@@ -1,91 +1,18 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scenes/boss/boss.gd" id="1_boss"]
-[ext_resource type="Material" path="res://assets/shaders/boil_material.tres" id="2_boil"]
-
-[sub_resource type="Gradient" id="Gradient_torso"]
-offsets = PackedFloat32Array(0, 1)
-colors = PackedColorArray(0.565, 0.337, 0.467, 1, 0.565, 0.337, 0.467, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_torso"]
-gradient = SubResource("Gradient_torso")
-width = 360
-height = 420
-
-[sub_resource type="Gradient" id="Gradient_armor"]
-offsets = PackedFloat32Array(0, 1)
-colors = PackedColorArray(0.255, 0.369, 0.608, 1, 0.255, 0.369, 0.608, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_armor"]
-gradient = SubResource("Gradient_armor")
-width = 130
-height = 100
-
-[sub_resource type="Gradient" id="Gradient_core"]
-offsets = PackedFloat32Array(0, 0.94, 1)
-colors = PackedColorArray(0.859, 0.588, 0.573, 1, 0.859, 0.588, 0.573, 1, 0.859, 0.588, 0.573, 0)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_core"]
-gradient = SubResource("Gradient_core")
-width = 130
-height = 130
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="Gradient" id="Gradient_head"]
-offsets = PackedFloat32Array(0, 1)
-colors = PackedColorArray(0.365, 0.443, 0.604, 1, 0.365, 0.443, 0.604, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_head"]
-gradient = SubResource("Gradient_head")
-width = 280
-height = 200
-
-[sub_resource type="Gradient" id="Gradient_crown"]
-offsets = PackedFloat32Array(0, 1)
-colors = PackedColorArray(0.859, 0.851, 0.569, 1, 0.859, 0.851, 0.569, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_crown"]
-gradient = SubResource("Gradient_crown")
-width = 160
-height = 60
-
-[sub_resource type="Gradient" id="Gradient_eye"]
-offsets = PackedFloat32Array(0, 0.94, 1)
-colors = PackedColorArray(0.988, 0.984, 0.988, 1, 0.988, 0.984, 0.988, 1, 0.988, 0.984, 0.988, 0)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_eye"]
-gradient = SubResource("Gradient_eye")
-width = 80
-height = 80
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="Gradient" id="Gradient_fist"]
-offsets = PackedFloat32Array(0, 0.94, 1)
-colors = PackedColorArray(0.451, 0.373, 0.694, 1, 0.451, 0.373, 0.694, 1, 0.451, 0.373, 0.694, 0)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_fist"]
-gradient = SubResource("Gradient_fist")
-width = 170
-height = 150
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="Gradient" id="Gradient_shadow"]
-offsets = PackedFloat32Array(0, 0.94, 1)
-colors = PackedColorArray(0.176, 0.153, 0.188, 0.5, 0.176, 0.153, 0.188, 0.5, 0.176, 0.153, 0.188, 0)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_shadow"]
-gradient = SubResource("Gradient_shadow")
-width = 220
-height = 40
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
+[ext_resource type="Texture2D" path="res://assets/art/boss/torso.png" id="2_torso"]
+[ext_resource type="Texture2D" path="res://assets/art/boss/armor.png" id="3_armor"]
+[ext_resource type="SpriteFrames" path="res://assets/art/boss/core_frames.tres" id="4_core"]
+[ext_resource type="SpriteFrames" path="res://assets/art/boss/target_frames.tres" id="5_target"]
+[ext_resource type="Texture2D" path="res://assets/art/boss/head.png" id="6_head"]
+[ext_resource type="Texture2D" path="res://assets/art/boss/crown.png" id="7_crown"]
+[ext_resource type="SpriteFrames" path="res://assets/art/boss/eye_frames.tres" id="8_eye"]
+[ext_resource type="Texture2D" path="res://assets/art/boss/fist_open.png" id="9_open"]
+[ext_resource type="Texture2D" path="res://assets/art/boss/fist_closed.png" id="10_closed"]
+[ext_resource type="Texture2D" path="res://assets/art/boss/reticle.png" id="11_reticle"]
+[ext_resource type="SpriteFrames" path="res://assets/art/fx/laser_warn_frames.tres" id="12_warn"]
+[ext_resource type="SpriteFrames" path="res://assets/art/fx/laser_beam_frames.tres" id="13_beam"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_core"]
 radius = 70.0
@@ -189,7 +116,7 @@ tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.85),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Vector2(0.3, 0.3), Vector2(1, 1)]
+"values": [Vector2(1.2, 1.2), Vector2(4, 4)]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -431,24 +358,32 @@ tracks/2/keys = {
 "method": &"shake"
 }]
 }
-
-[sub_resource type="Gradient" id="Gradient_warn"]
-offsets = PackedFloat32Array(0, 1)
-colors = PackedColorArray(0.859, 0.588, 0.573, 1, 0.859, 0.588, 0.573, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_warn"]
-gradient = SubResource("Gradient_warn")
-width = 1280
-height = 6
-
-[sub_resource type="Gradient" id="Gradient_beam"]
-offsets = PackedFloat32Array(0, 1)
-colors = PackedColorArray(0.859, 0.569, 0.827, 1, 0.859, 0.569, 0.827, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_beam"]
-gradient = SubResource("Gradient_beam")
-width = 1280
-height = 34
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.3, 0.7, 1.1, 1.5, 1.9),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"values": [{
+"args": [],
+"method": &"death_boom"
+}, {
+"args": [],
+"method": &"death_boom"
+}, {
+"args": [],
+"method": &"death_boom"
+}, {
+"args": [],
+"method": &"death_boom"
+}, {
+"args": [],
+"method": &"death_boom"
+}]
+}
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_beam"]
 size = Vector2(1280, 30)
@@ -578,24 +513,35 @@ script = ExtResource("1_boss")
 position = Vector2(0, 520)
 
 [node name="Torso" type="Sprite2D" parent="Rig"]
-material = ExtResource("2_boil")
 position = Vector2(1080, 470)
-texture = SubResource("GradientTexture2D_torso")
+scale = Vector2(4, 4)
+texture = ExtResource("2_torso")
 
 [node name="ArmorL" type="Sprite2D" parent="Rig"]
-material = ExtResource("2_boil")
 position = Vector2(960, 320)
-texture = SubResource("GradientTexture2D_armor")
+scale = Vector2(4, 4)
+texture = ExtResource("3_armor")
 
 [node name="ArmorR" type="Sprite2D" parent="Rig"]
-material = ExtResource("2_boil")
 position = Vector2(1200, 320)
-texture = SubResource("GradientTexture2D_armor")
+scale = Vector2(4, 4)
+texture = ExtResource("3_armor")
+flip_h = true
 
-[node name="Core" type="Sprite2D" parent="Rig"]
-material = ExtResource("2_boil")
+[node name="Core" type="Node2D" parent="Rig"]
 position = Vector2(1060, 420)
-texture = SubResource("GradientTexture2D_core")
+
+[node name="Glow" type="AnimatedSprite2D" parent="Rig/Core"]
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("4_core")
+animation = &"pulse"
+autoplay = "pulse"
+
+[node name="Target" type="AnimatedSprite2D" parent="Rig/Core"]
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("5_target")
+animation = &"blink"
+autoplay = "blink"
 
 [node name="WeakPoint" type="Area2D" parent="Rig/Core"]
 collision_layer = 16
@@ -605,25 +551,31 @@ monitorable = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Rig/Core/WeakPoint"]
 shape = SubResource("CircleShape2D_core")
 
-[node name="Head" type="Sprite2D" parent="Rig"]
-material = ExtResource("2_boil")
+[node name="Head" type="Node2D" parent="Rig"]
 position = Vector2(1090, 170)
-texture = SubResource("GradientTexture2D_head")
+
+[node name="Face" type="Sprite2D" parent="Rig/Head"]
+scale = Vector2(4, 4)
+texture = ExtResource("6_head")
 
 [node name="Crown" type="Sprite2D" parent="Rig/Head"]
-material = ExtResource("2_boil")
 position = Vector2(0, -125)
-texture = SubResource("GradientTexture2D_crown")
+scale = Vector2(4, 4)
+texture = ExtResource("7_crown")
 
-[node name="Eye" type="Sprite2D" parent="Rig/Head"]
-material = ExtResource("2_boil")
+[node name="Eye" type="AnimatedSprite2D" parent="Rig/Head"]
 position = Vector2(-50, 0)
-texture = SubResource("GradientTexture2D_eye")
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("8_eye")
+animation = &"look"
+autoplay = "look"
 
-[node name="FistL" type="Sprite2D" parent="Rig"]
-material = ExtResource("2_boil")
+[node name="FistL" type="Node2D" parent="Rig"]
 position = Vector2(880, 540)
-texture = SubResource("GradientTexture2D_fist")
+
+[node name="Hand" type="Sprite2D" parent="Rig/FistL"]
+scale = Vector2(4, 4)
+texture = ExtResource("9_open")
 
 [node name="BombSpawn" type="Marker2D" parent="Rig/FistL"]
 position = Vector2(-20, -60)
@@ -634,12 +586,15 @@ position = Vector2(500, 0)
 [node name="Shadow" type="Sprite2D" parent="Rig/SlamAnchor"]
 visible = false
 position = Vector2(0, 640)
-texture = SubResource("GradientTexture2D_shadow")
+scale = Vector2(4, 4)
+texture = ExtResource("11_reticle")
 
-[node name="FistR" type="Sprite2D" parent="Rig/SlamAnchor"]
-material = ExtResource("2_boil")
+[node name="FistR" type="Node2D" parent="Rig/SlamAnchor"]
 position = Vector2(0, -260)
-texture = SubResource("GradientTexture2D_fist")
+
+[node name="Hand" type="Sprite2D" parent="Rig/SlamAnchor/FistR"]
+scale = Vector2(4, 4)
+texture = ExtResource("10_closed")
 
 [node name="Hitbox" type="Area2D" parent="Rig/SlamAnchor/FistR"]
 collision_layer = 8
@@ -653,14 +608,19 @@ disabled = true
 [node name="LaserLow" type="Node2D" parent="."]
 position = Vector2(640, 612)
 
-[node name="Warn" type="Sprite2D" parent="LaserLow"]
+[node name="Warn" type="AnimatedSprite2D" parent="LaserLow"]
 visible = false
-texture = SubResource("GradientTexture2D_warn")
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("12_warn")
+animation = &"march"
+autoplay = "march"
 
-[node name="Beam" type="Sprite2D" parent="LaserLow"]
+[node name="Beam" type="AnimatedSprite2D" parent="LaserLow"]
 visible = false
-material = ExtResource("2_boil")
-texture = SubResource("GradientTexture2D_beam")
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("13_beam")
+animation = &"crackle"
+autoplay = "crackle"
 
 [node name="Hitbox" type="Area2D" parent="LaserLow"]
 collision_layer = 8
@@ -674,14 +634,19 @@ disabled = true
 [node name="LaserHigh" type="Node2D" parent="."]
 position = Vector2(640, 440)
 
-[node name="Warn" type="Sprite2D" parent="LaserHigh"]
+[node name="Warn" type="AnimatedSprite2D" parent="LaserHigh"]
 visible = false
-texture = SubResource("GradientTexture2D_warn")
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("12_warn")
+animation = &"march"
+autoplay = "march"
 
-[node name="Beam" type="Sprite2D" parent="LaserHigh"]
+[node name="Beam" type="AnimatedSprite2D" parent="LaserHigh"]
 visible = false
-material = ExtResource("2_boil")
-texture = SubResource("GradientTexture2D_beam")
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("13_beam")
+animation = &"crackle"
+autoplay = "crackle"
 
 [node name="Hitbox" type="Area2D" parent="LaserHigh"]
 collision_layer = 8

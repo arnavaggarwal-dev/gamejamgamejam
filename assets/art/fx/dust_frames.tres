@@ -1,0 +1,46 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/fx/dust.png" id="1_g7i01"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5hthv"]
+atlas = ExtResource("1_g7i01")
+region = Rect2(0, 0, 16, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ingi2"]
+atlas = ExtResource("1_g7i01")
+region = Rect2(16, 0, 16, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3kt6b"]
+atlas = ExtResource("1_g7i01")
+region = Rect2(32, 0, 16, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l5egd"]
+atlas = ExtResource("1_g7i01")
+region = Rect2(48, 0, 16, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ojeqd"]
+atlas = ExtResource("1_g7i01")
+region = Rect2(64, 0, 16, 8)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5hthv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ingi2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3kt6b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l5egd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ojeqd")
+}],
+"loop": 0,
+"name": &"play",
+"speed": 16.0
+}]

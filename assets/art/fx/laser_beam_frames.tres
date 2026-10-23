@@ -1,0 +1,32 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/fx/laser_beam.png" id="1_eqqpn"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r7shv"]
+atlas = ExtResource("1_eqqpn")
+region = Rect2(0, 0, 320, 12)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qogx1"]
+atlas = ExtResource("1_eqqpn")
+region = Rect2(320, 0, 320, 12)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t3c1k"]
+atlas = ExtResource("1_eqqpn")
+region = Rect2(640, 0, 320, 12)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r7shv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qogx1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t3c1k")
+}],
+"loop": 1,
+"name": &"crackle",
+"speed": 20.0
+}]

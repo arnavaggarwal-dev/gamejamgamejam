@@ -1,0 +1,25 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/boss/target.png" id="1_ipdct"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1gh6w"]
+atlas = ExtResource("1_ipdct")
+region = Rect2(0, 0, 44, 44)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_u018c"]
+atlas = ExtResource("1_ipdct")
+region = Rect2(44, 0, 44, 44)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1gh6w")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_u018c")
+}],
+"loop": 1,
+"name": &"blink",
+"speed": 3.0
+}]

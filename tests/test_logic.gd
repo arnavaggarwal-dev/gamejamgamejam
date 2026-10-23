@@ -138,7 +138,7 @@ func _test_game_wiring() -> void:
 	var boss: Boss = game.get_node("Boss")
 	var hud: HUD = game.get_node("HUD")
 	player.take_hit()
-	check(not hud.hearts[2].visible and hud.hearts[1].visible, "losing a heart updates the HUD")
+	check(hud.hearts[2].texture == HUD.HEART_EMPTY and hud.hearts[1].texture == HUD.HEART_FULL, "losing a heart updates the HUD")
 	boss.state = Boss.State.IDLE
 	boss.take_hit()
 	check(hud.boss_bar.value == boss.hits_total() - 1, "a boss hit updates the boss bar")

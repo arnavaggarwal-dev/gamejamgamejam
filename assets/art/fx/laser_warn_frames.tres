@@ -1,0 +1,25 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/fx/laser_warn.png" id="1_edmf5"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bxg8u"]
+atlas = ExtResource("1_edmf5")
+region = Rect2(0, 0, 320, 3)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_45epd"]
+atlas = ExtResource("1_edmf5")
+region = Rect2(320, 0, 320, 3)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bxg8u")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_45epd")
+}],
+"loop": 1,
+"name": &"march",
+"speed": 12.0
+}]

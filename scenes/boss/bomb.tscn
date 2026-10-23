@@ -1,7 +1,8 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scenes/boss/bomb.gd" id="1_bomb"]
-[ext_resource type="Material" path="res://assets/shaders/boil_material.tres" id="2_boil"]
+[ext_resource type="SpriteFrames" path="res://assets/art/fx/bomb_frames.tres" id="2_frames"]
+[ext_resource type="SpriteFrames" path="res://assets/art/fx/arrow_frames.tres" id="3_arrow"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_bounce"]
 friction = 0.8
@@ -12,30 +13,6 @@ radius = 20.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_blast"]
 radius = 90.0
-
-[sub_resource type="Gradient" id="Gradient_bomb"]
-offsets = PackedFloat32Array(0, 0.94, 1)
-colors = PackedColorArray(0.176, 0.153, 0.188, 1, 0.176, 0.153, 0.188, 1, 0.176, 0.153, 0.188, 0)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_bomb"]
-gradient = SubResource("Gradient_bomb")
-width = 44
-height = 44
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
-
-[sub_resource type="Gradient" id="Gradient_spark"]
-offsets = PackedFloat32Array(0, 0.94, 1)
-colors = PackedColorArray(0.859, 0.851, 0.569, 1, 0.859, 0.851, 0.569, 1, 0.859, 0.851, 0.569, 0)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_spark"]
-gradient = SubResource("Gradient_spark")
-width = 12
-height = 12
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
 
 [sub_resource type="Animation" id="Animation_fuse"]
 resource_name = "fuse"
@@ -50,7 +27,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 1, 1.1, 1.8, 1.9, 2.3, 2.4, 2.6, 2.7, 2.8, 2.9, 2.95),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "update": 1,
-"values": [Color(1, 1, 1, 1), Color(5, 5, 5, 1), Color(1, 1, 1, 1), Color(5, 5, 5, 1), Color(1, 1, 1, 1), Color(5, 5, 5, 1), Color(1, 1, 1, 1), Color(5, 5, 5, 1), Color(1, 1, 1, 1), Color(5, 5, 5, 1), Color(1, 1, 1, 1), Color(5, 5, 5, 1)]
+"values": [Color(1, 1, 1, 1), Color(3, 1.8, 1.8, 1), Color(1, 1, 1, 1), Color(3, 1.8, 1.8, 1), Color(1, 1, 1, 1), Color(3, 1.8, 1.8, 1), Color(1, 1, 1, 1), Color(3, 1.8, 1.8, 1), Color(1, 1, 1, 1), Color(3, 1.8, 1.8, 1), Color(1, 1, 1, 1), Color(3, 1.8, 1.8, 1)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_bomb"]
@@ -59,21 +36,29 @@ _data = {
 }
 
 [node name="Bomb" type="RigidBody2D"]
+z_index = 3
 collision_layer = 4
 physics_material_override = SubResource("PhysicsMaterial_bounce")
 gravity_scale = 1.5
+lock_rotation = true
 freeze_mode = 1
 script = ExtResource("1_bomb")
 
 [node name="Art" type="Node2D" parent="."]
 
-[node name="Body" type="Sprite2D" parent="Art"]
-material = ExtResource("2_boil")
-texture = SubResource("GradientTexture2D_bomb")
+[node name="Body" type="AnimatedSprite2D" parent="Art"]
+position = Vector2(2, -6)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("2_frames")
+animation = &"fuse"
+autoplay = "fuse"
 
-[node name="Spark" type="Sprite2D" parent="Art"]
-position = Vector2(8, -24)
-texture = SubResource("GradientTexture2D_spark")
+[node name="Arrow" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -48)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("3_arrow")
+animation = &"bob"
+autoplay = "bob"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_body")
@@ -93,18 +78,19 @@ shape = SubResource("CircleShape2D_blast")
 disabled = true
 
 [node name="CPUParticles2D" type="CPUParticles2D" parent="."]
+z_index = 6
 emitting = false
-amount = 24
-lifetime = 0.5
+amount = 20
+lifetime = 0.6
 one_shot = true
 explosiveness = 1.0
 spread = 180.0
-gravity = Vector2(0, 0)
-initial_velocity_min = 120.0
-initial_velocity_max = 320.0
-scale_amount_min = 6.0
-scale_amount_max = 12.0
-color = Color(0.859, 0.588, 0.573, 1)
+gravity = Vector2(0, 700)
+initial_velocity_min = 160.0
+initial_velocity_max = 380.0
+scale_amount_min = 4.0
+scale_amount_max = 8.0
+color = Color(0.859, 0.851, 0.569, 1)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {

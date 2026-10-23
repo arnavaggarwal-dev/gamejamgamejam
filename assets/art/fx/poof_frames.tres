@@ -1,0 +1,53 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/fx/poof.png" id="1_mco0c"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mli4s"]
+atlas = ExtResource("1_mco0c")
+region = Rect2(0, 0, 28, 28)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_db0rd"]
+atlas = ExtResource("1_mco0c")
+region = Rect2(28, 0, 28, 28)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eiivv"]
+atlas = ExtResource("1_mco0c")
+region = Rect2(56, 0, 28, 28)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_k8b4f"]
+atlas = ExtResource("1_mco0c")
+region = Rect2(84, 0, 28, 28)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s3m7a"]
+atlas = ExtResource("1_mco0c")
+region = Rect2(112, 0, 28, 28)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sykvb"]
+atlas = ExtResource("1_mco0c")
+region = Rect2(140, 0, 28, 28)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mli4s")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_db0rd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_eiivv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_k8b4f")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_s3m7a")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sykvb")
+}],
+"loop": 0,
+"name": &"play",
+"speed": 14.0
+}]

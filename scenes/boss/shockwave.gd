@@ -7,7 +7,7 @@ var direction := 1
 
 
 func _ready() -> void:
-	$Art.scale.x = direction
+	$Art.flip_h = direction < 0
 
 
 func _physics_process(delta: float) -> void:

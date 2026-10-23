@@ -1,0 +1,17 @@
+[remap]
+
+importer="font_data_bmfont"
+type="FontFile"
+uid="uid://djhrxlxsqx7sb"
+path="res://.godot/imported/kilowatt.fnt-e8443a82c8c5d489cc2c8fa2e40f9b8e.fontdata"
+
+[deps]
+
+source_file="res://assets/art/ui/kilowatt.fnt"
+dest_files=["res://.godot/imported/kilowatt.fnt-e8443a82c8c5d489cc2c8fa2e40f9b8e.fontdata"]
+
+[params]
+
+fallbacks=[]
+compress=true
+scaling_mode=2

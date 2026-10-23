@@ -11,8 +11,9 @@ Jam theme: "I'm just a little guy". Target: Godot 4.7, GL Compatibility.
 | Damage model | Hero cannot hit boss directly; picks up the boss's bombs and throws them back | One extra verb (grab/throw); readable dodge-grab-throw-stagger loop | playtests say it's too easy or too hard |
 | Boss | Giant robot king; armor falls off each phase | Rigid parts animate with simple tweens; visible progress | - |
 | Length | One boss, 3 phases (no boss rush); phase 3 reuses phase-2 attacks, faster, plus platform breaks | Polish over quantity; drawing eats ~1 day | Day 1 finishes early |
-| Art | Cuphead-inspired "rubber-hose lite": user hand-draws a few poses + boss parts; Godot adds film filter, line-boil shader, squash/stretch. Jame-gam palette: boss = dark row, arena = pastels, hero = teal, telegraphs = salmon | Cuphead look at a glance without frame-by-frame | drawing runs over budget (fall back to flat shapes) |
-| Boss art | Separate transparent PNG per puppet part, joints at known pivots | Cut-out animation in AnimationPlayer | - |
+| Art | Pixel art at 4x (320x180 art canvas), drawn by code in `tools/art/` (regenerate with `build_art.gd` then `build_frames.gd`). Jame-gam palette only, ink outlines on foreground, outline-free background, top-left light with hue-shifted ramps. Replaced the rubber-hose plan (2026-10-23, user found the placeholder look unreadable) | Consistent, repeatable, no artist bottleneck | the user wants to hand-draw over it |
+| Boss art | One sprite per puppet part, as 4x-scaled children so hitboxes and animation paths are unchanged | Cut-out animation in AnimationPlayer | - |
+| Readability | J prompt over grabbable bombs, bobbing arrow on loose bombs, dotted throw arc, lock-on brackets on the core, slam reticle, laser warning line, goal/laser hints, hit sparks, dust, explosions, phase flash | The user asked to "understand the game" at a glance | playtest shows clutter |
 | Language | GDScript | Fast iteration; simplest web export | - |
 | Node authoring | All nodes authored in `.tscn`, never `Node.new()` in code | Project rule | - |
 | IP | Original characters only, no Nintendo names or look-alikes | Jam rules, takedown risk | - |

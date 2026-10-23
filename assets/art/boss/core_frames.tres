@@ -1,0 +1,39 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/boss/core.png" id="1_gwtj8"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ftjbk"]
+atlas = ExtResource("1_gwtj8")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8eryb"]
+atlas = ExtResource("1_gwtj8")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6q0en"]
+atlas = ExtResource("1_gwtj8")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1gctu"]
+atlas = ExtResource("1_gwtj8")
+region = Rect2(96, 0, 32, 32)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ftjbk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8eryb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6q0en")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1gctu")
+}],
+"loop": 1,
+"name": &"pulse",
+"speed": 8.0
+}]
