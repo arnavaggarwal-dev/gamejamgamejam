@@ -11,8 +11,8 @@ const JUMP_BUFFER := 0.12
 
 @export var speed := 330.0
 @export var accel := 2600.0
-@export var gravity := 1800.0
-@export var jump_velocity := -640.0
+@export var gravity := 2000.0
+@export var jump_velocity := -900.0
 @export var throw_velocity := Vector2(620, -760)  # tune in the Task 6 playtest
 @export var lob_velocity := Vector2(300, -900)  # used while aim_up is held
 

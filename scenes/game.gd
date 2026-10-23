@@ -39,5 +39,6 @@ func _on_boss_phase_changed(phase: int) -> void:
 
 
 func _on_boss_defeated() -> void:
+	player.hurtbox.set_deferred("monitoring", false)  # deferred: defeated fires inside the WeakPoint physics callback
 	await hud.show_banner("KNOCKOUT!", 2.5)
 	hud.show_end("YOU WIN!")

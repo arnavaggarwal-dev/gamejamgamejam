@@ -86,6 +86,7 @@ func _test_arena() -> void:
 	for i in 60:
 		await physics_frame
 	check(player.is_on_floor(), "player stands on the arena floor")
+	check(pow(player.jump_velocity, 2.0) / (2.0 * player.gravity) > 640.0 - 468.0, "a jump clears the side platforms")
 	game.queue_free()
 	await process_frame
 
@@ -141,6 +142,9 @@ func _test_game_wiring() -> void:
 	boss.state = Boss.State.IDLE
 	boss.take_hit()
 	check(hud.boss_bar.value == boss.hits_total() - 1, "a boss hit updates the boss bar")
+	boss.defeated.emit()
+	await process_frame
+	check(not player.hurtbox.monitoring, "player can't be hurt after the knockout")
 	game.queue_free()
 	await process_frame
 	Engine.time_scale = 1.0
