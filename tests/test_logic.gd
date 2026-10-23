@@ -31,6 +31,7 @@ func _run() -> void:
 	await _test_boss()
 	await _test_game_wiring()
 	await _test_phase_extras()
+	await _test_skip_phase()
 	await _test_title()
 	if _errors.count:
 		printerr("%d engine/script error(s) during tests" % _errors.count)
@@ -163,6 +164,23 @@ func _test_phase_extras() -> void:
 	check(arena_anim.current_animation == "break_platforms", "phase 3 breaks the platforms")
 	game.queue_free()
 	await process_frame
+
+
+func _test_skip_phase() -> void:
+	var game: Node2D = load("res://scenes/game.tscn").instantiate()
+	root.add_child(game)
+	await process_frame
+	var boss: Boss = game.get_node("Boss")
+	var hud: HUD = game.get_node("HUD")
+	check(hud.skip_button.visible, "skip-phase button shows in debug runs")
+	hud.skip_button.pressed.emit()
+	check(boss.phase == 1 and boss.hp == Boss.HITS_PER_PHASE, "skip phase jumps to phase 2 with full hits")
+	boss.skip_phase()
+	boss.skip_phase()
+	check(boss.state == Boss.State.DEAD, "skipping from the last phase knocks the king out")
+	game.queue_free()
+	await process_frame
+	Engine.time_scale = 1.0
 
 
 func _test_title() -> void:

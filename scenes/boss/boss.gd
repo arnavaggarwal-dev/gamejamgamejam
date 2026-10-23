@@ -96,6 +96,15 @@ func restart_phase() -> void:
 	_rest()
 
 
+## Debug shortcut: jump to the next phase (from the last phase, straight to the knockout).
+func skip_phase() -> void:
+	if state == State.DEAD:
+		return
+	hp = 0
+	health_changed.emit(hits_left(), hits_total())
+	_advance_phase()
+
+
 # --- called from animation method tracks ---
 
 func aim_slam() -> void:

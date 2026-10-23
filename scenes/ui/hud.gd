@@ -3,6 +3,7 @@ extends CanvasLayer
 ## Hearts, boss bar, big banners, the goal hint and the end panel. Displays only; owns no game state.
 
 signal retry_pressed
+signal skip_phase_pressed
 
 const HEART_FULL := preload("res://assets/art/ui/heart_full.png")
 const HEART_EMPTY := preload("res://assets/art/ui/heart_empty.png")
@@ -17,10 +18,13 @@ var _banner_id := 0
 @onready var end_panel: Control = $EndPanel
 @onready var end_label: Label = $EndPanel/VBox/Label
 @onready var retry: Button = $EndPanel/VBox/Retry
+@onready var skip_button: Button = $SkipPhase
 
 
 func _ready() -> void:
 	retry.pressed.connect(retry_pressed.emit)
+	skip_button.visible = OS.is_debug_build()  # testing aid: never shows in a release export
+	skip_button.pressed.connect(skip_phase_pressed.emit)
 
 
 func set_hearts(hp: int) -> void:

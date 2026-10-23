@@ -20,11 +20,18 @@ func _ready() -> void:
 	boss.phase_changed.connect(_on_boss_phase_changed)
 	boss.defeated.connect(_on_boss_defeated)
 	hud.retry_pressed.connect(get_tree().reload_current_scene)
+	hud.skip_phase_pressed.connect(boss.skip_phase)
 	hud.set_hearts(player.hp)
 	hud.set_boss_health(boss.hits_left(), boss.hits_total())
 	await hud.show_banner("LITTLE GUY  vs  BIG GUY", 2.0)
 	hud.show_hint(GOAL_HINT)
 	boss.start_fight()
+
+
+## F2 skips to the next phase in debug runs (same as the HUD button).
+func _unhandled_input(event: InputEvent) -> void:
+	if OS.is_debug_build() and event.is_action_pressed("debug_skip_phase"):
+		boss.skip_phase()
 
 
 func _on_first_hit(_hits_left: int, _hits_total: int) -> void:
