@@ -36,7 +36,7 @@ GODOT="/c/Users/ARNAVAGGARWAL/Downloads/Utility apps/Godot_v4.7.1-stable_win64.e
 "$GODOT" --headless --path . -s tests/test_logic.gd
 ```
 
-Exit code 0 and a final line `0 failure(s)` means pass. Exit code 1 = a `FAIL` line. Exit code 2 with `TIMEOUT` = a test hit a runtime error (scroll up for the `SCRIPT ERROR`). Lines like `ObjectDB instances leaked at exit` are harmless.
+Exit code 0 and a final line `0 failure(s)` means pass. Exit code 1 = a `FAIL` line or any engine/script error (the runner counts them through a `Logger` and prints `N engine/script error(s) during tests`; scroll up for the `ERROR` / `SCRIPT ERROR`). Exit code 2 with `TIMEOUT` = the run hung. Lines like `ObjectDB instances leaked at exit` after the final line are harmless.
 
 **Palette** (use these exact `Color()` values in `.tscn` files):
 
@@ -2389,7 +2389,7 @@ func _test_phase_extras() -> void:
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run the test commands. Expected: `FAIL  phase 2 adds the laser`, `FAIL  laser animation exists`, an error about `Arena/ArenaAnim` not found, then `TIMEOUT` after 20 s, exit code 2.
+Run the test commands. Expected: `FAIL  phase 2 adds the laser`, `FAIL  laser animation exists`, an error about `Arena/ArenaAnim` not found, an `engine/script error(s) during tests` line, exit code 1.
 
 - [ ] **Step 3: Update `scenes/boss/boss.gd`**
 
@@ -2777,7 +2777,7 @@ func _test_title() -> void:
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run the test commands. Expected: error loading `res://scenes/title.tscn`, then `TIMEOUT` after 20 s, exit code 2.
+Run the test commands. Expected: error loading `res://scenes/title.tscn`, an `engine/script error(s) during tests` line, exit code 1.
 
 - [ ] **Step 3: Create `assets/shaders/film_filter.gdshader`**
 
