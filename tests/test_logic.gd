@@ -15,6 +15,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	_test_bomb()
+	await _test_player()
 	print("%d failure(s)" % failures)
 	quit(1 if failures else 0)
 
@@ -37,6 +38,27 @@ func _test_bomb() -> void:
 	bomb.explode()
 	bomb.explode()
 	check(bomb.exploded, "explode is safe to call twice")
+
+
+func _test_player() -> void:
+	var player: Player = load("res://scenes/player/player.tscn").instantiate()
+	root.add_child(player)
+	await process_frame
+	var died := [false]
+	player.died.connect(func() -> void: died[0] = true)
+	player.take_hit()
+	check(player.hp == 2, "a hit costs one heart")
+	player.take_hit()
+	check(player.hp == 2, "invulnerable right after a hit")
+	player.invuln.stop()
+	player.take_hit()
+	player.invuln.stop()
+	player.take_hit()
+	check(player.hp == 0 and died[0], "losing the last heart emits died")
+	player.reset(Vector2(100, 100))
+	check(player.hp == Player.MAX_HP and player.visible, "reset refills hearts and shows the player")
+	player.queue_free()
+	await process_frame
 
 
 func _on_timeout() -> void:
