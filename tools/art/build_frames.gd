@@ -29,6 +29,7 @@ const SHEETS := {
 	"fx/laser_warn_frames.tres": [Vector2i(640, 3), {"march": ["fx/laser_warn.png", 2, 12.0, true]}],
 	"fx/laser_beam_frames.tres": [Vector2i(640, 12), {"crackle": ["fx/laser_beam.png", 3, 20.0, true]}],
 	"boss/eye_frames.tres": [Vector2i(20, 20), {"look": ["boss/eye.png", 2, 1.5, true]}],
+	"boss/bot_frames.tres": [Vector2i(40, 44), {"hover": ["boss/bot.png", 2, 8.0, true, 0], "hurt": ["boss/bot.png", 1, 1.0, false, 2], "broken": ["boss/bot.png", 1, 1.0, false, 3]}],
 	"boss/core_frames.tres": [Vector2i(32, 32), {"pulse": ["boss/core.png", 4, 8.0, true]}],
 	"boss/target_frames.tres": [Vector2i(44, 44), {"blink": ["boss/target.png", 2, 3.0, true]}],
 	"world/gear_frames.tres": [Vector2i(104, 104), {"turn": ["world/gear.png", 6, 3.0, true]}],

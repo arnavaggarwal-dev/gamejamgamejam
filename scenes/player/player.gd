@@ -22,7 +22,7 @@ const POOF := preload("res://scenes/fx/poof.tscn")
 @export var jump_velocity := -900.0
 @export var throw_velocity := Vector2(620, -760)
 @export var lob_velocity := Vector2(300, -900)  # used while aim_up is held
-@export var dash_speed := 950.0  # for DashTimer.wait_time; i-frames the whole way
+@export var dash_speed := 1235.0  # for DashTimer.wait_time (~200 px); i-frames the whole way
 
 var hp := MAX_HP
 var facing := 1

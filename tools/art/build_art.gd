@@ -148,6 +148,7 @@ func _boss() -> void:
 	_save_sheet("boss/fist_open.png", [Boss.fist_open()])
 	_save_sheet("boss/armor.png", [Boss.armor()])
 	_save_sheet("boss/reticle.png", [Boss.reticle()])
+	_save_sheet("boss/bot.png", Boss.bot_frames())
 
 
 func _hero() -> void:

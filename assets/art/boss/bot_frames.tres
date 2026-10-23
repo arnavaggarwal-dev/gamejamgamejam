@@ -1,0 +1,49 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/boss/bot.png" id="1_byxgs"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_883g6"]
+atlas = ExtResource("1_byxgs")
+region = Rect2(120, 0, 40, 44)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s7qb0"]
+atlas = ExtResource("1_byxgs")
+region = Rect2(0, 0, 40, 44)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_scd4l"]
+atlas = ExtResource("1_byxgs")
+region = Rect2(40, 0, 40, 44)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hkgr0"]
+atlas = ExtResource("1_byxgs")
+region = Rect2(80, 0, 40, 44)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_883g6")
+}],
+"loop": 0,
+"name": &"broken",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_s7qb0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_scd4l")
+}],
+"loop": 1,
+"name": &"hover",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hkgr0")
+}],
+"loop": 0,
+"name": &"hurt",
+"speed": 1.0
+}]

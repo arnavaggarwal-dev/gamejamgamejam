@@ -1,0 +1,221 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/boss/training_bot.gd" id="1_script"]
+[ext_resource type="SpriteFrames" path="res://assets/art/boss/bot_frames.tres" id="2_bot"]
+[ext_resource type="SpriteFrames" path="res://assets/art/boss/core_frames.tres" id="3_core"]
+[ext_resource type="SpriteFrames" path="res://assets/art/boss/target_frames.tres" id="4_target"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_core"]
+radius = 48.0
+
+[sub_resource type="Animation" id="Animation_hover"]
+resource_name = "hover"
+length = 1.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Hover:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.8, 1.6),
+"transitions": PackedFloat32Array(-2, -2, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, -10), Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_die"]
+resource_name = "die"
+length = 1.6
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.6, 1.55, 1.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"values": [{
+"args": [Vector2(-30, -20)],
+"method": &"boom"
+}, {
+"args": [Vector2(36, 10)],
+"method": &"boom"
+}, {
+"args": [Vector2(0, -40)],
+"method": &"boom"
+}, {
+"args": [&"broken"],
+"method": &"emit_signal"
+}, {
+"args": [],
+"method": &"queue_free"
+}]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Hover/Art")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [&"broken"],
+"method": &"play"
+}]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Hover/Core:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Hover:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(2, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, 150)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Hover:rotation")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(2, 1),
+"update": 0,
+"values": [0.0, 0.5]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Hover:modulate")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 1, 1.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_main"]
+_data = {
+&"die": SubResource("Animation_die"),
+&"hover": SubResource("Animation_hover")
+}
+
+[sub_resource type="Animation" id="Animation_hit"]
+resource_name = "hit"
+length = 0.4
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Hover/Art")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [&"hurt"],
+"method": &"play"
+}, {
+"args": [&"hover"],
+"method": &"play"
+}]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Hover/Art:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 0.55, 0.55, 1), Color(1, 1, 1, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Hover:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.25),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1.25, 0.8), Vector2(1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_juice"]
+_data = {
+&"hit": SubResource("Animation_hit")
+}
+
+[node name="TrainingBot" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Hover" type="Node2D" parent="."]
+
+[node name="Art" type="AnimatedSprite2D" parent="Hover"]
+position = Vector2(0, -16)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("2_bot")
+animation = &"hover"
+autoplay = "hover"
+
+[node name="Core" type="Node2D" parent="Hover"]
+
+[node name="Glow" type="AnimatedSprite2D" parent="Hover/Core"]
+scale = Vector2(2, 2)
+sprite_frames = ExtResource("3_core")
+animation = &"pulse"
+autoplay = "pulse"
+
+[node name="Target" type="AnimatedSprite2D" parent="Hover/Core"]
+scale = Vector2(2, 2)
+sprite_frames = ExtResource("4_target")
+animation = &"blink"
+autoplay = "blink"
+
+[node name="WeakPoint" type="Area2D" parent="Hover/Core"]
+collision_layer = 16
+collision_mask = 4
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hover/Core/WeakPoint"]
+shape = SubResource("CircleShape2D_core")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_main")
+}
+autoplay = "hover"
+
+[node name="Juice" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_juice")
+}
+
+[connection signal="body_entered" from="Hover/Core/WeakPoint" to="." method="_on_weak_point_body_entered"]

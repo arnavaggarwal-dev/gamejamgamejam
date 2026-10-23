@@ -20,7 +20,7 @@ var _errors := ErrorCounter.new()
 func _initialize() -> void:
 	OS.add_logger(_errors)
 	# A runtime error inside a test stops _run before quit(); the watchdog ends the process instead of hanging.
-	create_timer(40.0, true, false, true).timeout.connect(_on_timeout)
+	create_timer(60.0, true, false, true).timeout.connect(_on_timeout)
 	_run.call_deferred()
 
 
@@ -36,6 +36,7 @@ func _run() -> void:
 	await _test_pause()
 	await _test_stage()
 	await _test_tutorial()
+	await _test_tutorial_rush()
 	await _test_title()
 	if _errors.count:
 		printerr("%d engine/script error(s) during tests" % _errors.count)
@@ -137,11 +138,16 @@ func _test_boss() -> void:
 	boss2.state = Boss.State.IDLE
 	var bomb: Bomb = load("res://scenes/boss/bomb.tscn").instantiate()
 	root.add_child(bomb)
-	bomb.global_position = boss2.get_node("Rig/Core").global_position
+	bomb.global_position = Vector2(200, 560)  # held here first, like a real throw
+	bomb.pick_up()
+	await physics_frame
+	var core_at: Vector2 = boss2.get_node("Rig/Core").global_position
 	bomb.throw(Vector2.ZERO)
+	bomb.global_position = core_at
 	for i in 5:
 		await physics_frame
 	check(boss2.hp == Boss.HITS_PER_PHASE - 1 and bomb.exploded, "a thrown bomb on the core hurts the boss")
+	check(bomb.global_position.distance_to(core_at) < 40.0, "the blast stays on the core, not back where the bomb was thrown from")
 	boss2.queue_free()
 	await process_frame
 
@@ -280,7 +286,8 @@ func _test_tutorial() -> void:
 	var hud: HUD = game.get_node("HUD")
 	var tutorial: Tutorial = game.get_node("Tutorial")
 	await create_timer(2.3).timeout
-	check(boss.holding and hud.coach_label.visible, "the tutorial starts with the king holding still and a big instruction")
+	check(not boss.visible and is_instance_valid(tutorial.bot) and hud.coach_label.visible, "the tutorial starts against Lil' Watt with the king hidden and a big instruction")
+	check(hud.boss_name.text == "LIL' WATT" and hud.boss_bar.value == TrainingBot.HITS, "the boss bar shows the training bot")
 	var player: Player = game.get_node("Player")
 	check(tutorial.spotlight.visible and player.z_index > tutorial.spotlight.z_index, "the lesson greys out everything but the hero")
 	Input.action_press("move_right")
@@ -304,8 +311,55 @@ func _test_tutorial() -> void:
 	skip.pressed = true
 	Input.parse_input_event(skip)
 	await create_timer(0.4).timeout
-	check(Tutorial.done and not boss.holding, "Enter skips the rest and the fight starts")
-	check(not tutorial.spotlight.visible and player.z_index < tutorial.spotlight.z_index, "skipping lifts the grey-out")
+	check(Tutorial.done and not tutorial.spotlight.visible and player.z_index < tutorial.spotlight.z_index, "Enter skips the rest and lifts the grey-out")
+	await create_timer(1.8).timeout
+	check(not is_instance_valid(tutorial.bot) and boss.visible and boss.state == Boss.State.INTRO, "skipping blows up Lil' Watt and the king rises")
+	game.queue_free()
+	await process_frame
+	Engine.time_scale = 1.0
+
+
+## A player who grabs the practice bomb and hits the core before the lesson asks must not get stuck.
+func _test_tutorial_rush() -> void:
+	Tutorial.done = false
+	var game: Node2D = load("res://scenes/game.tscn").instantiate()
+	root.add_child(game)
+	var player: Player = game.get_node("Player")
+	var boss: Boss = game.get_node("Boss")
+	var tutorial: Tutorial = game.get_node("Tutorial")
+	await create_timer(2.3).timeout
+	Input.action_press("move_right")
+	await create_timer(0.8).timeout
+	Input.action_release("move_right")
+	await create_timer(0.8).timeout
+	for action in ["jump", "dash"]:
+		Input.action_press(action)
+		await physics_frame
+		await physics_frame
+		Input.action_release(action)
+		await create_timer(1.0).timeout
+	while not is_instance_valid(tutorial._practice):
+		await physics_frame
+	player.global_position = tutorial._practice.global_position + Vector2(-30, -12)
+	await physics_frame
+	await physics_frame
+	player._grab()
+	var bomb := player.held_bomb
+	player._throw()
+	bomb.global_position = tutorial.bot.core.global_position
+	await create_timer(2.0).timeout
+	var hud: HUD = game.get_node("HUD")
+	check(tutorial.bot.hp == TrainingBot.HITS - 1 and hud.coach_label.text.begins_with("AGAIN"), "hitting the core early moves the lesson on")
+	check(player.hp == Player.MAX_HP, "a hit on Lil' Watt never hurts the thrower")
+	for i in TrainingBot.HITS - 1:
+		while not is_instance_valid(tutorial._practice) or tutorial._practice.exploded:
+			await physics_frame
+		tutorial._practice.throw(Vector2.ZERO)
+		tutorial._practice.global_position = tutorial.bot.core.global_position
+		await create_timer(0.3).timeout
+	check(hud.boss_bar.value == 0, "every hit on Lil' Watt shows on the boss bar")
+	await create_timer(4.5).timeout
+	check(Tutorial.done and boss.visible and boss.hits_left() == boss.hits_total() and hud.boss_name.text == "KING KILOWATT", "breaking Lil' Watt brings in the king at full health")
 	game.queue_free()
 	await process_frame
 	Engine.time_scale = 1.0

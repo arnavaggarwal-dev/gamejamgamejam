@@ -30,12 +30,10 @@ func _ready() -> void:
 	await hud.show_banner("LITTLE GUY  vs  BIG GUY", 2.0)
 	if Tutorial.done:
 		hud.show_hint(GOAL_HINT)
-		boss.start_fight()
 	else:
-		boss.holding = true
-		boss.start_fight()
-		await tutorial.run()
-		boss.release()
+		await tutorial.run()  # Lil' Watt first; the king stays hidden until it breaks
+		hud.show_banner("HERE COMES THE KING!", 1.6)
+	boss.start_fight()
 
 
 ## F2 skips to the next phase in debug runs (same as the HUD button).

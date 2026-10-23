@@ -1,12 +1,13 @@
 class_name Tutorial
 extends Node
 ## Hand-holding first fight: one simple instruction at a time, each waiting until the player
-## actually does it, against a king who holds still. Afterwards it shows a one-time tip the
-## first time each danger appears. Enter (or Tab / gamepad Back) skips the lesson.
+## actually does it, against Lil' Watt, a little training bot (the king stays hidden until it
+## breaks). Afterwards it shows a one-time tip the first time each danger appears.
+## Enter (or Tab / gamepad Back) skips the lesson.
 
 const BOMB := preload("res://scenes/boss/bomb.tscn")
 const STEP_PAUSE := 0.7
-const ARROW_ABOVE_CORE := Vector2(0, -110)
+const ARROW_ABOVE_CORE := Vector2(0, -140)
 const LIFT := 60  # z added to whatever the current step is about, above the Spotlight (z 50)
 
 static var done := false  # once per session, so restarts go straight to the fight
@@ -21,11 +22,16 @@ var projectiles: Node2D
 var _skip := false
 var _practice: Bomb
 var _start_x := 0.0
-var _hits_before := 0
 var _lifted: Array[CanvasItem] = []
 
 @onready var core_arrow: AnimatedSprite2D = $CoreArrow
 @onready var spotlight: ColorRect = $Spotlight
+@onready var bot: TrainingBot = $TrainingBot
+
+
+func _ready() -> void:
+	if done:
+		bot.queue_free()  # restarts go straight to the king
 
 
 func setup(p: Player, b: Boss, h: HUD, s: Stage, proj: Node2D) -> void:
@@ -45,9 +51,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		_skip = true
 
 
-## Returns once the player has finished (or skipped) the lesson.
+## Returns once Lil' Watt is in pieces, whether the player broke it or skipped the lesson.
 func run() -> void:
 	hud.show_hint("ENTER: SKIP TUTORIAL")
+	hud.set_boss_name("LIL' WATT")
+	hud.set_boss_health(bot.hp, TrainingBot.HITS)
+	bot.hit.connect(hud.set_boss_health.bind(TrainingBot.HITS))
 	_start_x = player.global_position.x
 	_focus([player])
 	await _step("WALK WITH THE  ARROW KEYS", _walked)
@@ -57,21 +66,25 @@ func run() -> void:
 		_spawn_practice_bomb()
 	await _step("A BOMB!  WALK OVER TO IT", _next_to_bomb)
 	await _step("PRESS  Z  TO PICK IT UP", _holding_bomb)
-	_hits_before = boss.hits_left()
 	core_arrow.show()
-	_focus([player, _practice, boss.get_node("Rig/Core"), core_arrow])
-	await _step("THROW IT AT THE GLOWING CORE!\nFACE THE KING AND PRESS  Z", _hit_core)
+	_focus([player, _practice, bot.core, core_arrow])
+	await _step("THROW IT AT THE GLOWING CORE!\nFACE THE ROBOT AND PRESS  Z", _bot_hit)
+	await _step("AGAIN!  BREAK LIL' WATT!", _bot_broken)
 	core_arrow.hide()
 	_focus([])
 	if not _skip:
-		hud.coach("YES!!  THAT'S HOW YOU HURT HIM.\nNOW DODGE HIS ATTACKS.  GO!")
-		await get_tree().create_timer(2.6, false).timeout
+		hud.coach("YOU BROKE IT!!\nNOW FOR THE REAL BOSS...")
+		await get_tree().create_timer(2.0, false).timeout
 	_finish()
+	if is_instance_valid(bot):
+		await bot.broken
+	hud.set_boss_name("KING KILOWATT")
+	hud.set_boss_health(boss.hits_left(), boss.hits_total())
 
 
 func _step(text: String, is_done: Callable) -> void:
-	if _skip:
-		return
+	if _skip or is_done.call():
+		return  # skipped, or the player already did it
 	hud.coach(text)
 	while not _skip and not is_done.call():
 		await get_tree().physics_frame
@@ -94,17 +107,29 @@ func _dashed() -> bool:
 
 
 func _next_to_bomb() -> bool:
-	return player.held_bomb != null or player._nearest_bomb() == _practice
+	return _bot_hit() or player.held_bomb != null or player._nearest_bomb() == _practice
 
 
 func _holding_bomb() -> bool:
-	return player.held_bomb != null
+	return _bot_hit() or player.held_bomb != null
 
 
-func _hit_core() -> bool:
-	if not is_instance_valid(_practice) and player.held_bomb == null:
-		_spawn_practice_bomb()  # it rolled away into nothing; hand them another
-	return boss.hits_left() < _hits_before
+## A hit on the bot also ends the earlier bomb steps, so a player who rushes ahead (grab and
+## throw before the lesson asks) never waits on a step they already did.
+func _bot_hit() -> bool:
+	_restock()
+	return bot.hp < TrainingBot.HITS
+
+
+func _bot_broken() -> bool:
+	_restock()
+	return bot.hp <= 0
+
+
+## Hands over a fresh practice bomb once the last one has exploded or been lost.
+func _restock() -> void:
+	if not is_instance_valid(_practice) and player.held_bomb == null and bot.hp > 0:
+		_spawn_practice_bomb()
 
 
 ## A practice bomb that never goes off, dropped a few steps ahead of the player.
@@ -141,6 +166,8 @@ func _finish() -> void:
 	hud.coach("")
 	hud.show_hint("")
 	core_arrow.hide()
+	if is_instance_valid(bot):
+		bot.break_down()
 	if is_instance_valid(_practice) and not _practice.exploded:
 		if player.held_bomb == _practice:
 			_practice.get_node("FuseTimer").start()  # skipped mid-carry: it becomes a real bomb
@@ -150,8 +177,8 @@ func _finish() -> void:
 
 
 func _process(_delta: float) -> void:
-	if core_arrow.visible:
-		core_arrow.global_position = boss.get_node("Rig/Core").global_position + ARROW_ABOVE_CORE
+	if core_arrow.visible and is_instance_valid(bot):
+		core_arrow.global_position = bot.core.global_position + ARROW_ABOVE_CORE
 	if not done or player == null:
 		return
 	if player.is_on_floor() and stage.panel_at(player.global_position.x).belt_speed != 0.0:

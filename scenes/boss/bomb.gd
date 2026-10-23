@@ -56,7 +56,7 @@ func explode() -> void:
 	if exploded:
 		return
 	exploded = true
-	set_deferred("freeze", true)
+	_settle.call_deferred(global_position)
 	art.hide()
 	arrow.hide()
 	blast_shape.set_deferred("disabled", false)
@@ -69,3 +69,10 @@ func explode() -> void:
 	blast_shape.set_deferred("disabled", true)
 	await get_tree().create_timer(0.6).timeout
 	queue_free()
+
+
+## Freezes the spent bomb where it blew up. Re-freezing a body that was frozen before (held)
+## snaps it back to where it was last frozen, the thrower's hands, so the spot is set again.
+func _settle(at: Vector2) -> void:
+	freeze = true
+	global_position = at

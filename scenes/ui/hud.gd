@@ -13,6 +13,7 @@ var _hint_id := 0
 
 @onready var hearts: Array = $Hearts.get_children()
 @onready var boss_bar: ProgressBar = $BossBar/Bar
+@onready var boss_name: Label = $BossBar/Name
 @onready var banner: Label = $Banner
 @onready var hint: Label = $Hint
 @onready var coach_label: Label = $Coach
@@ -32,6 +33,10 @@ func _ready() -> void:
 func set_hearts(hp: int) -> void:
 	for i in hearts.size():
 		hearts[i].texture = HEART_FULL if i < hp else HEART_EMPTY
+
+
+func set_boss_name(text: String) -> void:
+	boss_name.text = text
 
 
 func set_boss_health(hits_left: int, hits_total: int) -> void:

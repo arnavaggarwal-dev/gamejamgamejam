@@ -25,6 +25,7 @@
 [ext_resource type="Script" path="res://scenes/tutorial.gd" id="23_tutorial"]
 [ext_resource type="SpriteFrames" path="res://assets/art/fx/arrow_frames.tres" id="24_arrow"]
 [ext_resource type="Shader" path="res://assets/shaders/spotlight.gdshader" id="25_spot"]
+[ext_resource type="PackedScene" path="res://scenes/boss/training_bot.tscn" id="26_bot"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_spot"]
 shader = ExtResource("25_spot")
@@ -217,6 +218,7 @@ scale_amount_max = 4.0
 color = Color(0.988, 0.984, 0.988, 0.35)
 
 [node name="Boss" parent="." node_paths=PackedStringArray("projectiles") instance=ExtResource("3_boss")]
+visible = false
 projectiles = NodePath("../Projectiles")
 
 [node name="Arena" type="Node2D" parent="."]
@@ -369,6 +371,9 @@ target = NodePath("../Player")
 
 [node name="Tutorial" type="Node" parent="."]
 script = ExtResource("23_tutorial")
+
+[node name="TrainingBot" parent="Tutorial" instance=ExtResource("26_bot")]
+position = Vector2(740, 420)
 
 [node name="Spotlight" type="ColorRect" parent="Tutorial"]
 visible = false

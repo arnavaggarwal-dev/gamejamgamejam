@@ -234,3 +234,52 @@ static func reticle():
 			elif outer and floori(x / 4.0) % 2 == 0:
 				c.px(x, y, P.SALMON)
 	return c
+
+
+## Lil' Watt, the tutorial bot: a round little king on a jet with the same core in its chest.
+## Frames: hover a, hover b (jet flicker), hurt (eye shut), broken (X eye, no jet, cracked).
+static func bot_frames() -> Array:
+	var frames := []
+	for kind in ["hover_a", "hover_b", "hurt", "broken"]:
+		var c = Canvas.new(40, 44)
+		if kind != "broken":
+			var flame := [P.CREAM, P.BUTTER, P.BUTTER, P.PEACH, P.PEACH, P.SALMON, P.SALMON]
+			for i in (7 if kind == "hover_a" else 5):
+				var half := maxi(0, 3 - floori(i / 2.0))
+				c.hline(20 - half, 19 + half, 35 + i, flame[i])
+		for y in range(8, 35):
+			var dy := y - 21.0 + 0.5
+			var half := int(sqrt(maxf(0.0, 169.0 - dy * dy)))
+			_metal_span(c, 20 - half, 19 + half, y, 8)
+		c.rect(3, 23, 4, 3, P.SLATE)
+		c.rect(33, 23, 4, 3, P.SLATE)
+		# Visor with one big eye, like the king's.
+		c.rect(11, 12, 18, 6, P.INK)
+		match kind:
+			"hurt":  # > < wince
+				for p in [[15, 13], [16, 14], [15, 15], [24, 13], [23, 14], [24, 15]]:
+					c.px(p[0], p[1], P.CREAM)
+			"broken":
+				c.line(17, 13, 21, 16, P.SALMON)
+				c.line(21, 13, 17, 16, P.SALMON)
+			_:
+				c.rect(18, 13, 4, 4, P.SKY)
+				c.px(18, 13, P.CREAM)
+				c.vline(20, 14, 15, P.INK)
+		# Core socket: the glowing core sprite sits on top of this.
+		c.ellipse(20, 26, 6, 6, P.INK)
+		c.ring(20, 26, 6.5, 1.2, P.BUTTER)
+		var tilt := 1 if kind == "broken" else 0
+		for sx in [14, 20, 26]:
+			for i in 4:
+				var h := floori(i / 2.0)
+				c.hline(sx - h, sx + h, 2 + i + tilt, P.BUTTER)
+			c.px(sx, 2 + tilt, P.CREAM)
+		_gold_band(c, 12, 6 + tilt, 17, 3)
+		if kind == "broken":
+			c.recolor(P.BLUE, P.SLATE)
+			c.recolor(P.PERI, P.BLUE)
+			c.line(11, 21, 15, 29, P.INK)
+		c.outline()
+		frames.append(c)
+	return frames
