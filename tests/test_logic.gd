@@ -16,6 +16,7 @@ func _initialize() -> void:
 func _run() -> void:
 	_test_bomb()
 	await _test_player()
+	await _test_arena()
 	print("%d failure(s)" % failures)
 	quit(1 if failures else 0)
 
@@ -58,6 +59,17 @@ func _test_player() -> void:
 	player.reset(Vector2(100, 100))
 	check(player.hp == Player.MAX_HP and player.visible, "reset refills hearts and shows the player")
 	player.queue_free()
+	await process_frame
+
+
+func _test_arena() -> void:
+	var game: Node2D = load("res://scenes/game.tscn").instantiate()
+	root.add_child(game)
+	var player: Player = game.get_node("Player")
+	for i in 60:
+		await physics_frame
+	check(player.is_on_floor(), "player stands on the arena floor")
+	game.queue_free()
 	await process_frame
 
 
