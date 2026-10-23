@@ -143,6 +143,7 @@ func _play(anim_name: StringName, new_state: State) -> void:
 	state = new_state
 	anim.speed_scale = PHASES[phase].speed
 	anim.play(anim_name)
+	anim.advance(0.0)  # apply key 0 now so the reset rest pose never renders for a frame
 
 
 func _reset_rig() -> void:

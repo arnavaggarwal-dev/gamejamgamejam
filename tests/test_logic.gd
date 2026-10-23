@@ -97,6 +97,8 @@ func _test_boss() -> void:
 	root.add_child(boss)
 	await process_frame
 	check(not boss.take_hit(), "boss ignores hits during the intro")
+	boss.start_fight()
+	check(is_equal_approx(boss.rig.position.y, 520.0), "intro starts with the boss sunk, no first-frame pop")
 	check([boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"slam", &"bombs", &"slam"], "phase 1 cycles slam, bombs")
 	var phases := []
 	var won := [false]
