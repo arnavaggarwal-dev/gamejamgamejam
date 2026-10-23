@@ -40,6 +40,7 @@ const SHEETS := {
 	"world/warn_frames.tres": [Vector2i(40, 6), {"blink": ["world/warn.png", 2, 8.0, true]}],
 	"world/zap_frames.tres": [Vector2i(40, 16), {"crackle": ["world/zap.png", 3, 18.0, true]}],
 	"world/lift_frames.tres": [Vector2i(50, 12), {"hover": ["world/lift.png", 2, 10.0, true]}],
+	"world/core_hub_frames.tres": [Vector2i(12, 8), {"pulse": ["world/core_hub.png", 2, 4.0, true, 0], "dim": ["world/core_hub.png", 1, 1.0, true, 2]}],
 	"world/debris_frames.tres": [Vector2i(14, 12), {"tumble": ["world/debris.png", 2, 8.0, true]}],
 }
 

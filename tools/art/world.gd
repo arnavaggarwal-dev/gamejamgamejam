@@ -367,3 +367,40 @@ static func platform():
 	c.px(47, 2, P.BUTTER)
 	c.outline()
 	return c
+
+
+## Core platform plate: king-blue metal with a gold walking edge (outer end pieces are rounded).
+static func core_plate(end: bool):
+	var c = Canvas.new(12, 8)
+	c.rect(1, 1, 10, 6, P.BLUE)
+	c.hline(1, 10, 1, P.BUTTER)
+	c.hline(1, 10, 2, P.PERI)
+	c.hline(1, 10, 6, P.NAVY)
+	for rx in [3, 8]:
+		c.px(rx, 4, P.PERI)
+		c.px(rx + 1, 5, P.INK)
+	if end:
+		c.px(1, 1, P.CLEAR)
+		c.px(1, 6, P.CLEAR)
+		c.px(1, 2, P.BUTTER)
+	c.outline()
+	return c
+
+
+## The core platform's hub: a dark housing holding the core the plates cling to.
+## Frames: lit pulse a, lit pulse b (armed), dim (unarmed or broken).
+static func core_hub_frames() -> Array:
+	var frames := []
+	for r in [2.2, 2.8, 0.0]:
+		var c = Canvas.new(12, 8)
+		c.rect(1, 1, 10, 6, P.CHARCOAL)
+		c.hline(1, 10, 1, P.BUTTER)
+		c.ring(5.5, 4.0, 3.4, 1.0, P.BUTTER)
+		if r > 0.0:
+			c.glow_disc(5.5, 4.0, r, P.GLOW)
+		else:
+			c.ellipse(5.5, 4.0, 2.4, 2.4, P.SLATE)
+			c.px(4, 3, P.PERI)
+		c.outline()
+		frames.append(c)
+	return frames

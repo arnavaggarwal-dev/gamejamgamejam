@@ -35,6 +35,7 @@ func _run() -> void:
 	await _test_skip_phase()
 	await _test_pause()
 	await _test_stage()
+	await _test_core_platform()
 	await _test_tutorial()
 	await _test_tutorial_rush()
 	await _test_title()
@@ -253,6 +254,36 @@ func _test_stage() -> void:
 	await physics_frame
 	await physics_frame
 	check(player.hp == hp_before - 1 and player.global_position.y < 700 and not stage.panel_at(player.global_position.x).collapsed, "a pit costs a heart and respawns the player on solid floor")
+	game.queue_free()
+	await process_frame
+	Engine.time_scale = 1.0
+
+
+func _test_core_platform() -> void:
+	var game: Node2D = load("res://scenes/game.tscn").instantiate()
+	root.add_child(game)
+	await process_frame
+	var stage: Stage = game.get_node("Arena")
+	var player: Player = game.get_node("Player")
+	var plat: CorePlatform = stage.core_platforms[0]
+	player.hurtbox.monitoring = false
+	player.global_position = plat.global_position + Vector2(0, -60)
+	var home := [Vector2(-80, 0)]  # L1's home spot in core_platform.tscn
+	var drift := [0.0]
+	for i in 60:
+		await physics_frame
+		drift[0] = maxf(drift[0], plat.get_node("Parts/L1").position.distance_to(home[0]))
+	check(player.is_on_floor() and plat.anim.current_animation == &"idle" and not plat.shape.disabled, "phase 1: a core platform holds like a plain platform")
+	check(drift[0] > 0.0 and drift[0] <= 3.0, "its plates hum about fixed spots (max drift %.1f px)" % drift[0])
+	check(plat.hub.animation == &"dim" and not plat.halo.visible, "unarmed in phase 1, its core is dark")
+	stage.set_phase(1)
+	check(plat.hub.animation == &"pulse" and plat.halo.visible, "armed in phase 2, its core glows")
+	await create_timer(0.9).timeout
+	check(plat.anim.current_animation == &"break" and plat.shape.disabled and player.global_position.y > plat.global_position.y - 40.0, "phase 2: standing on it shakes it apart and drops the player")
+	check(plat.hub.animation == &"dim" and not plat.halo.visible, "the core goes dark while it is broken")
+	await create_timer(2.6).timeout
+	check(not plat.shape.disabled and plat.get_node("Parts/L1").position.distance_to(home[0]) <= 3.0, "then the core pulls the plates back into place")
+	check(plat.hub.animation == &"pulse" and plat.halo.visible, "and glows again once whole")
 	game.queue_free()
 	await process_frame
 	Engine.time_scale = 1.0

@@ -43,6 +43,8 @@ func setup(p: Player, b: Boss, h: HUD, s: Stage, proj: Node2D) -> void:
 	boss.attack_started.connect(_on_attack_started)
 	stage.zap_started.connect(_tip.bind("zap", "YELLOW STRIPES = ZAP!  GET OFF THEM!"))
 	stage.collapsed.connect(_tip.bind("collapse", "THE FLOOR IS BREAKING!  DON'T FALL IN THE HOLES!", 5.0))
+	for plat in stage.core_platforms:
+		plat.broke.connect(_tip.bind("core_platform", "GLOWING PLATFORMS FALL APART!  THEY COME BACK."))
 	player.hp_changed.connect(_on_hp_changed)
 
 

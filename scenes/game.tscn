@@ -26,6 +26,7 @@
 [ext_resource type="SpriteFrames" path="res://assets/art/fx/arrow_frames.tres" id="24_arrow"]
 [ext_resource type="Shader" path="res://assets/shaders/spotlight.gdshader" id="25_spot"]
 [ext_resource type="PackedScene" path="res://scenes/boss/training_bot.tscn" id="26_bot"]
+[ext_resource type="PackedScene" path="res://scenes/stage/core_platform.tscn" id="27_coreplat"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_spot"]
 shader = ExtResource("25_spot")
@@ -343,6 +344,14 @@ position = Vector2(760, 560)
 [node name="Slider" parent="Arena" instance=ExtResource("9_lift")]
 position = Vector2(1500, 470)
 curve = SubResource("Curve2D_slide")
+
+[node name="CorePlatforms" type="Node2D" parent="Arena"]
+
+[node name="CoreL" parent="Arena/CorePlatforms" instance=ExtResource("27_coreplat")]
+position = Vector2(540, 330)
+
+[node name="CoreR" parent="Arena/CorePlatforms" instance=ExtResource("27_coreplat")]
+position = Vector2(1760, 320)
 
 [node name="Hazards" type="Node2D" parent="Arena"]
 

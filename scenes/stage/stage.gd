@@ -1,8 +1,9 @@
 class_name Stage
 extends Node2D
 ## The arena's own moves. Phase 1 is plain stone so the king's attacks read cleanly; phase 2
-## switches on the conveyors, the lifts and zaps near the player; phase 3 flips the belts,
-## zaps more often and collapses two panels into pits under falling rubble.
+## switches on the conveyors, the lifts, zaps near the player and the core platforms that fall
+## apart underfoot; phase 3 flips the belts, zaps more often and collapses two panels into pits
+## under falling rubble.
 
 signal zap_started
 signal collapsed
@@ -23,6 +24,7 @@ var phase := 0
 @onready var zap_timer: Timer = $ZapTimer
 @onready var debris_timer: Timer = $DebrisTimer
 @onready var lifts: Array = [$Piston, $Slider]
+@onready var core_platforms: Array = $CorePlatforms.get_children()
 
 
 func _ready() -> void:
@@ -42,6 +44,8 @@ func set_phase(p: int) -> void:
 			panels[i].set_belt(BELTS[i])
 		for lift in lifts:
 			lift.get_node("AnimationPlayer").play(&"glide")
+		for plat in core_platforms:
+			plat.armed = true
 	elif phase == 2:
 		for i in BELTS:
 			panels[i].set_belt(-panels[i].belt_speed)
