@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://scenes/boss/boss.tscn" id="5_boss"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="3_player"]
 [ext_resource type="Material" path="res://assets/shaders/boil_material.tres" id="4_boil"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="6_hud"]
 
 [sub_resource type="Gradient" id="Gradient_sky"]
 offsets = PackedFloat32Array(0, 1)
@@ -122,3 +123,5 @@ position = Vector2(200, 598)
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(640, 360)
 script = ExtResource("2_cam")
+
+[node name="HUD" parent="." instance=ExtResource("6_hud")]

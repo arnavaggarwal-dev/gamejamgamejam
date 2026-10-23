@@ -29,6 +29,7 @@ func _run() -> void:
 	await _test_player()
 	await _test_arena()
 	await _test_boss()
+	await _test_game_wiring()
 	if _errors.count:
 		printerr("%d engine/script error(s) during tests" % _errors.count)
 	print("%d failure(s)" % failures)
@@ -124,3 +125,20 @@ func _test_boss() -> void:
 	check(boss2.hp == Boss.HITS_PER_PHASE - 1 and bomb.exploded, "a thrown bomb on the core hurts the boss")
 	boss2.queue_free()
 	await process_frame
+
+
+func _test_game_wiring() -> void:
+	var game: Node2D = load("res://scenes/game.tscn").instantiate()
+	root.add_child(game)
+	await process_frame
+	var player: Player = game.get_node("Player")
+	var boss: Boss = game.get_node("Boss")
+	var hud: HUD = game.get_node("HUD")
+	player.take_hit()
+	check(not hud.hearts[2].visible and hud.hearts[1].visible, "losing a heart updates the HUD")
+	boss.state = Boss.State.IDLE
+	boss.take_hit()
+	check(hud.boss_bar.value == boss.hits_total() - 1, "a boss hit updates the boss bar")
+	game.queue_free()
+	await process_frame
+	Engine.time_scale = 1.0

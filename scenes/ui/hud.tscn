@@ -1,0 +1,137 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/hud.gd" id="1_hud"]
+
+[sub_resource type="Gradient" id="Gradient_heart"]
+offsets = PackedFloat32Array(0, 0.94, 1)
+colors = PackedColorArray(0.859, 0.588, 0.573, 1, 0.859, 0.588, 0.573, 1, 0.859, 0.588, 0.573, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_heart"]
+gradient = SubResource("Gradient_heart")
+width = 40
+height = 40
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
+bg_color = Color(0.176, 0.153, 0.188, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_fill"]
+bg_color = Color(0.859, 0.588, 0.573, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+content_margin_left = 48.0
+content_margin_top = 32.0
+content_margin_right = 48.0
+content_margin_bottom = 32.0
+bg_color = Color(0.176, 0.153, 0.188, 0.85)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[node name="HUD" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_hud")
+
+[node name="Hearts" type="HBoxContainer" parent="."]
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 160.0
+offset_bottom = 64.0
+theme_override_constants/separation = 8
+
+[node name="Heart1" type="TextureRect" parent="Hearts"]
+layout_mode = 2
+texture = SubResource("GradientTexture2D_heart")
+
+[node name="Heart2" type="TextureRect" parent="Hearts"]
+layout_mode = 2
+texture = SubResource("GradientTexture2D_heart")
+
+[node name="Heart3" type="TextureRect" parent="Hearts"]
+layout_mode = 2
+texture = SubResource("GradientTexture2D_heart")
+
+[node name="BossBar" type="VBoxContainer" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -464.0
+offset_top = 20.0
+offset_right = -24.0
+offset_bottom = 80.0
+grow_horizontal = 0
+
+[node name="Name" type="Label" parent="BossBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.988, 0.984, 0.988, 1)
+theme_override_colors/font_outline_color = Color(0.176, 0.153, 0.188, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 22
+text = "KING KILOWATT"
+horizontal_alignment = 2
+
+[node name="Bar" type="ProgressBar" parent="BossBar"]
+custom_minimum_size = Vector2(440, 22)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_bar_fill")
+max_value = 9.0
+value = 9.0
+show_percentage = false
+
+[node name="Banner" type="Label" parent="."]
+visible = false
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -60.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.859, 0.851, 0.569, 1)
+theme_override_colors/font_outline_color = Color(0.176, 0.153, 0.188, 1)
+theme_override_constants/outline_size = 18
+theme_override_font_sizes/font_size = 72
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EndPanel" type="PanelContainer" parent="."]
+visible = false
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -110.0
+offset_right = 200.0
+offset_bottom = 110.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="EndPanel"]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="Label" type="Label" parent="EndPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.988, 0.984, 0.988, 1)
+theme_override_font_sizes/font_size = 48
+text = "YOU WIN!"
+horizontal_alignment = 1
+
+[node name="Retry" type="Button" parent="EndPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Play again"
