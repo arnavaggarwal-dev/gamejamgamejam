@@ -2,12 +2,23 @@ extends SceneTree
 ## Headless logic checks. Run from the project folder:
 ##   "$GODOT" --headless --path . --import
 ##   "$GODOT" --headless --path . -s tests/test_logic.gd
-## Exit code 0 = all passed.
+## Exit code 0 = all passed; 1 = a FAIL or any engine/script error; 2 = hung (watchdog).
+
+## Counts every engine or script error and warning raised while the tests run,
+## so a crash inside a test fails the suite instead of passing silently.
+class ErrorCounter extends Logger:
+	var count := 0
+
+	func _log_error(_function: String, _file: String, _line: int, _code: String, _rationale: String, _editor_notify: bool, _error_type: int, _script_backtraces: Array[ScriptBacktrace]) -> void:
+		count += 1
+
 
 var failures := 0
+var _errors := ErrorCounter.new()
 
 
 func _initialize() -> void:
+	OS.add_logger(_errors)
 	# A runtime error inside a test stops _run before quit(); the watchdog ends the process instead of hanging.
 	create_timer(20.0, true, false, true).timeout.connect(_on_timeout)
 	_run.call_deferred()
@@ -17,8 +28,10 @@ func _run() -> void:
 	_test_bomb()
 	await _test_player()
 	await _test_arena()
+	if _errors.count:
+		printerr("%d engine/script error(s) during tests" % _errors.count)
 	print("%d failure(s)" % failures)
-	quit(1 if failures else 0)
+	quit(1 if failures or _errors.count else 0)
 
 
 func check(ok: bool, what: String) -> void:
