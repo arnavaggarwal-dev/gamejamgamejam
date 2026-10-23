@@ -1,0 +1,23 @@
+[gd_scene format=3]
+
+[ext_resource type="Shader" path="res://assets/shaders/film_filter.gdshader" id="1_film"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_film"]
+shader = ExtResource("1_film")
+shader_parameter/fade = 0.15
+shader_parameter/tint = Vector3(1, 0.94, 0.82)
+shader_parameter/grain = 0.07
+shader_parameter/flicker = 0.04
+shader_parameter/vignette = 0.9
+
+[node name="FilmFilter" type="CanvasLayer"]
+layer = 20
+
+[node name="Rect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_film")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

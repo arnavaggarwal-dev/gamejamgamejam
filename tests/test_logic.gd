@@ -31,6 +31,7 @@ func _run() -> void:
 	await _test_boss()
 	await _test_game_wiring()
 	await _test_phase_extras()
+	await _test_title()
 	if _errors.count:
 		printerr("%d engine/script error(s) during tests" % _errors.count)
 	print("%d failure(s)" % failures)
@@ -157,4 +158,14 @@ func _test_phase_extras() -> void:
 	var arena_anim: AnimationPlayer = game.get_node("Arena/ArenaAnim")
 	check(arena_anim.current_animation == "break_platforms", "phase 3 breaks the platforms")
 	game.queue_free()
+	await process_frame
+
+
+func _test_title() -> void:
+	var title: Control = load("res://scenes/title.tscn").instantiate()
+	root.add_child(title)
+	await process_frame
+	check(title.get_node("VBox/Start").has_focus(), "title focuses the Start button")
+	check(title.get_node("FilmFilter/Rect").material != null, "film filter has its shader material")
+	title.queue_free()
 	await process_frame

@@ -1,0 +1,86 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/title.gd" id="1_title"]
+[ext_resource type="PackedScene" path="res://scenes/fx/film_filter.tscn" id="2_film"]
+
+[sub_resource type="Gradient" id="Gradient_bg"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.573, 0.71, 0.859, 1, 0.725, 0.569, 0.863, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_bg"]
+gradient = SubResource("Gradient_bg")
+width = 1280
+height = 720
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[node name="Title" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_title")
+
+[node name="Bg" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_bg")
+expand_mode = 1
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -560.0
+offset_top = -200.0
+offset_right = 560.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Name" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.859, 0.851, 0.569, 1)
+theme_override_colors/font_outline_color = Color(0.176, 0.153, 0.188, 1)
+theme_override_constants/outline_size = 20
+theme_override_font_sizes/font_size = 64
+text = "LITTLE GUY vs BIG GUY"
+horizontal_alignment = 1
+
+[node name="Tag" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.988, 0.984, 0.988, 1)
+theme_override_colors/font_outline_color = Color(0.176, 0.153, 0.188, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 28
+text = "I'm just a little guy."
+horizontal_alignment = 1
+
+[node name="Start" type="Button" parent="VBox"]
+custom_minimum_size = Vector2(220, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 32
+text = "Start"
+
+[node name="Controls" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.988, 0.984, 0.988, 1)
+theme_override_colors/font_outline_color = Color(0.176, 0.153, 0.188, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 20
+text = "A/D move    Space jump    J grab and throw    hold W + J to lob"
+horizontal_alignment = 1
+
+[node name="FilmFilter" parent="." instance=ExtResource("2_film")]
