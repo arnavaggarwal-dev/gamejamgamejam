@@ -30,6 +30,7 @@ func _run() -> void:
 	await _test_arena()
 	await _test_boss()
 	await _test_game_wiring()
+	await _test_phase_extras()
 	if _errors.count:
 		printerr("%d engine/script error(s) during tests" % _errors.count)
 	print("%d failure(s)" % failures)
@@ -142,3 +143,18 @@ func _test_game_wiring() -> void:
 	game.queue_free()
 	await process_frame
 	Engine.time_scale = 1.0
+
+
+func _test_phase_extras() -> void:
+	var game: Node2D = load("res://scenes/game.tscn").instantiate()
+	root.add_child(game)
+	await process_frame
+	var boss: Boss = game.get_node("Boss")
+	boss.phase = 1
+	check([boss.next_attack(), boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"slam", &"bombs", &"laser", &"bombs"], "phase 2 adds the laser")
+	check(boss.anim.has_animation(&"laser"), "laser animation exists")
+	boss.phase_changed.emit(2)
+	var arena_anim: AnimationPlayer = game.get_node("Arena/ArenaAnim")
+	check(arena_anim.current_animation == "break_platforms", "phase 3 breaks the platforms")
+	game.queue_free()
+	await process_frame

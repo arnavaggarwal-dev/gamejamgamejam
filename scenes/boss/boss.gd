@@ -2,7 +2,7 @@ class_name Boss
 extends Node2D
 ## King Kilowatt. Cycles a fixed attack pattern per phase; only thrown bombs hurt him.
 ## Attacks live in the AnimationPlayer: value tracks move the rig and toggle hitboxes,
-## method tracks call aim_slam / slam_impact / spawn_bomb / shake at the right frames.
+## method tracks call aim_slam / slam_impact / spawn_bomb / laser_fire / shake at the right frames.
 
 signal health_changed(hits_left: int, hits_total: int)
 signal phase_changed(phase: int)  # 0-based: the second phase emits 1
@@ -16,8 +16,8 @@ const BOMB_SCENE := preload("res://scenes/boss/bomb.tscn")
 const SHOCKWAVE_SCENE := preload("res://scenes/boss/shockwave.tscn")
 const PHASES := [
 	{attacks = [&"slam", &"bombs"], speed = 1.0, rest = 1.2},
-	{attacks = [&"slam", &"bombs", &"bombs"], speed = 1.2, rest = 0.9},
-	{attacks = [&"slam", &"bombs", &"bombs"], speed = 1.45, rest = 0.6},
+	{attacks = [&"slam", &"bombs", &"laser", &"bombs"], speed = 1.2, rest = 0.9},
+	{attacks = [&"slam", &"bombs", &"laser", &"bombs"], speed = 1.45, rest = 0.6},
 ]
 
 @export var projectiles: Node2D
@@ -38,6 +38,8 @@ var _rest_pose := {}
 @onready var bomb_spawn: Marker2D = $Rig/FistL/BombSpawn
 @onready var anim: AnimationPlayer = $AnimationPlayer
 @onready var rest_timer: Timer = $RestTimer
+@onready var laser_low: Node2D = $LaserLow
+@onready var laser_high: Node2D = $LaserHigh
 
 
 func _ready() -> void:
@@ -114,6 +116,10 @@ func spawn_bomb() -> void:
 	bomb.linear_velocity = Vector2(randf_range(-650.0, -250.0), -350.0)
 
 
+func laser_fire() -> void:
+	shake(6.0)
+
+
 func shake(amount: float) -> void:
 	get_tree().call_group("camera", "shake", amount)
 
@@ -154,6 +160,10 @@ func _reset_rig() -> void:
 	eye.modulate = Color.WHITE
 	shadow.hide()
 	$Rig/SlamAnchor/FistR/Hitbox/CollisionShape2D.set_deferred("disabled", true)
+	for laser: Node2D in [laser_low, laser_high]:
+		laser.get_node("Warn").hide()
+		laser.get_node("Beam").hide()
+		laser.get_node("Hitbox/CollisionShape2D").set_deferred("disabled", true)
 
 
 func _spawn_parent() -> Node:

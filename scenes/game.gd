@@ -6,6 +6,7 @@ extends Node2D
 @onready var hud: HUD = $HUD
 @onready var projectiles: Node2D = $Projectiles
 @onready var respawn: Marker2D = $RespawnPoint
+@onready var arena_anim: AnimationPlayer = $Arena/ArenaAnim
 
 
 func _ready() -> void:
@@ -32,6 +33,9 @@ func _on_player_died() -> void:
 
 func _on_boss_phase_changed(phase: int) -> void:
 	hud.show_banner("PHASE %d" % (phase + 1), 1.2)
+	if phase == 2:
+		arena_anim.play(&"break_platforms")
+		get_tree().call_group("camera", "shake", 14.0)
 
 
 func _on_boss_defeated() -> void:
