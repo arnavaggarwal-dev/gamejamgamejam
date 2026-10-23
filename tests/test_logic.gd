@@ -14,6 +14,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	_test_bomb()
 	print("%d failure(s)" % failures)
 	quit(1 if failures else 0)
 
@@ -24,6 +25,18 @@ func check(ok: bool, what: String) -> void:
 	else:
 		failures += 1
 		printerr("FAIL  ", what)
+
+
+func _test_bomb() -> void:
+	var bomb: Bomb = load("res://scenes/boss/bomb.tscn").instantiate()
+	root.add_child(bomb)
+	bomb.pick_up()
+	check(bomb.freeze and bomb.collision_layer == 0, "picked-up bomb is frozen and ghosted")
+	bomb.throw(Vector2(100, -100))
+	check(bomb.thrown and not bomb.freeze and bomb.collision_layer == Bomb.LAYER_BOMB, "thrown bomb is live")
+	bomb.explode()
+	bomb.explode()
+	check(bomb.exploded, "explode is safe to call twice")
 
 
 func _on_timeout() -> void:
