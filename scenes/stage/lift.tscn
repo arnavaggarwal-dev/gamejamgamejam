@@ -40,13 +40,18 @@ curve = SubResource("Curve2D_rise")
 rotates = false
 loop = false
 
-[node name="Body" type="AnimatableBody2D" parent="Follow"]
+[node name="Remote" type="RemoteTransform2D" parent="Follow"]
+remote_path = NodePath("../../Body")
+update_rotation = false
+update_scale = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Follow/Body"]
+[node name="Body" type="AnimatableBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Body"]
 shape = SubResource("RectangleShape2D_lift")
 one_way_collision = true
 
-[node name="Art" type="AnimatedSprite2D" parent="Follow/Body"]
+[node name="Art" type="AnimatedSprite2D" parent="Body"]
 position = Vector2(0, 12)
 scale = Vector2(4, 4)
 sprite_frames = ExtResource("1_frames")
@@ -58,4 +63,3 @@ callback_mode_process = 0
 libraries = {
 &"": SubResource("AnimationLibrary_lift")
 }
-autoplay = "glide"

@@ -98,4 +98,5 @@ static func animations() -> Dictionary:
 		"carry": [{"arms": "up"}, {"arms": "up", "bob": 1, "rx": 7.0, "ry": 6.0, "leaf": 1}],
 		"carry_run": _run_poses("up"),
 		"hurt": [{"eyes": "hurt", "bob": 1, "rx": 7.2, "ry": 5.8, "arm_dy": -1, "tail": [[3, 1], [1, 0], [0, -1]]}],
+		"dash": [{"rx": 7.6, "ry": 5.6, "bob": 1, "feet": [[2, 18], [6, 19]], "arm_dy": 0, "tail": [[3, 1], [1, 1], [0, 1]], "leaf": 1}],
 	}

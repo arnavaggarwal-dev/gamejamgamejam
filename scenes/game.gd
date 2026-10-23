@@ -1,7 +1,7 @@
 extends Node2D
 ## Arena root: wires player, boss, stage, backdrop, tutorial and HUD together and handles restarts.
 
-const GOAL_HINT := "GRAB BOMBS [J] AND THROW THEM AT THE CORE!"
+const GOAL_HINT := "GRAB BOMBS [X] AND THROW THEM AT THE CORE!"
 
 @onready var player: Player = $Player
 @onready var boss: Boss = $Boss
@@ -36,7 +36,6 @@ func _ready() -> void:
 		boss.start_fight()
 		await tutorial.run()
 		boss.release()
-	stage.start()
 
 
 ## F2 skips to the next phase in debug runs (same as the HUD button).

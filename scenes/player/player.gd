@@ -20,16 +20,21 @@ const POOF := preload("res://scenes/fx/poof.tscn")
 @export var accel := 2600.0
 @export var gravity := 2000.0
 @export var jump_velocity := -900.0
-@export var throw_velocity := Vector2(620, -760)  # tune in the Task 6 playtest
+@export var throw_velocity := Vector2(620, -760)
 @export var lob_velocity := Vector2(300, -900)  # used while aim_up is held
+@export var dash_speed := 950.0  # for DashTimer.wait_time; i-frames the whole way
 
 var hp := MAX_HP
 var facing := 1
 var held_bomb: Bomb = null
+var dashing: bool:
+	get:
+		return not dash_timer.is_stopped()
 var _coyote := 0.0
 var _jump_buffer := 0.0
 var _was_on_floor := true
 var _dead := false
+var _air_dash_ready := true  # one dash per jump
 
 @onready var art: Node2D = $Art
 @onready var flip: Node2D = $Art/Flip
@@ -41,6 +46,10 @@ var _dead := false
 @onready var anim: AnimationPlayer = $AnimationPlayer
 @onready var aim: Node2D = $Aim
 @onready var prompt: Sprite2D = $Prompt
+@onready var dash_timer: Timer = $DashTimer
+@onready var dash_cooldown: Timer = $DashCooldown
+@onready var trail: CPUParticles2D = $Trail
+@onready var juice: AnimationPlayer = $Juice
 
 
 func _ready() -> void:
@@ -56,16 +65,23 @@ func _physics_process(delta: float) -> void:
 		fell_in_pit.emit()
 		return
 	var dir := Input.get_axis("move_left", "move_right")
-	velocity.x = move_toward(velocity.x, dir * speed, accel * delta)
-	if dir != 0.0:
+	if dir != 0.0 and not dashing:
 		facing = 1 if dir > 0.0 else -1
 		flip.scale.x = facing
 
 	if is_on_floor():
 		_coyote = COYOTE_TIME
+		_air_dash_ready = true
 	else:
 		_coyote -= delta
-		velocity.y += gravity * delta
+	if Input.is_action_just_pressed("dash") and dash_cooldown.is_stopped() and _air_dash_ready:
+		_start_dash()
+	if dashing:
+		velocity = Vector2(facing * dash_speed, 0.0)
+	else:
+		velocity.x = move_toward(velocity.x, dir * speed, accel * delta)
+		if not is_on_floor():
+			velocity.y += gravity * delta
 
 	_jump_buffer = JUMP_BUFFER if Input.is_action_just_pressed("jump") else _jump_buffer - delta
 	if _jump_buffer > 0.0 and _coyote > 0.0:
@@ -98,7 +114,7 @@ func _physics_process(delta: float) -> void:
 
 
 func take_hit() -> void:
-	if _dead or not invuln.is_stopped():
+	if _dead or dashing or not invuln.is_stopped():
 		return
 	hp -= 1
 	hp_changed.emit(hp)
@@ -109,6 +125,25 @@ func take_hit() -> void:
 	invuln.start()
 	anim.play(&"hurt")
 	velocity = Vector2(-facing * 260.0, -380.0)
+
+
+## Short burst in the facing direction with i-frames, a stretch and a streak trail.
+func _start_dash() -> void:
+	if not is_on_floor():
+		_air_dash_ready = false
+	dash_timer.start()
+	dash_cooldown.start()
+	trail.emitting = true
+	juice.play(&"dash")
+	_puff(DUST, _feet())
+
+
+## DashTimer.timeout (connected in the scene). If the dash ended inside a hazard, it still hurts.
+func _end_dash() -> void:
+	trail.emitting = false
+	velocity.x = facing * speed
+	if hurtbox.monitoring and hurtbox.has_overlapping_areas():
+		take_hit()
 
 
 func reset(at: Vector2) -> void:
@@ -197,7 +232,7 @@ func _puff(scene: PackedScene, at: Vector2) -> void:
 
 
 func _on_invuln_timeout() -> void:
-	if hurtbox.has_overlapping_areas():
+	if hurtbox.monitoring and hurtbox.has_overlapping_areas():
 		take_hit()
 
 
@@ -211,6 +246,8 @@ func _update_pose(dir: float) -> void:
 	var pose := &"idle"
 	if invuln.time_left > invuln.wait_time - 0.25:
 		pose = &"hurt"
+	elif dashing and not held_bomb:
+		pose = &"dash"
 	elif held_bomb:
 		pose = &"carry_run" if moving else &"carry"
 	elif not is_on_floor():

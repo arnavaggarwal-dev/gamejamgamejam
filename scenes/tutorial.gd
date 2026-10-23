@@ -46,15 +46,16 @@ func _unhandled_input(event: InputEvent) -> void:
 func run() -> void:
 	hud.show_hint("ENTER: SKIP TUTORIAL")
 	_start_x = player.global_position.x
-	await _step("WALK WITH  A  AND  D", _walked)
-	await _step("JUMP WITH  SPACE", _jumped)
+	await _step("WALK WITH THE  ARROW KEYS", _walked)
+	await _step("JUMP WITH  Z", _jumped)
+	await _step("DASH WITH  C", _dashed)
 	if not _skip:
 		_spawn_practice_bomb()
 	await _step("A BOMB!  WALK OVER TO IT", _next_to_bomb)
-	await _step("PRESS  J  TO PICK IT UP", _holding_bomb)
+	await _step("PRESS  X  TO PICK IT UP", _holding_bomb)
 	_hits_before = boss.hits_left()
 	core_arrow.show()
-	await _step("THROW IT AT THE GLOWING CORE!\nFACE THE KING AND PRESS  J", _hit_core)
+	await _step("THROW IT AT THE GLOWING CORE!\nFACE THE KING AND PRESS  X", _hit_core)
 	core_arrow.hide()
 	if not _skip:
 		hud.coach("YES!!  THAT'S HOW YOU HURT HIM.\nNOW DODGE HIS ATTACKS.  GO!")
@@ -80,6 +81,10 @@ func _walked() -> bool:
 
 func _jumped() -> bool:
 	return not player.is_on_floor()
+
+
+func _dashed() -> bool:
+	return player.dashing
 
 
 func _next_to_bomb() -> bool:
@@ -137,7 +142,7 @@ func _on_attack_started(attack: StringName) -> void:
 		&"slam":
 			_tip("slam", "SEE THE RED RING?  A FIST IS COMING.  MOVE!")
 		&"bombs":
-			_tip("bombs", "BOMBS!  GRAB ONE [J], THROW IT AT THE CORE!")
+			_tip("bombs", "BOMBS!  GRAB ONE [X], THROW IT AT THE CORE!")
 		&"laser":
 			_tip("laser", "LASER!  LOW LINE = JUMP.  HIGH LINE = STAY DOWN.")
 

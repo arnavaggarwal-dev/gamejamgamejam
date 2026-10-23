@@ -233,15 +233,13 @@ static func railing():
 ## One floor panel tile (40x20 art = 160x80 world). Collision top is row 0; tiles 10 px wide line up across panels.
 static func floor_tile():
 	var c = Canvas.new(40, 20)
-	for y in range(1, 20):
-		for x in 40:
-			var tile := (floori(x / 10.0) + floori((y - 3) / 8.0)) % 2 == 0
-			c.px(x, y, P.ROSE if tile else P.PLUM)
+	# One calm stone colour with soft plum seams (no checker), so the floor reads without buzzing.
+	c.rect(0, 1, 40, 19, P.ROSE)
 	for x in range(0, 40, 10):
-		c.vline(x, 4, 19, P.INK)
+		c.vline(x, 4, 19, P.PLUM)
 		c.px(x + 1, 4, P.PEACH)
-	for y in [11, 19]:
-		c.hline(0, 39, y, P.INK)
+	c.hline(0, 39, 11, P.PLUM)
+	c.hline(0, 39, 19, P.INK)
 	c.hline(0, 39, 0, P.INK)
 	c.hline(0, 39, 1, P.PEACH)
 	c.hline(0, 39, 2, P.PEACH)

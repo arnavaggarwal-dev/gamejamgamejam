@@ -47,6 +47,14 @@ static func arrow_frames() -> Array:
 	return frames
 
 
+## Speed streak left behind by a dash (symmetric, so it never needs flipping).
+static func streak():
+	var c = Canvas.new(8, 2)
+	c.hline(0, 7, 0, P.MINT)
+	c.hline(1, 6, 1, P.CREAM)
+	return c
+
+
 ## 8-frame explosion: flash, fireball, breakup, smoke.
 static func explosion_frames() -> Array:
 	var frames := []

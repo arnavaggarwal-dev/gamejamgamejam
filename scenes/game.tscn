@@ -97,6 +97,7 @@ frame = 2
 [node name="Glow1" type="Sprite2D" parent="Backdrop/WallLayer"]
 position = Vector2(80, 216)
 scale = Vector2(4, 4)
+modulate = Color(1, 1, 1, 0.6)
 texture = ExtResource("19_glow")
 
 [node name="Torch1" type="AnimatedSprite2D" parent="Backdrop/WallLayer" groups=["torches"]]
@@ -110,6 +111,7 @@ frame = 1
 [node name="Glow2" type="Sprite2D" parent="Backdrop/WallLayer"]
 position = Vector2(480, 216)
 scale = Vector2(4, 4)
+modulate = Color(1, 1, 1, 0.6)
 texture = ExtResource("19_glow")
 
 [node name="Torch2" type="AnimatedSprite2D" parent="Backdrop/WallLayer" groups=["torches"]]
@@ -123,6 +125,7 @@ frame = 2
 [node name="Glow3" type="Sprite2D" parent="Backdrop/WallLayer"]
 position = Vector2(720, 216)
 scale = Vector2(4, 4)
+modulate = Color(1, 1, 1, 0.6)
 texture = ExtResource("19_glow")
 
 [node name="Torch3" type="AnimatedSprite2D" parent="Backdrop/WallLayer" groups=["torches"]]
@@ -136,6 +139,7 @@ frame = 3
 [node name="Glow4" type="Sprite2D" parent="Backdrop/WallLayer"]
 position = Vector2(1208, 216)
 scale = Vector2(4, 4)
+modulate = Color(1, 1, 1, 0.6)
 texture = ExtResource("19_glow")
 
 [node name="Torch4" type="AnimatedSprite2D" parent="Backdrop/WallLayer" groups=["torches"]]
@@ -149,6 +153,7 @@ frame = 0
 [node name="Glow5" type="Sprite2D" parent="Backdrop/WallLayer"]
 position = Vector2(1436, 216)
 scale = Vector2(4, 4)
+modulate = Color(1, 1, 1, 0.6)
 texture = ExtResource("19_glow")
 
 [node name="Torch5" type="AnimatedSprite2D" parent="Backdrop/WallLayer" groups=["torches"]]
@@ -162,6 +167,7 @@ frame = 1
 [node name="Glow6" type="Sprite2D" parent="Backdrop/WallLayer"]
 position = Vector2(1840, 216)
 scale = Vector2(4, 4)
+modulate = Color(1, 1, 1, 0.6)
 texture = ExtResource("19_glow")
 
 [node name="Torch6" type="AnimatedSprite2D" parent="Backdrop/WallLayer" groups=["torches"]]
@@ -191,7 +197,7 @@ one_shot = true
 
 [node name="Motes" type="CPUParticles2D" parent="Backdrop"]
 position = Vector2(1280, 360)
-amount = 70
+amount = 24
 lifetime = 10.0
 preprocess = 10.0
 emission_shape = 3
@@ -203,7 +209,7 @@ initial_velocity_min = 4.0
 initial_velocity_max = 12.0
 scale_amount_min = 4.0
 scale_amount_max = 4.0
-color = Color(0.988, 0.984, 0.988, 0.55)
+color = Color(0.988, 0.984, 0.988, 0.35)
 
 [node name="Boss" parent="." node_paths=PackedStringArray("projectiles") instance=ExtResource("3_boss")]
 projectiles = NodePath("../Projectiles")

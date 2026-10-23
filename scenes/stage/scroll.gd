@@ -1,7 +1,7 @@
 extends Sprite2D
 ## Scrolls a repeating texture region sideways forever (the clouds behind the windows).
 
-@export var speed := 6.0  # art px per second
+@export var speed := 3.0  # art px per second
 
 
 func _process(delta: float) -> void:

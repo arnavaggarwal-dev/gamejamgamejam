@@ -2,11 +2,16 @@ extends Node2D
 ## Throne-room scenery: the crowd cheers on cue (its CheerTimer sends it back to idle, wired in
 ## the scene), and the room darkens and the torches burn hotter each phase.
 
-const MOODS := [Color(1, 1, 1), Color(0.86, 0.8, 0.95), Color(0.72, 0.64, 0.86)]
+# Dimmed from the start so the pale wall never glares; each phase goes a step darker.
+const MOODS := [Color(0.88, 0.86, 0.92), Color(0.8, 0.75, 0.9), Color(0.68, 0.6, 0.82)]
 const TORCH_TINTS := [Color(1, 1, 1), Color(1.15, 0.9, 0.9), Color(1.35, 0.75, 0.75)]
 
 @onready var crowd: AnimatedSprite2D = $WallLayer/Crowd
 @onready var cheer_timer: Timer = $CheerTimer
+
+
+func _ready() -> void:
+	modulate = MOODS[0]
 
 
 func cheer(seconds := 1.5) -> void:

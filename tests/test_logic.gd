@@ -20,7 +20,7 @@ var _errors := ErrorCounter.new()
 func _initialize() -> void:
 	OS.add_logger(_errors)
 	# A runtime error inside a test stops _run before quit(); the watchdog ends the process instead of hanging.
-	create_timer(20.0, true, false, true).timeout.connect(_on_timeout)
+	create_timer(40.0, true, false, true).timeout.connect(_on_timeout)
 	_run.call_deferred()
 
 
@@ -92,6 +92,17 @@ func _test_arena() -> void:
 		await physics_frame
 	check(player.is_on_floor(), "player stands on the arena floor")
 	check(pow(player.jump_velocity, 2.0) / (2.0 * player.gravity) > 640.0 - 468.0, "a jump clears the side platforms")
+	player.hurtbox.monitoring = false
+	Input.action_press("dash")
+	await physics_frame
+	await physics_frame
+	Input.action_release("dash")
+	var hp_before := player.hp
+	player.take_hit()
+	check(player.dashing and absf(player.velocity.x) == player.dash_speed, "C dashes fast along the facing")
+	check(player.hp == hp_before, "a dash dodges hits")
+	await create_timer(0.3).timeout
+	check(not player.dashing and absf(player.velocity.x) < player.dash_speed, "the dash ends on its own")
 	game.queue_free()
 	await process_frame
 
@@ -214,10 +225,15 @@ func _test_stage() -> void:
 	var stage: Stage = game.get_node("Arena")
 	var player: Player = game.get_node("Player")
 	check(stage.panels.size() == 16, "the floor is 16 panels across a 2560 px arena")
-	check(stage.panels[4].belt_speed > 0.0 and stage.panels[11].belt_speed < 0.0, "conveyors push both ways")
-	var belt_before: float = stage.panels[4].belt_speed
+	var piston: Node2D = stage.get_node("Piston")
+	check(stage.panels[4].belt_speed == 0.0 and not piston.get_node("AnimationPlayer").is_playing() and stage.zap_timer.is_stopped(), "phase 1 is plain, still stone")
 	stage.set_phase(1)
-	check(stage.panels[4].belt_speed == -belt_before, "conveyors reverse on a phase change")
+	check(stage.panels[4].belt_speed > 0.0 and stage.panels[11].belt_speed < 0.0, "phase 2 starts conveyors pushing both ways")
+	check(piston.get_node("AnimationPlayer").is_playing() and not stage.zap_timer.is_stopped(), "phase 2 starts the lifts and zaps")
+	await _ride_lift(player, piston.get_node("Body"))
+	var belt_before: float = stage.panels[4].belt_speed
+	stage.set_phase(2)
+	check(stage.panels[4].belt_speed == -belt_before, "conveyors reverse in phase 3")
 	player.global_position = Vector2(240, 598)
 	stage.zap_near_player()
 	var panel: FloorPanel = stage.panel_at(240)
@@ -234,6 +250,25 @@ func _test_stage() -> void:
 	game.queue_free()
 	await process_frame
 	Engine.time_scale = 1.0
+
+
+## Stand on a moving lift for most of a cycle: the player must ride it, not float or get flung.
+func _ride_lift(player: Player, body: Node2D) -> void:
+	player.hurtbox.monitoring = false
+	player.global_position = body.global_position + Vector2(0, -60)
+	player.velocity = Vector2.ZERO
+	var off := 0
+	var worst_gap := 0.0
+	var max_up := 0.0
+	for i in 200:
+		await physics_frame
+		if i > 20:
+			off += 0 if player.is_on_floor() else 1
+			worst_gap = maxf(worst_gap, absf((body.global_position.y - 12.0) - (player.global_position.y + 42.0)))
+			max_up = minf(max_up, player.velocity.y)
+	check(off < 4 and worst_gap < 6.0, "the player rides a moving lift (off %d frames, gap %.1f px)" % [off, worst_gap])
+	check(max_up > -400.0, "a lift never launches the player (peak vy %.0f)" % max_up)
+	player.hurtbox.monitoring = true
 
 
 func _test_tutorial() -> void:
@@ -254,8 +289,13 @@ func _test_tutorial() -> void:
 	await physics_frame
 	await physics_frame
 	Input.action_release("jump")
-	await create_timer(1.5).timeout
-	check(is_instance_valid(tutorial._practice), "walking then jumping brings out a practice bomb")
+	await create_timer(1.0).timeout
+	Input.action_press("dash")
+	await physics_frame
+	await physics_frame
+	Input.action_release("dash")
+	await create_timer(1.2).timeout
+	check(is_instance_valid(tutorial._practice), "walking, jumping then dashing brings out a practice bomb")
 	var skip := InputEventAction.new()
 	skip.action = "skip_tutorial"
 	skip.pressed = true

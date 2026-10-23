@@ -65,6 +65,7 @@ func _world() -> void:
 func _fx() -> void:
 	_save_sheet("fx/bomb.png", Fx.bomb_frames())
 	_save_sheet("fx/arrow.png", Fx.arrow_frames())
+	_save_sheet("fx/streak.png", [Fx.streak()])
 	_save_sheet("fx/explosion.png", Fx.explosion_frames())
 	_save_sheet("fx/spark.png", Fx.spark_frames())
 	_save_sheet("fx/dust.png", Fx.dust_frames())
@@ -77,7 +78,7 @@ func _fx() -> void:
 func _ui() -> void:
 	_save_sheet("ui/heart_full.png", [Ui.heart(true)])
 	_save_sheet("ui/heart_empty.png", [Ui.heart(false)])
-	_save_sheet("ui/key_j.png", [Ui.key_cap("J")])
+	_save_sheet("ui/key_x.png", [Ui.key_cap("X")])
 	var font: Array = Ui.font("kilowatt.png")
 	_save("ui/kilowatt.png", font[0])
 	var f := FileAccess.open(OUT + "ui/kilowatt.fnt", FileAccess.WRITE)
