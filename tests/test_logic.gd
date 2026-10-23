@@ -369,7 +369,7 @@ func _test_title() -> void:
 	var title: Control = load("res://scenes/title.tscn").instantiate()
 	root.add_child(title)
 	await process_frame
-	check(title.get_node("VBox/Start").has_focus(), "title focuses the Start button")
+	check(title.get_node("Card/VBox/Start").has_focus(), "title focuses the Start button")
 	check(title.get_node("FilmFilter/Rect").material != null, "film filter has its shader material")
 	title.queue_free()
 	await process_frame

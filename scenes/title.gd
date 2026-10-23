@@ -8,6 +8,6 @@ func _ready() -> void:
 	boss.get_node("Rig/FistL").hide()
 	boss.get_node("Rig/Core/Target").hide()
 	boss.anim.play(&"idle")
-	var start: Button = $VBox/Start
+	var start: Button = $Card/VBox/Start
 	start.grab_focus()
 	start.pressed.connect(func() -> void: get_tree().change_scene_to_file("res://scenes/game.tscn"))
