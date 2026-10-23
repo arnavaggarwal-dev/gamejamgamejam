@@ -1,0 +1,532 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/boss/boss.gd" id="1_boss"]
+[ext_resource type="Material" path="res://assets/shaders/boil_material.tres" id="2_boil"]
+
+[sub_resource type="Gradient" id="Gradient_torso"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.565, 0.337, 0.467, 1, 0.565, 0.337, 0.467, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_torso"]
+gradient = SubResource("Gradient_torso")
+width = 360
+height = 420
+
+[sub_resource type="Gradient" id="Gradient_armor"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.255, 0.369, 0.608, 1, 0.255, 0.369, 0.608, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_armor"]
+gradient = SubResource("Gradient_armor")
+width = 130
+height = 100
+
+[sub_resource type="Gradient" id="Gradient_core"]
+offsets = PackedFloat32Array(0, 0.94, 1)
+colors = PackedColorArray(0.859, 0.588, 0.573, 1, 0.859, 0.588, 0.573, 1, 0.859, 0.588, 0.573, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_core"]
+gradient = SubResource("Gradient_core")
+width = 130
+height = 130
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_head"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.365, 0.443, 0.604, 1, 0.365, 0.443, 0.604, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_head"]
+gradient = SubResource("Gradient_head")
+width = 280
+height = 200
+
+[sub_resource type="Gradient" id="Gradient_crown"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.859, 0.851, 0.569, 1, 0.859, 0.851, 0.569, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_crown"]
+gradient = SubResource("Gradient_crown")
+width = 160
+height = 60
+
+[sub_resource type="Gradient" id="Gradient_eye"]
+offsets = PackedFloat32Array(0, 0.94, 1)
+colors = PackedColorArray(0.988, 0.984, 0.988, 1, 0.988, 0.984, 0.988, 1, 0.988, 0.984, 0.988, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_eye"]
+gradient = SubResource("Gradient_eye")
+width = 80
+height = 80
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_fist"]
+offsets = PackedFloat32Array(0, 0.94, 1)
+colors = PackedColorArray(0.451, 0.373, 0.694, 1, 0.451, 0.373, 0.694, 1, 0.451, 0.373, 0.694, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_fist"]
+gradient = SubResource("Gradient_fist")
+width = 170
+height = 150
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_shadow"]
+offsets = PackedFloat32Array(0, 0.94, 1)
+colors = PackedColorArray(0.176, 0.153, 0.188, 0.5, 0.176, 0.153, 0.188, 0.5, 0.176, 0.153, 0.188, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_shadow"]
+gradient = SubResource("Gradient_shadow")
+width = 220
+height = 40
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_core"]
+radius = 70.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fist"]
+size = Vector2(150, 130)
+
+[sub_resource type="Animation" id="Animation_idle"]
+resource_name = "idle"
+length = 1.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Head:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.8, 1.6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1090, 170), Vector2(1090, 182), Vector2(1090, 170)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig/FistL:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.8, 1.6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(880, 540), Vector2(880, 556), Vector2(880, 540)]
+}
+
+[sub_resource type="Animation" id="Animation_intro"]
+resource_name = "intro"
+length = 1.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.2),
+"transitions": PackedFloat32Array(0.4, 1),
+"update": 0,
+"values": [Vector2(0, 520), Vector2(0, 0)]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(1.2),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [14.0],
+"method": &"shake"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_slam"]
+resource_name = "slam"
+length = 1.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/SlamAnchor/FistR:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.7, 0.85, 1.1, 1.4),
+"transitions": PackedFloat32Array(0.5, 2, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, -260), Vector2(0, 40), Vector2(0, 565), Vector2(0, 565), Vector2(0, -260)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig/SlamAnchor/Shadow:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1.1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Rig/SlamAnchor/Shadow:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.85),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0.3, 0.3), Vector2(1, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Rig/SlamAnchor/FistR/Hitbox/CollisionShape2D:disabled")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.75, 1.1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [true, false, true]
+}
+tracks/4/type = "method"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath(".")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.85),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"aim_slam"
+}, {
+"args": [],
+"method": &"slam_impact"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_bombs"]
+resource_name = "bombs"
+length = 1.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/FistL:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.45, 0.75, 0.9, 1.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(880, 540), Vector2(960, 330), Vector2(840, 380), Vector2(960, 330), Vector2(840, 380), Vector2(880, 540)]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.45, 0.9),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"spawn_bomb"
+}, {
+"args": [],
+"method": &"spawn_bomb"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_stagger"]
+resource_name = "stagger"
+length = 0.8
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(14, 0), Vector2(-14, 0), Vector2(8, 0), Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_phase_2"]
+resource_name = "phase_2"
+length = 1.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/ArmorL:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.2),
+"transitions": PackedFloat32Array(2, 1),
+"update": 0,
+"values": [Vector2(960, 320), Vector2(880, 900)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig/ArmorL:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 2.5]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Rig:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1)]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [20.0],
+"method": &"shake"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_phase_3"]
+resource_name = "phase_3"
+length = 1.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/ArmorR:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.2),
+"transitions": PackedFloat32Array(2, 1),
+"update": 0,
+"values": [Vector2(1200, 320), Vector2(1280, 900)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig/ArmorR:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, -2.5]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Rig:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1)]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [20.0],
+"method": &"shake"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_death"]
+resource_name = "death"
+length = 2.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.15, 0.3, 0.45, 0.6, 2.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 2, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(16, 0), Vector2(-16, 0), Vector2(12, 0), Vector2(-12, 0), Vector2(0, 700)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 2.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(0.5, 0.5, 0.5, 1)]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [25.0],
+"method": &"shake"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_boss"]
+_data = {
+&"bombs": SubResource("Animation_bombs"),
+&"death": SubResource("Animation_death"),
+&"idle": SubResource("Animation_idle"),
+&"intro": SubResource("Animation_intro"),
+&"phase_2": SubResource("Animation_phase_2"),
+&"phase_3": SubResource("Animation_phase_3"),
+&"slam": SubResource("Animation_slam"),
+&"stagger": SubResource("Animation_stagger")
+}
+
+[node name="Boss" type="Node2D"]
+script = ExtResource("1_boss")
+
+[node name="Rig" type="Node2D" parent="."]
+position = Vector2(0, 520)
+
+[node name="Torso" type="Sprite2D" parent="Rig"]
+material = ExtResource("2_boil")
+position = Vector2(1080, 470)
+texture = SubResource("GradientTexture2D_torso")
+
+[node name="ArmorL" type="Sprite2D" parent="Rig"]
+material = ExtResource("2_boil")
+position = Vector2(960, 320)
+texture = SubResource("GradientTexture2D_armor")
+
+[node name="ArmorR" type="Sprite2D" parent="Rig"]
+material = ExtResource("2_boil")
+position = Vector2(1200, 320)
+texture = SubResource("GradientTexture2D_armor")
+
+[node name="Core" type="Sprite2D" parent="Rig"]
+material = ExtResource("2_boil")
+position = Vector2(1060, 420)
+texture = SubResource("GradientTexture2D_core")
+
+[node name="WeakPoint" type="Area2D" parent="Rig/Core"]
+collision_layer = 16
+collision_mask = 4
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rig/Core/WeakPoint"]
+shape = SubResource("CircleShape2D_core")
+
+[node name="Head" type="Sprite2D" parent="Rig"]
+material = ExtResource("2_boil")
+position = Vector2(1090, 170)
+texture = SubResource("GradientTexture2D_head")
+
+[node name="Crown" type="Sprite2D" parent="Rig/Head"]
+material = ExtResource("2_boil")
+position = Vector2(0, -125)
+texture = SubResource("GradientTexture2D_crown")
+
+[node name="Eye" type="Sprite2D" parent="Rig/Head"]
+material = ExtResource("2_boil")
+position = Vector2(-50, 0)
+texture = SubResource("GradientTexture2D_eye")
+
+[node name="FistL" type="Sprite2D" parent="Rig"]
+material = ExtResource("2_boil")
+position = Vector2(880, 540)
+texture = SubResource("GradientTexture2D_fist")
+
+[node name="BombSpawn" type="Marker2D" parent="Rig/FistL"]
+position = Vector2(-20, -60)
+
+[node name="SlamAnchor" type="Node2D" parent="Rig"]
+position = Vector2(500, 0)
+
+[node name="Shadow" type="Sprite2D" parent="Rig/SlamAnchor"]
+visible = false
+position = Vector2(0, 640)
+texture = SubResource("GradientTexture2D_shadow")
+
+[node name="FistR" type="Sprite2D" parent="Rig/SlamAnchor"]
+material = ExtResource("2_boil")
+position = Vector2(0, -260)
+texture = SubResource("GradientTexture2D_fist")
+
+[node name="Hitbox" type="Area2D" parent="Rig/SlamAnchor/FistR"]
+collision_layer = 8
+collision_mask = 0
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rig/SlamAnchor/FistR/Hitbox"]
+shape = SubResource("RectangleShape2D_fist")
+disabled = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_boss")
+}
+
+[node name="RestTimer" type="Timer" parent="."]
+one_shot = true

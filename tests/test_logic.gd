@@ -28,6 +28,7 @@ func _run() -> void:
 	_test_bomb()
 	await _test_player()
 	await _test_arena()
+	await _test_boss()
 	if _errors.count:
 		printerr("%d engine/script error(s) during tests" % _errors.count)
 	print("%d failure(s)" % failures)
@@ -89,3 +90,35 @@ func _test_arena() -> void:
 func _on_timeout() -> void:
 	printerr("TIMEOUT: a test crashed or hung")
 	quit(2)
+
+
+func _test_boss() -> void:
+	var boss: Boss = load("res://scenes/boss/boss.tscn").instantiate()
+	root.add_child(boss)
+	await process_frame
+	check(not boss.take_hit(), "boss ignores hits during the intro")
+	check([boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"slam", &"bombs", &"slam"], "phase 1 cycles slam, bombs")
+	var phases := []
+	var won := [false]
+	boss.phase_changed.connect(func(p: int) -> void: phases.append(p))
+	boss.defeated.connect(func() -> void: won[0] = true)
+	for i in boss.hits_total():
+		boss.state = Boss.State.IDLE
+		boss.take_hit()
+	check(phases == [1, 2], "phase advances every 3 hits")
+	check(won[0] and boss.state == Boss.State.DEAD, "9 hits defeat the boss")
+	boss.queue_free()
+
+	var boss2: Boss = load("res://scenes/boss/boss.tscn").instantiate()
+	root.add_child(boss2)
+	boss2.rig.position = Vector2.ZERO
+	boss2.state = Boss.State.IDLE
+	var bomb: Bomb = load("res://scenes/boss/bomb.tscn").instantiate()
+	root.add_child(bomb)
+	bomb.global_position = boss2.get_node("Rig/Core").global_position
+	bomb.throw(Vector2.ZERO)
+	for i in 5:
+		await physics_frame
+	check(boss2.hp == Boss.HITS_PER_PHASE - 1 and bomb.exploded, "a thrown bomb on the core hurts the boss")
+	boss2.queue_free()
+	await process_frame

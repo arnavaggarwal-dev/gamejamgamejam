@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scenes/game.gd" id="1_game"]
 [ext_resource type="Script" path="res://scenes/camera.gd" id="2_cam"]
+[ext_resource type="PackedScene" path="res://scenes/boss/boss.tscn" id="5_boss"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="3_player"]
 [ext_resource type="Material" path="res://assets/shaders/boil_material.tres" id="4_boil"]
 
@@ -49,6 +50,9 @@ script = ExtResource("1_game")
 [node name="Background" type="Sprite2D" parent="."]
 position = Vector2(640, 360)
 texture = SubResource("GradientTexture2D_sky")
+
+[node name="Boss" parent="." node_paths=PackedStringArray("projectiles") instance=ExtResource("5_boss")]
+projectiles = NodePath("../Projectiles")
 
 [node name="Arena" type="Node2D" parent="."]
 
