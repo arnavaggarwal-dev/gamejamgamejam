@@ -1,7 +1,7 @@
 extends Node2D
 ## Arena root: wires player, boss, stage, backdrop, tutorial and HUD together and handles restarts.
 
-const GOAL_HINT := "GRAB BOMBS [X] AND THROW THEM AT THE CORE!"
+const GOAL_HINT := "GRAB BOMBS [Z] AND THROW THEM AT THE CORE!"
 
 @onready var player: Player = $Player
 @onready var boss: Boss = $Boss

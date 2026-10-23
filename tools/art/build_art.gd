@@ -78,7 +78,7 @@ func _fx() -> void:
 func _ui() -> void:
 	_save_sheet("ui/heart_full.png", [Ui.heart(true)])
 	_save_sheet("ui/heart_empty.png", [Ui.heart(false)])
-	_save_sheet("ui/key_x.png", [Ui.key_cap("X")])
+	_save_sheet("ui/key_z.png", [Ui.key_cap("Z")])
 	var font: Array = Ui.font("kilowatt.png")
 	_save("ui/kilowatt.png", font[0])
 	var f := FileAccess.open(OUT + "ui/kilowatt.fnt", FileAccess.WRITE)

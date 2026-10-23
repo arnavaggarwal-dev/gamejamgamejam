@@ -84,8 +84,8 @@ text = "START"
 [node name="Controls" type="Label" parent="VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.859, 0.851, 0.569, 1)
-text = "ARROWS MOVE   Z JUMP   C DASH
-X GRAB/THROW   UP+X LOB   ESC PAUSE"
+text = "ARROWS MOVE   X JUMP   C DASH
+Z GRAB/THROW   UP+Z LOB   ESC PAUSE"
 horizontal_alignment = 1
 
 [node name="FilmFilter" parent="." instance=ExtResource("2_film")]

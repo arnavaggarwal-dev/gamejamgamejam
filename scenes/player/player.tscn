@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scenes/player/player.gd" id="1_player"]
 [ext_resource type="SpriteFrames" path="res://assets/art/hero/hero_frames.tres" id="2_frames"]
 [ext_resource type="Script" path="res://scenes/player/aim.gd" id="3_aim"]
-[ext_resource type="Texture2D" path="res://assets/art/ui/key_x.png" id="4_key"]
+[ext_resource type="Texture2D" path="res://assets/art/ui/key_z.png" id="4_key"]
 [ext_resource type="Texture2D" path="res://assets/art/fx/streak.png" id="5_streak"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
