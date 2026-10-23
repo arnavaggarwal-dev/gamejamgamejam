@@ -581,6 +581,7 @@ texture = ExtResource("9_open")
 position = Vector2(-20, -60)
 
 [node name="SlamAnchor" type="Node2D" parent="Rig"]
+z_index = 1
 position = Vector2(500, 0)
 
 [node name="Shadow" type="Sprite2D" parent="Rig/SlamAnchor"]

@@ -6,6 +6,7 @@ func _ready() -> void:
 	var boss: Boss = $Boss
 	boss.rig.position = Vector2.ZERO
 	boss.get_node("Rig/FistL").hide()
+	boss.get_node("Rig/Core/Target").hide()
 	boss.anim.play(&"idle")
 	var start: Button = $VBox/Start
 	start.grab_focus()

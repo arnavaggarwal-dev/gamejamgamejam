@@ -4,6 +4,8 @@ extends RigidBody2D
 
 const LAYER_BOMB := 4  # physics layer 3 "bomb"
 const EXPLOSION := preload("res://scenes/fx/explosion.tscn")
+const ARROW_OFFSET := Vector2(0, -48)
+const GROUND_DRAG := 350.0  # px/s² while touching a surface; rolling has no friction of its own
 
 var thrown := false
 var exploded := false
@@ -17,6 +19,19 @@ var exploded := false
 func _ready() -> void:
 	$FuseTimer.timeout.connect(explode)
 	$AnimationPlayer.play(&"fuse")
+
+
+## Rolling bombs coast to a stop on the floor; flight (and the player's aim arc) is untouched.
+func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
+	if state.get_contact_count() > 0:
+		state.linear_velocity.x = move_toward(state.linear_velocity.x, 0.0, GROUND_DRAG * state.step)
+
+
+## The body rolls (so bombs tumble off platforms) but pixel art must not rotate.
+func _process(_delta: float) -> void:
+	art.global_rotation = 0.0
+	arrow.global_rotation = 0.0
+	arrow.global_position = global_position + ARROW_OFFSET
 
 
 func pick_up() -> void:

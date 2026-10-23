@@ -147,6 +147,7 @@ func shake(amount: float) -> void:
 func _advance_phase() -> void:
 	rest_timer.stop()
 	if phase == PHASES.size() - 1:
+		slam_anchor.hide()  # the parked slam fist would sink into view with the rig
 		_play(&"death", State.DEAD)
 		defeated.emit()
 		return
