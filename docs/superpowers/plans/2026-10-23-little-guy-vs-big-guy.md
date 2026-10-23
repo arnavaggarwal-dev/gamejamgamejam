@@ -217,10 +217,11 @@ Controls: A/D or arrows move, Space or Z jump, J or X grab/throw, hold W or Up w
 
 - [ ] **Step 3: Ignore build output**
 
-Append one line to `.gitignore`:
+Append these lines to `.gitignore` and create an empty `build/.gdignore`, so git ignores the export output but keeps the marker that stops Godot importing (and re-packing) anything in `build/`:
 
 ```
-build/
+/build/*
+!/build/.gdignore
 ```
 
 - [ ] **Step 4: Create `assets/shaders/boil.gdshader`**
@@ -2026,7 +2027,7 @@ func _on_player_died() -> void:
 
 - [ ] **Step 9: Run tests to verify they pass**
 
-Run the test commands. Expected: 13 `PASS` lines, `0 failure(s)`, exit 0.
+Run the test commands. Expected: 14 `PASS` lines, `0 failure(s)`, exit 0.
 
 - [ ] **Step 10: User playtest (do not launch it yourself)**
 
@@ -2331,7 +2332,7 @@ func _on_boss_defeated() -> void:
 
 - [ ] **Step 7: Run tests to verify they pass**
 
-Run the test commands. Expected: 15 `PASS` lines, `0 failure(s)`, exit 0.
+Run the test commands. Expected: 16 `PASS` lines, `0 failure(s)`, exit 0.
 
 - [ ] **Step 8: Milestone playtest and tuning (user presses F5)**
 
@@ -2728,7 +2729,7 @@ func _on_boss_phase_changed(phase: int) -> void:
 
 - [ ] **Step 7: Run tests to verify they pass**
 
-Run the test commands. Expected: 18 `PASS` lines, `0 failure(s)`, exit 0.
+Run the test commands. Expected: 19 `PASS` lines, `0 failure(s)`, exit 0.
 
 - [ ] **Step 8: User playtest (F5)**
 
@@ -2963,7 +2964,7 @@ run/main_scene="res://scenes/title.tscn"
 
 - [ ] **Step 8: Run tests to verify they pass**
 
-Run the test commands. Expected: 20 `PASS` lines, `0 failure(s)`, exit 0.
+Run the test commands. Expected: 21 `PASS` lines, `0 failure(s)`, exit 0.
 
 - [ ] **Step 9: User check in the editor (F5)**
 
@@ -3090,7 +3091,7 @@ texture = ExtResource("art_bomb")
 
 - [ ] **Step 4: Run tests**
 
-Run the test commands. Expected: 20 `PASS` lines, `0 failure(s)`, no `ERROR:` lines about missing resources.
+Run the test commands. Expected: 21 `PASS` lines, `0 failure(s)`, no `ERROR:` lines about missing resources.
 
 - [ ] **Step 5: User check (F5)**
 
@@ -3207,7 +3208,7 @@ autoplay = true
 
 - [ ] **Step 6: Run tests**
 
-Run the test commands. Expected: 20 `PASS` lines, `0 failure(s)`.
+Run the test commands. Expected: 21 `PASS` lines, `0 failure(s)`.
 
 - [ ] **Step 7: User check (F5)**
 
@@ -3247,7 +3248,7 @@ dedicated_server=false
 custom_features=""
 export_filter="all_resources"
 include_filter=""
-exclude_filter="docs/*, tests/*"
+exclude_filter="docs/*, tests/*, build/*"
 export_path="build/web/index.html"
 encryption_include_filters=""
 encryption_exclude_filters=""
