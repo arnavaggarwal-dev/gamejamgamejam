@@ -189,7 +189,7 @@ func _process(_delta: float) -> void:
 	if is_instance_valid(held):
 		var fuse: Timer = held.get_node("FuseTimer")
 		if not fuse.is_stopped() and fuse.time_left < 1.3:
-			_tip("hot_bomb", "THROW IT NOW!  IT'S ABOUT TO BLOW!")
+			_tip("hot_bomb", "IT'S ABOUT TO BLOW!  THROW IT, OR [A] TO BOUNCE OFF IT!")
 
 
 func _on_attack_started(attack: StringName) -> void:

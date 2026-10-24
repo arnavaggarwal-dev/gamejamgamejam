@@ -1,6 +1,7 @@
 class_name Bomb
 extends RigidBody2D
-## Lobbed by the boss. The player picks it up and throws it back at the boss's core.
+## Lobbed by the boss. The player picks it up and throws it back at the boss's core. Its blast
+## never hurts the player: it bounces him away (Player.blast_from), so a bomb is a rocket jump.
 
 const LAYER_BOMB := 4  # physics layer 3 "bomb"
 const EXPLOSION := preload("res://scenes/fx/explosion.tscn")
@@ -8,6 +9,7 @@ const ARROW_OFFSET := Vector2(0, -48)
 const PIT_Y := 900.0
 const GROUND_DRAG := 350.0  # px/s² while touching a surface; rolling has no friction of its own
 const SPIN := 12.0  # rad/s while airborne
+const BLAST_REACH := 150.0  # px from the blast that bounces the player (times size)
 
 var thrown := false
 var exploded := false
@@ -15,14 +17,12 @@ var size := 1.0  # set before it enters the tree: phase 4's bombs come bigger, b
 
 @onready var art: Node2D = $Art
 @onready var arrow: Node2D = $Arrow
-@onready var blast_shape: CollisionShape2D = $BlastArea/CollisionShape2D
 @onready var particles: CPUParticles2D = $CPUParticles2D
 
 
 func _ready() -> void:
 	art.scale *= size
 	$CollisionShape2D.scale *= size
-	blast_shape.scale *= size
 	particles.scale_amount_min *= size
 	particles.scale_amount_max *= size
 	$FuseTimer.timeout.connect(explode)
@@ -72,16 +72,14 @@ func explode() -> void:
 	get_tree().call_group("camera", "hitstop", 0.04)
 	art.hide()
 	arrow.hide()
-	blast_shape.set_deferred("disabled", false)
 	particles.emitting = true
 	var boom: Node2D = EXPLOSION.instantiate()
 	get_parent().add_child.call_deferred(boom)
 	boom.position = position
 	boom.scale = Vector2.ONE * size
 	get_tree().call_group("camera", "shake", 10.0)
-	await get_tree().create_timer(0.15).timeout
-	blast_shape.set_deferred("disabled", true)
-	await get_tree().create_timer(0.6).timeout
+	get_tree().call_group("player", "blast_from", global_position, BLAST_REACH * size)
+	await get_tree().create_timer(0.75).timeout
 	queue_free()
 
 

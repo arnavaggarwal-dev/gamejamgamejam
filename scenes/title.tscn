@@ -150,6 +150,18 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "DASH"
 
+[node name="KeyBoom" type="Label" parent="Card/VBox/Controls"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.859, 0.851, 0.569, 1)
+theme_override_font_sizes/font_size = 28
+text = "A"
+horizontal_alignment = 2
+
+[node name="ActionBoom" type="Label" parent="Card/VBox/Controls"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "BLOW UP BOMB"
+
 [node name="Key5" type="Label" parent="Card/VBox/Controls"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.859, 0.851, 0.569, 1)

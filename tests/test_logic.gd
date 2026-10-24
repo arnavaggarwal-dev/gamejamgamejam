@@ -90,6 +90,22 @@ func _test_player() -> void:
 	check(player.hp == 0 and died[0], "losing the last heart emits died")
 	player.reset(Vector2(100, 100))
 	check(player.hp == Player.MAX_HP and player.visible, "reset refills hearts and shows the player")
+	var bomb: Bomb = load("res://scenes/boss/bomb.tscn").instantiate()
+	root.add_child(bomb)
+	bomb.global_position = player.hold_point.global_position
+	bomb.pick_up()
+	player.held_bomb = bomb
+	player.invuln.stop()
+	Input.action_press("detonate")
+	await physics_frame
+	Input.action_release("detonate")
+	check(bomb.exploded and player.hp == Player.MAX_HP and player.velocity.y < -1000.0, "[A] blows up the bomb in his hands: he rockets up, unhurt")
+	player.velocity = Vector2.ZERO
+	player.blast_from(player.global_position + Vector2(100, 40), 150.0)
+	check(player.velocity.x < -300.0 and player.velocity.y < -1000.0, "a blast beside him bounces him up and away from it")
+	player.velocity = Vector2.ZERO
+	player.blast_from(player.global_position + Vector2(400, 0), 150.0)
+	check(player.velocity == Vector2.ZERO, "a far blast leaves him alone")
 	player.queue_free()
 	await process_frame
 

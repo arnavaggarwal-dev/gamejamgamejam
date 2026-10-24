@@ -11,9 +11,6 @@ bounce = 0.3
 [sub_resource type="CircleShape2D" id="CircleShape2D_body"]
 radius = 20.0
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_blast"]
-radius = 90.0
-
 [sub_resource type="Animation" id="Animation_fuse"]
 resource_name = "fuse"
 length = 4.5
@@ -68,15 +65,6 @@ shape = SubResource("CircleShape2D_body")
 wait_time = 4.5
 one_shot = true
 autostart = true
-
-[node name="BlastArea" type="Area2D" parent="."]
-collision_layer = 8
-collision_mask = 0
-monitoring = false
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="BlastArea"]
-shape = SubResource("CircleShape2D_blast")
-disabled = true
 
 [node name="CPUParticles2D" type="CPUParticles2D" parent="."]
 z_index = 6

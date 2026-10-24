@@ -18,6 +18,7 @@ const POOF := preload("res://scenes/fx/poof.tscn")
 const SLIME := preload("res://scenes/fx/slime.tscn")
 const GHOST := preload("res://scenes/fx/afterimage.tscn")
 const HARD_LANDING := 1500.0  # px/s fall speed for the biggest landing squash
+const BOMB_BOUNCE := Vector2(650.0, -1150.0)  # off a blast: sideways away from it (at most), always this fast up
 
 @export var speed := 330.0
 @export var accel := 2600.0
@@ -42,6 +43,7 @@ var _air_jump_ready := true  # one jump in mid-air (after a dash, off a ledge, o
 var _dash_dir := Vector2.RIGHT
 var _dash_grounded := false  # started on the floor (and not upward): you can still jump out of it
 var frozen := false  # cutscenes: no control and no harm, he just stands and watches
+var _thrown: Bomb = null  # the last bomb he threw, for [A] to set off
 
 @onready var art: Node2D = $Art
 @onready var flip: Node2D = $Art/Flip
@@ -127,6 +129,8 @@ func _physics_process(delta: float) -> void:
 			_throw()
 		else:
 			_grab()
+	if Input.is_action_just_pressed("detonate"):
+		_detonate()
 	if held_bomb:
 		held_bomb.global_position = hold_point.global_position + Vector2(0.0, -24.0 * (held_bomb.size - 1.0))  # a big bomb sits higher
 	_update_aim()
@@ -252,8 +256,33 @@ func _throw_velocity() -> Vector2:
 
 func _throw() -> void:
 	held_bomb.throw(_throw_velocity())
+	_thrown = held_bomb
 	held_bomb = null
 	juice.play(&"throw")
+
+
+## [A]: sets a bomb off right now: the one in his hands (overhead, so it rockets him straight
+## up), else the last one he threw.
+func _detonate() -> void:
+	var bomb: Bomb = held_bomb if held_bomb else _thrown
+	if is_instance_valid(bomb) and not bomb.exploded:
+		bomb.explode()
+
+
+## Bomb blasts never hurt the little guy. One within reach bounces him away from it, always
+## upward, and gives him back his air jump and dash: a bomb under him is a rocket jump.
+func blast_from(at: Vector2, reach: float) -> void:
+	var away := global_position - at
+	if _dead or frozen or away.length() > reach:
+		return
+	if dashing:
+		_cancel_dash()
+	velocity = Vector2(clampf(away.x / reach, -1.0, 1.0) * BOMB_BOUNCE.x, BOMB_BOUNCE.y)
+	_coyote = 0.0
+	_air_jump_ready = true
+	_air_dash_ready = true
+	juice.play(&"jump")
+	_puff(SLIME, _feet())
 
 
 ## Predicts the bomb's flight with the same gravity the RigidBody2D will feel.
