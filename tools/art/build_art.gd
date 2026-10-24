@@ -78,6 +78,7 @@ func _fx() -> void:
 	_save_sheet("fx/shockwave.png", Fx.shockwave_frames())
 	_save_sheet("fx/laser_warn.png", Fx.laser_warn_frames())
 	_save_sheet("fx/laser_beam.png", Fx.laser_beam_frames())
+	_save_sheet("fx/dash_beam.png", Fx.dash_beam_frames())
 
 
 func _ui() -> void:

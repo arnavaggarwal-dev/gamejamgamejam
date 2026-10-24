@@ -20,7 +20,7 @@ var _errors := ErrorCounter.new()
 func _initialize() -> void:
 	OS.add_logger(_errors)
 	# A runtime error inside a test stops _run before quit(); the watchdog ends the process instead of hanging.
-	create_timer(60.0, true, false, true).timeout.connect(_on_timeout)
+	create_timer(120.0, true, false, true).timeout.connect(_on_timeout)
 	_run.call_deferred()
 
 
@@ -34,6 +34,8 @@ func _run() -> void:
 	await _test_giant_stages()
 	await _test_boss_moves()
 	await _test_target_spin()
+	await _test_eye()
+	await _test_roam()
 	await _test_game_wiring()
 	await _test_phase_extras()
 	await _test_skip_phase()
@@ -307,11 +309,19 @@ func _test_boss_moves() -> void:
 	boss._play(&"swoop", Boss.State.ATTACK)
 	await create_timer(0.65).timeout  # ~0.85 s of the tell at stage-3 speed
 	check(boss.head.position.distance_to(hover) < 12.0 and boss.anim.current_animation == &"swoop", "the swoop tells for most of a second (eye flashing, head quivering) before it moves")
+	check(boss.dash_beam.visible and absf(angle_difference(boss.dash_beam.global_rotation, (Vector2(400, 540) - boss.head.global_position).angle())) < 0.05, "a light beam shows the line he is about to dash along")
+	var aim := Vector2(400, 540)  # no player here: he aims at x 400, kept above the floor
 	var closest := [INF]
+	var flashed := [0.0]
+	var last: Vector2 = boss.head.global_position
 	for i in 90:
 		await physics_frame
-		closest[0] = minf(closest[0], boss.head.global_position.distance_to(Vector2(400, 530)))
-	check(closest[0] < 70.0, "the head swoops right through the player's spot (closest %.0f px)" % closest[0])
+		var now: Vector2 = boss.head.global_position
+		closest[0] = minf(closest[0], aim.distance_to(Geometry2D.get_closest_point_to_segment(aim, last, now)))
+		flashed[0] = maxf(flashed[0], boss.head.material.get_shader_parameter(&"flash"))
+		last = now
+	check(closest[0] < 20.0, "the head dashes straight through the aimed spot (closest %.0f px)" % closest[0])
+	check(flashed[0] > 0.9, "the head flashes white as it dashes")
 	boss.queue_free()
 	await process_frame
 
@@ -325,6 +335,53 @@ func _test_target_spin() -> void:
 		turned[0] = maxf(turned[0], target.rotation)
 	check(turned[0] > 1.4, "the target brackets snap a quarter turn every few seconds")
 	target.queue_free()
+	await process_frame
+
+
+## His eye follows the player, and the laser leaves from the eye, aimed at the player.
+func _test_eye() -> void:
+	var boss: Boss = load("res://scenes/boss/boss.tscn").instantiate()
+	root.add_child(boss)
+	var player: Player = load("res://scenes/player/player.tscn").instantiate()
+	root.add_child(player)
+	player.set_physics_process(false)
+	player.global_position = Vector2(300, 600)
+	await process_frame
+	await process_frame
+	var look := (player.global_position - boss.eye.global_position).angle()
+	check(absf(angle_difference(boss.eye.global_rotation + PI, look)) < 0.05, "his eye always looks at the player")
+	boss.phase = 2
+	boss._play(&"laser", Boss.State.ATTACK)
+	await create_timer(0.85 / boss.anim.speed_scale).timeout
+	var beam: Node2D = boss.eye_beam
+	var at_player := (player.global_position - beam.global_position).angle()
+	check(beam.global_position.distance_to(boss.eye.global_position) < 1.0 and beam.get_node("Beam").visible and not beam.get_node("Hitbox/CollisionShape2D").disabled, "the laser fires out of his eye")
+	check(absf(angle_difference(beam.global_rotation, at_player)) < 0.05, "the eye laser is aimed at the player")
+	player.queue_free()
+	boss.queue_free()
+	await process_frame
+
+
+## Between attacks he roams back and forth near the player, legs stepping as he walks.
+func _test_roam() -> void:
+	var game: Node2D = load("res://scenes/game.tscn").instantiate()
+	root.add_child(game)
+	var boss: Boss = game.get_node("Boss")
+	var player: Player = game.get_node("Player")
+	player.hurtbox.monitoring = false
+	while boss.state != Boss.State.IDLE:
+		await physics_frame
+	boss.rest_timer.stop()  # no attacks: just watch him walk
+	var span := [INF, -INF]
+	var lift := [0.0]
+	for i in 240:
+		await physics_frame
+		span[0] = minf(span[0], boss.position.x)
+		span[1] = maxf(span[1], boss.position.x)
+		lift[0] = maxf(lift[0], -minf(boss.leg_f.position.y, boss.leg_b.position.y))
+	check(span[1] - span[0] > 150.0, "he roams the stage while the player stands still (%.0f px)" % (span[1] - span[0]))
+	check(lift[0] > 10.0, "his legs step as he walks")
+	game.queue_free()
 	await process_frame
 
 

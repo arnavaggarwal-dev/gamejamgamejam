@@ -196,6 +196,21 @@ static func laser_warn_frames() -> Array:
 	return frames
 
 
+## The head's dash tell: a pale beam of light along the line it is about to dash (2 frames of
+## shimmer). Drawn solid; the node makes it see-through.
+static func dash_beam_frames() -> Array:
+	var frames := []
+	for f in 2:
+		var c = Canvas.new(640, 7)
+		c.rect(0, 1, 640, 5, P.BUTTER)
+		c.rect(0, 2, 640, 3, P.CREAM)
+		for x in range(f * 6, 640, 12):
+			c.px(x, 0, P.BUTTER)
+			c.px(x + 3, 6, P.BUTTER)
+		frames.append(c)
+	return frames
+
+
 ## The beam itself: hot cream core, pink edges that crackle (3 frames).
 static func laser_beam_frames() -> Array:
 	var frames := []

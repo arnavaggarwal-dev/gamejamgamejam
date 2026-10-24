@@ -29,6 +29,7 @@ const SHEETS := {
 	"fx/shockwave_frames.tres": [Vector2i(20, 14), {"roll": ["fx/shockwave.png", 3, 12.0, true]}],
 	"fx/laser_warn_frames.tres": [Vector2i(640, 3), {"march": ["fx/laser_warn.png", 2, 12.0, true]}],
 	"fx/laser_beam_frames.tres": [Vector2i(640, 12), {"crackle": ["fx/laser_beam.png", 3, 20.0, true]}],
+	"fx/dash_beam_frames.tres": [Vector2i(640, 7), {"shimmer": ["fx/dash_beam.png", 2, 8.0, true]}],
 	"boss/eye_frames.tres": [Vector2i(20, 20), {"look": ["boss/eye.png", 2, 1.5, true]}],
 	"boss/jet_frames.tres": [Vector2i(12, 18), {"burn": ["boss/jet.png", 2, 12.0, true]}],
 	"boss/bot_frames.tres": [Vector2i(40, 44), {"hover": ["boss/bot.png", 2, 8.0, true, 0], "hurt": ["boss/bot.png", 1, 1.0, false, 2], "broken": ["boss/bot.png", 1, 1.0, false, 3]}],

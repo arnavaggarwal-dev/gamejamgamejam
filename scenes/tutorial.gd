@@ -201,11 +201,11 @@ func _on_attack_started(attack: StringName) -> void:
 		&"charge":
 			_tip("charge", "HE'S CHARGING!  GET BACK!")
 		&"swoop":
-			_tip("swoop", "HE'S SWOOPING AT YOU!  RUN OR DASH THROUGH!")
+			_tip("swoop", "HE DASHES ALONG THE LIGHT BEAM!  GET OFF IT!")
 		&"rain", &"bombs", &"spit":
 			_tip("bombs", "BOMBS!  GRAB ONE [Z], THROW IT AT THE CORE!")
 		&"laser":
-			_tip("laser", "LASER!  LOW LINE = JUMP.  HIGH LINE = STAY DOWN.")
+			_tip("laser", "EYE LASER!  STEP OUT OF THE RED LINE!")
 
 
 func _on_hp_changed(hp: int) -> void:

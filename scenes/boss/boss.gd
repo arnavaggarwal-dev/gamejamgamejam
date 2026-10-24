@@ -4,8 +4,9 @@ extends Node2D
 ## front knee); break them and the torso crashes down (chest core); break that and the head
 ## flies in on jet boosters (the eye). Only thrown bombs hurt him.
 ## Attacks live in the AnimationPlayer: value tracks move the rig and toggle hitboxes, method
-## tracks call stomp_* / swoop / rain_bomb / spawn_bomb / spit_bomb / boom / land / shake.
-## Moves that chase the player (the stomp's walk, the swoop's path) are tweens started there.
+## tracks call stomp_* / aim_* / swoop / rain_bomb / spawn_bomb / spit_bomb / boom / land / shake.
+## Moves that chase the player (the stomp's walk, the head's dash) are tweens started there.
+## Between attacks he roams: he drifts either side of his spot near the player, legs stepping.
 
 signal health_changed(hits_left: int, hits_total: int)
 signal phase_changed(phase: int)  # 0-based: the second phase emits 1
@@ -35,7 +36,11 @@ const PHASES := [
 const RAIL_MIN := 0.0
 const RAIL_MAX := 1280.0
 const RAIL_LEAD := 560.0
-const RAIL_SPEED := 260.0
+const RAIL_SPEED := 300.0
+const WANDER := 260.0  # px he roams either side of his spot near the player
+const WANDER_RATE := 0.6  # rad/s of the roaming sway
+const STRIDE := 36.0  # px a leg lifts per step while he walks
+const DASH_OVERSHOOT := 300.0  # px the head dashes past where it aimed
 const TORSO_X := 1080.0
 const ARENA_W := 2560.0
 
@@ -45,25 +50,29 @@ var hp := HITS_PER_PHASE
 var _attack_index := 0
 var _rest_pose := {}
 var _rail_dust := 0.0
-var _move: Tween  # the running chase tween (stomp walk / swoop), killed on any new animation
+var _move: Tween  # the running chase tween (stomp walk / head dash), killed on any new animation
+var _wander := 0.0
+var _stride := 0.0
+var _dash_target := Vector2.ZERO
 
 @onready var rig: Node2D = $Rig
 @onready var legs: Node2D = $Rig/Legs
 @onready var stomp_anchor: Node2D = $Rig/Legs/StompAnchor
 @onready var stomp_ring: Node2D = $Rig/Legs/StompRing
 @onready var leg_f: Node2D = $Rig/Legs/StompAnchor/LegF
+@onready var leg_b: Node2D = $Rig/Legs/LegB
 @onready var upper: Node2D = $Rig/Upper
 @onready var head: Node2D = $Rig/Upper/Head
 @onready var eye: Node2D = $Rig/Upper/Head/Eye
 @onready var mouth: Marker2D = $Rig/Upper/Head/Mouth
+@onready var eye_beam: Node2D = $Rig/Upper/Head/EyeBeam
+@onready var dash_beam: Node2D = $Rig/Upper/Head/DashBeam
 @onready var body: Node2D = $Rig/Upper/Body
 @onready var fist_l: Node2D = $Rig/Upper/Body/FistL
 @onready var bomb_spawn: Marker2D = $Rig/Upper/Body/FistL/BombSpawn
 @onready var cores: Array = [$Rig/Legs/StompAnchor/LegF/KneeCore, $Rig/Upper/Body/Core, $Rig/Upper/Head/EyeCore]
 @onready var anim: AnimationPlayer = $AnimationPlayer
 @onready var rest_timer: Timer = $RestTimer
-@onready var laser_low: Node2D = $LaserLow
-@onready var laser_high: Node2D = $LaserHigh
 
 
 func _ready() -> void:
@@ -83,20 +92,45 @@ func start_fight() -> void:
 	_play(&"intro", State.INTRO)
 
 
-## Rides the rail toward the player while resting, so attacks always land near them.
+## His eye always looks at the player (the art's pupil looks left, hence the half turn).
+func _process(_delta: float) -> void:
+	var player := get_tree().get_first_node_in_group("player") as Node2D
+	if player:
+		eye.global_rotation = (player.global_position - eye.global_position).angle() - PI
+
+
+## Rides the rail while resting, roaming either side of his spot near the player so attacks
+## still land close; in the legs stage the legs step as he walks.
 func _physics_process(delta: float) -> void:
 	if state != State.IDLE:
 		return
 	var player := get_tree().get_first_node_in_group("player") as Node2D
 	if player == null:
 		return
+	_wander += WANDER_RATE * delta
+	var goal := clampf(_rail_goal(player) + sin(_wander) * WANDER, RAIL_MIN, RAIL_MAX)
 	var before := position.x
-	position.x = move_toward(position.x, _rail_goal(player), RAIL_SPEED * delta)
-	if absf(position.x - before) > 0.1:
+	position.x = move_toward(position.x, goal, RAIL_SPEED * delta)
+	var moving := absf(position.x - before) > 0.1
+	if moving:
 		_rail_dust -= delta
 		if _rail_dust <= 0.0:
 			_rail_dust = 0.2
 			_fx(DUST_SCENE, Vector2(weak_point().global_position.x + randf_range(-150.0, 150.0), FLOOR_Y - 16.0))
+	if phase == 0:
+		_step_legs(delta, moving)
+
+
+## Walking legs: front and back lift in turn; a foot coming down kicks up dust.
+func _step_legs(delta: float, moving: bool) -> void:
+	var before := signf(sin(_stride))
+	_stride = _stride + 7.0 * delta if moving else 0.0
+	var lift := sin(_stride) * STRIDE
+	leg_f.position.y = -maxf(lift, 0.0)
+	leg_b.position.y = -maxf(-lift, 0.0)
+	if moving and signf(sin(_stride)) != before:
+		var foot: Node2D = (leg_b if before > 0.0 else leg_f).get_node("Foot")
+		_fx(DUST_SCENE, Vector2(foot.global_position.x, FLOOR_Y - 16.0))
 
 
 func _rail_goal(player: Node2D) -> float:
@@ -175,16 +209,35 @@ func stomp_return() -> void:
 	_chase().tween_property(stomp_anchor, "position:x", _rest_pose[stomp_anchor].x, 0.4 / anim.speed_scale).set_trans(Tween.TRANS_SINE)
 
 
-## Stage 3: the head rises to one side, dives through where the player stands, shoots out the
-## other side and flies home (the swoop animation keeps the ram hitbox live for the pass).
+## Stage 3 tell: aim the dash at the player (called repeatedly, then it locks) and lay the
+## light beam along that line.
+func aim_dash() -> void:
+	_dash_target = _player_pos()
+	_dash_target.y = minf(_dash_target.y, 540.0)  # the head must not dash into the floor
+	dash_beam.global_rotation = (_dash_target - head.global_position).angle()
+
+
+## Stage 3: the head dashes straight along the beam, through the aimed spot and past it, then
+## flies home (the swoop animation flashes it white and keeps the ram hitbox live). Diving at
+## a spot by the floor, it hits the spot and skids on along the floor instead of into it.
 func swoop() -> void:
-	var x := _player_x()
+	var dir := (_dash_target - head.global_position).normalized()
+	var past := _dash_target + dir * DASH_OVERSHOOT
 	var s := anim.speed_scale
 	var path := _chase()
-	path.tween_property(head, "global_position", Vector2(x + 320.0, 230.0), 0.35 / s).set_trans(Tween.TRANS_SINE)
-	path.tween_property(head, "global_position", Vector2(x, 530.0), 0.3 / s).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	path.tween_property(head, "global_position", Vector2(x - 340.0, 300.0), 0.3 / s).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	if past.y > 540.0:
+		path.tween_property(head, "global_position", _dash_target, 0.28 / s).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		past = _dash_target + Vector2(signf(dir.x) * DASH_OVERSHOOT * 0.7, 0.0)
+		path.tween_property(head, "global_position:x", clampf(past.x, 80.0, ARENA_W - 80.0), 0.15 / s).set_ease(Tween.EASE_OUT)
+	else:
+		path.tween_property(head, "global_position", past, 0.35 / s).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	path.tween_interval(0.15 / s)
 	path.tween_property(head, "position", _rest_pose[head], 0.6 / s).set_trans(Tween.TRANS_SINE)
+
+
+## Stage 3 laser tell: point the eye beam at the player (called repeatedly, then it locks).
+func aim_eye_beam() -> void:
+	eye_beam.global_rotation = (_player_pos() - eye_beam.global_position).angle()
 
 
 func _reset_eye() -> void:
@@ -257,6 +310,11 @@ func _drop_bomb(at: Vector2, velocity: Vector2) -> void:
 	bomb.linear_velocity = velocity
 
 
+func _player_pos() -> Vector2:
+	var player := get_tree().get_first_node_in_group("player") as Node2D
+	return player.global_position if player else Vector2(400.0, 560.0)
+
+
 func _player_x() -> float:
 	var player := get_tree().get_first_node_in_group("player") as Node2D
 	return clampf(player.global_position.x if player else 400.0, 80.0, ARENA_W - 80.0)
@@ -307,15 +365,16 @@ func _reset_rig() -> void:
 	stomp_ring.hide()
 	for box in [leg_f.get_node("Hitbox"), fist_l.get_node("Hitbox"), body.get_node("ChargeHitbox"), head.get_node("RamHitbox")]:
 		box.get_node("CollisionShape2D").set_deferred("disabled", true)
-	for laser: Node2D in [laser_low, laser_high]:
-		laser.get_node("Warn").hide()
-		laser.get_node("Beam").hide()
-		laser.get_node("Hitbox/CollisionShape2D").set_deferred("disabled", true)
+	eye_beam.get_node("Warn").hide()
+	eye_beam.get_node("Beam").hide()
+	eye_beam.get_node("Hitbox/CollisionShape2D").set_deferred("disabled", true)
+	dash_beam.hide()
+	head.material.set_shader_parameter(&"flash", 0.0)
 
 
 ## Where each part sits at rest in this stage (a stage break moves the torso and head).
 func _capture_rest_pose() -> void:
-	for n: Node2D in [legs, stomp_anchor, leg_f, upper, body, head, fist_l]:
+	for n: Node2D in [legs, stomp_anchor, leg_f, leg_b, upper, body, head, fist_l]:
 		_rest_pose[n] = n.position
 
 
