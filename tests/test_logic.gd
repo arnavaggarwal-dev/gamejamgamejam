@@ -31,6 +31,7 @@ func _run() -> void:
 	await _test_arena()
 	await _test_boss()
 	await _test_giant_stages()
+	await _test_boss_moves()
 	await _test_game_wiring()
 	await _test_phase_extras()
 	await _test_skip_phase()
@@ -218,9 +219,40 @@ func _test_giant_stages() -> void:
 		boss.state = Boss.State.IDLE
 		boss.take_hit()
 	await create_timer(2.1).timeout  # the drop is over, his first attack is not yet
-	check(not boss.get_node("Rig/Upper/Body").visible and boss.head.global_position.y > 400.0 and armed.call(2) and not armed.call(1), "breaking the torso drops the head onto the floor and arms the eye")
+	check(not boss.body.visible and boss.head.global_position.y > 300.0 and boss.head.global_position.y < 450.0 and boss.head.get_node("Jets").visible and armed.call(2) and not armed.call(1), "breaking the torso brings the head in, hovering on jets, and arms the eye")
 	check(boss.state == Boss.State.IDLE and boss.anim.current_animation == &"idle_3", "the head fights on")
-	check([boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"hop", &"spit", &"laser"], "stage 3 hops, spits bombs and fires the laser")
+	check([boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"swoop", &"spit", &"laser"], "stage 3 swoops, spits bombs and fires the laser")
+	boss.queue_free()
+	await process_frame
+
+
+## The attacks that chase the player: the stomp walks its raised leg over, the torso lunges,
+## the head swoops through (no player here, so they all go for x = 400).
+func _test_boss_moves() -> void:
+	var boss: Boss = load("res://scenes/boss/boss.tscn").instantiate()
+	root.add_child(boss)
+	await process_frame
+	boss._play(&"stomp", Boss.State.ATTACK)
+	await create_timer(0.6).timeout
+	var knee_y: float = boss.weak_point().global_position.y
+	check(boss.leg_f.position.y < -200.0 and knee_y > 0.0 and knee_y < 400.0, "the stomp lifts the leg with the knee still in view")
+	await create_timer(0.4).timeout
+	check(absf(boss.stomp_anchor.global_position.x - 400.0) < 2.0 and is_equal_approx(boss.stomp_ring.global_position.x, 400.0), "the raised leg walks over to the player's spot, under the red ring")
+	await create_timer(1.8).timeout
+	check(is_equal_approx(boss.stomp_anchor.position.x, 1020.0), "then walks back under him")
+	boss.phase = 1
+	boss._play(&"charge", Boss.State.ATTACK)
+	await create_timer(0.55).timeout
+	check(not boss.body.get_node("ChargeHitbox/CollisionShape2D").disabled, "the torso charge is dangerous while it lunges")
+	await create_timer(0.25).timeout
+	check(boss.body.position.x < -400.0, "the torso lunges ~420 px toward the player")
+	boss.phase = 2
+	boss._play(&"swoop", Boss.State.ATTACK)
+	var closest := [INF]
+	for i in 90:
+		await physics_frame
+		closest[0] = minf(closest[0], boss.head.global_position.distance_to(Vector2(400, 530)))
+	check(closest[0] < 70.0, "the head swoops right through the player's spot (closest %.0f px)" % closest[0])
 	boss.queue_free()
 	await process_frame
 
@@ -251,7 +283,7 @@ func _test_phase_extras() -> void:
 	await process_frame
 	var boss: Boss = game.get_node("Boss")
 	boss.phase = 1
-	check([boss.next_attack(), boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"slam", &"bombs", &"laser", &"bombs"], "phase 2 adds the laser")
+	check([boss.next_attack(), boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"swipe", &"bombs", &"charge", &"bombs"], "stage 2 (torso) swipes, throws bombs and charges")
 	check(boss.anim.has_animation(&"laser"), "laser animation exists")
 	boss.phase_changed.emit(2)
 	var stage: Stage = game.get_node("Arena")

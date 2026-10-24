@@ -2,9 +2,10 @@ class_name Boss
 extends Node2D
 ## King Kilowatt, too big for the screen. Stage 1 only his legs fit in frame (weak spot: the
 ## front knee); break them and the torso crashes down (chest core); break that and the head
-## drops onto the floor (the eye). Only thrown bombs hurt him.
+## flies in on jet boosters (the eye). Only thrown bombs hurt him.
 ## Attacks live in the AnimationPlayer: value tracks move the rig and toggle hitboxes, method
-## tracks call aim_* / *_impact / rain_bomb / spawn_bomb / spit_bomb / boom / land / shake.
+## tracks call stomp_* / swoop / rain_bomb / spawn_bomb / spit_bomb / boom / land / shake.
+## Moves that chase the player (the stomp's walk, the swoop's path) are tweens started there.
 
 signal health_changed(hits_left: int, hits_total: int)
 signal phase_changed(phase: int)  # 0-based: the second phase emits 1
@@ -22,8 +23,8 @@ const EXPLOSION_SCENE := preload("res://scenes/fx/explosion.tscn")
 const DUST_SCENE := preload("res://scenes/fx/dust.tscn")
 const PHASES := [
 	{attacks = [&"stomp", &"rain"], speed = 1.0, rest = 1.2},  # legs
-	{attacks = [&"slam", &"bombs", &"laser", &"bombs"], speed = 1.2, rest = 0.9},  # torso
-	{attacks = [&"hop", &"spit", &"laser", &"spit"], speed = 1.4, rest = 0.7},  # head
+	{attacks = [&"swipe", &"bombs", &"charge", &"bombs"], speed = 1.2, rest = 0.9},  # torso
+	{attacks = [&"swoop", &"spit", &"laser", &"spit"], speed = 1.3, rest = 0.7},  # head
 ]
 
 @export var projectiles: Node2D
@@ -44,19 +45,19 @@ var hp := HITS_PER_PHASE
 var _attack_index := 0
 var _rest_pose := {}
 var _rail_dust := 0.0
+var _move: Tween  # the running chase tween (stomp walk / swoop), killed on any new animation
 
 @onready var rig: Node2D = $Rig
 @onready var legs: Node2D = $Rig/Legs
 @onready var stomp_anchor: Node2D = $Rig/Legs/StompAnchor
+@onready var stomp_ring: Node2D = $Rig/Legs/StompRing
 @onready var leg_f: Node2D = $Rig/Legs/StompAnchor/LegF
 @onready var upper: Node2D = $Rig/Upper
 @onready var head: Node2D = $Rig/Upper/Head
 @onready var eye: Node2D = $Rig/Upper/Head/Eye
 @onready var mouth: Marker2D = $Rig/Upper/Head/Mouth
+@onready var body: Node2D = $Rig/Upper/Body
 @onready var fist_l: Node2D = $Rig/Upper/Body/FistL
-@onready var slam_anchor: Node2D = $Rig/Upper/Body/SlamAnchor
-@onready var fist_r: Node2D = $Rig/Upper/Body/SlamAnchor/FistR
-@onready var shadow: Node2D = $Rig/Upper/Body/SlamAnchor/Shadow
 @onready var bomb_spawn: Marker2D = $Rig/Upper/Body/FistL/BombSpawn
 @onready var cores: Array = [$Rig/Legs/StompAnchor/LegF/KneeCore, $Rig/Upper/Body/Core, $Rig/Upper/Head/EyeCore]
 @onready var anim: AnimationPlayer = $AnimationPlayer
@@ -158,24 +159,36 @@ func skip_phase() -> void:
 
 # --- called from animation method tracks ---
 
-func aim_slam() -> void:
-	slam_anchor.global_position.x = _player_x()
-
-
-func aim_stomp() -> void:
-	stomp_anchor.global_position.x = _player_x()
-
-
-func slam_impact() -> void:
-	_quake(slam_anchor.global_position.x, 18.0)
+## Stage 1: the lifted front leg walks over to the player; a red ring marks where it lands.
+func stomp_aim() -> void:
+	var x := _player_x()
+	stomp_ring.global_position.x = x
+	_chase().tween_property(stomp_anchor, "global_position:x", x, 0.45 / anim.speed_scale).set_trans(Tween.TRANS_SINE)
 
 
 func stomp_impact() -> void:
 	_quake(stomp_anchor.global_position.x, 20.0)
 
 
-func hop_impact() -> void:
-	_quake(head.global_position.x, 16.0)
+## ...and walks back to stand under him.
+func stomp_return() -> void:
+	_chase().tween_property(stomp_anchor, "position:x", _rest_pose[stomp_anchor].x, 0.4 / anim.speed_scale).set_trans(Tween.TRANS_SINE)
+
+
+## Stage 3: the head rises to one side, dives through where the player stands, shoots out the
+## other side and flies home (the swoop animation keeps the ram hitbox live for the pass).
+func swoop() -> void:
+	var x := _player_x()
+	var s := anim.speed_scale
+	var path := _chase()
+	path.tween_property(head, "global_position", Vector2(x + 320.0, 230.0), 0.35 / s).set_trans(Tween.TRANS_SINE)
+	path.tween_property(head, "global_position", Vector2(x, 530.0), 0.3 / s).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	path.tween_property(head, "global_position", Vector2(x - 340.0, 300.0), 0.3 / s).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	path.tween_property(head, "position", _rest_pose[head], 0.6 / s).set_trans(Tween.TRANS_SINE)
+
+
+func _reset_eye() -> void:
+	eye.modulate = Color.WHITE
 
 
 func spawn_bomb() -> void:
@@ -230,6 +243,13 @@ func _quake(x: float, amount: float) -> void:
 		_fx(DUST_SCENE, Vector2(x + dir * 72.0, FLOOR_Y - 16.0))
 
 
+func _chase() -> Tween:
+	if _move:
+		_move.kill()
+	_move = create_tween()
+	return _move
+
+
 func _drop_bomb(at: Vector2, velocity: Vector2) -> void:
 	var bomb: Bomb = BOMB_SCENE.instantiate()
 	_spawn_parent().add_child(bomb)
@@ -275,14 +295,17 @@ func _play(anim_name: StringName, new_state: State) -> void:
 
 
 func _reset_rig() -> void:
+	if _move:
+		_move.kill()
 	for n: Node2D in _rest_pose:
 		n.position = _rest_pose[n]
 	rig.position = Vector2.ZERO
 	rig.modulate = Color.WHITE
 	eye.modulate = Color.WHITE
-	shadow.hide()
-	stomp_anchor.get_node("Shadow").hide()
-	for box in [fist_r.get_node("Hitbox"), leg_f.get_node("Hitbox"), head.get_node("HopHitbox")]:
+	body.modulate = Color.WHITE
+	fist_l.modulate = Color.WHITE
+	stomp_ring.hide()
+	for box in [leg_f.get_node("Hitbox"), fist_l.get_node("Hitbox"), body.get_node("ChargeHitbox"), head.get_node("RamHitbox")]:
 		box.get_node("CollisionShape2D").set_deferred("disabled", true)
 	for laser: Node2D in [laser_low, laser_high]:
 		laser.get_node("Warn").hide()
@@ -292,7 +315,7 @@ func _reset_rig() -> void:
 
 ## Where each part sits at rest in this stage (a stage break moves the torso and head).
 func _capture_rest_pose() -> void:
-	for n: Node2D in [legs, stomp_anchor, leg_f, upper, head, fist_l, fist_r]:
+	for n: Node2D in [legs, stomp_anchor, leg_f, upper, body, head, fist_l]:
 		_rest_pose[n] = n.position
 
 

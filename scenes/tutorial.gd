@@ -195,15 +195,17 @@ func _process(_delta: float) -> void:
 func _on_attack_started(attack: StringName) -> void:
 	match attack:
 		&"stomp":
-			_tip("stomp", "SEE THE RED RING?  A FOOT IS COMING.  MOVE!")
-		&"slam":
-			_tip("slam", "SEE THE RED RING?  A FIST IS COMING.  MOVE!")
+			_tip("stomp", "HIS FOOT WALKS TO THE RED RING.  MOVE!")
+		&"swipe":
+			_tip("swipe", "HAND SWIPE!  JUMP OVER IT  (OR DASH THROUGH).")
+		&"charge":
+			_tip("charge", "HE'S CHARGING!  GET BACK!")
+		&"swoop":
+			_tip("swoop", "HE'S SWOOPING AT YOU!  RUN OR DASH THROUGH!")
 		&"rain", &"bombs", &"spit":
 			_tip("bombs", "BOMBS!  GRAB ONE [Z], THROW IT AT THE CORE!")
 		&"laser":
 			_tip("laser", "LASER!  LOW LINE = JUMP.  HIGH LINE = STAY DOWN.")
-		&"hop":
-			_tip("hop", "HE'S HOPPING!  JUMP OVER THE SHOCKWAVES!")
 
 
 func _on_hp_changed(hp: int) -> void:

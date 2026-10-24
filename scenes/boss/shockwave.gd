@@ -1,6 +1,6 @@
 class_name Shockwave
 extends Area2D
-## Ground wave from a fist slam. Jump over it.
+## Ground wave from a stomp. Jump over it.
 
 @export var speed := 480.0
 var direction := 1

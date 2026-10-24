@@ -351,3 +351,20 @@ static func neck():
 			c.px(16, y + 4, P.BUTTER)
 	c.outline()
 	return c
+
+
+## The head's jet booster: a metal nozzle and a flickering flame (2 frames).
+static func jet_frames() -> Array:
+	var frames := []
+	var flame := [P.CREAM, P.BUTTER, P.BUTTER, P.PEACH, P.PEACH, P.SALMON, P.SALMON, P.PLUM]
+	for length in [8, 6]:
+		var c = Canvas.new(12, 18)
+		c.rect(2, 1, 8, 4, P.SLATE)
+		c.hline(2, 9, 1, P.PERI)
+		c.hline(3, 8, 4, P.NAVY)
+		for i in length:
+			var half := maxi(0, 3 - floori(i / 2.0))
+			c.hline(6 - half, 5 + half, 5 + i, flame[i])
+		c.outline()
+		frames.append(c)
+	return frames

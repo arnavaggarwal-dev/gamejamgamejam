@@ -1,0 +1,25 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/boss/jet.png" id="1_bvuxw"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1h3va"]
+atlas = ExtResource("1_bvuxw")
+region = Rect2(0, 0, 12, 18)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ugwfe"]
+atlas = ExtResource("1_bvuxw")
+region = Rect2(12, 0, 12, 18)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1h3va")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ugwfe")
+}],
+"loop": 1,
+"name": &"burn",
+"speed": 12.0
+}]
