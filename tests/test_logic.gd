@@ -294,9 +294,21 @@ func _test_giant_stages() -> void:
 	for i in Boss.HITS_PER_PHASE:
 		boss.state = Boss.State.IDLE
 		boss.take_hit()
-	await create_timer(7.4).timeout  # the whole rebuild
-	check(boss.phase == Boss.FINAL and boss.legs.visible and boss.body.visible and boss.head.position == Vector2(1090, 170), "breaking the head rebuilds him: legs, torso, head back together")
-	check(boss.rig.scale.is_equal_approx(Vector2(1.5, 1.5)) and boss.rig.position.is_equal_approx(Boss.GROWN_POS), "...and he grows 1.5x, feet still on the floor")
+	await create_timer(2.4).timeout  # the shatter
+	var shards: CPUParticles2D = boss.get_node("Rig/Upper/Shards")
+	check(not boss.head.visible and shards.emitting and boss.fallen_crown.visible and boss.fallen_crown.global_position.y > 560.0, "breaking the head shatters it, and the crown drops to the floor")
+	await create_timer(1.0).timeout
+	check(boss.phase == Boss.FINAL and boss.state == Boss.State.PHASE_SHIFT and not boss.legs.visible, "...and he lies in pieces, waiting for Lil' Watt")
+	var up := [false]
+	boss.revived.connect(func() -> void: up[0] = true)
+	boss.revive()
+	await create_timer(6.8).timeout  # the whole rise
+	var torso_x: float = boss.body.get_node("Torso").global_position.x
+	var legs_x: float = (boss.leg_f.global_position.x + boss.leg_b.global_position.x) / 2.0
+	check(absf(torso_x - legs_x) < 20.0, "the rebuilt giant's torso sits centred on his legs")
+	check(up[0] and is_equal_approx(boss.position.x, Boss.FINAL_X) and boss.legs.visible and boss.body.visible and boss.head.visible and boss.head.position == Vector2(1090, 170), "revive() rebuilds him mid arena of doom: legs, torso, head back together")
+	var crown_y: float = boss.head.get_node("Crown").global_position.y
+	check(boss.rig.scale.is_equal_approx(Vector2.ONE * Boss.GROWN_SCALE) and boss.rig.position.is_equal_approx(Boss.GROWN_POS) and crown_y < -1300.0 and crown_y > -1440.0, "...and he grows as tall as the zoomed-out screen, feet still on the floor")
 	check(not armed.call(0) and not armed.call(1) and not armed.call(2), "the giant has no weak spot of his own")
 	check(boss.state == Boss.State.IDLE and boss.anim.current_animation == &"idle_4", "the giant fights on")
 	boss.queue_free()
@@ -411,8 +423,9 @@ func _test_roam() -> void:
 	await process_frame
 
 
-## Phase 4 in the arena: the camera pulls back 3x over the arena of doom, Lil' Watt flies in
-## linked to the giant, and breaking Lil' Watt knocks the king out.
+## Phase 4 in the arena: the head shatters and the camera pulls back 3x over the arena of doom;
+## in a cutscene Lil' Watt flies in, gets angry and revives the king, then fights beside him.
+## Breaking Lil' Watt knocks the king out.
 func _test_final_phase() -> void:
 	var game: Node2D = load("res://scenes/game.tscn").instantiate()
 	root.add_child(game)
@@ -428,10 +441,28 @@ func _test_final_phase() -> void:
 	await create_timer(3.0).timeout
 	var stage: Stage = game.get_node("Arena")
 	check(camera.zoom.is_equal_approx(Vector2.ONE / 3.0) and camera.limit_right == 7680 and camera.limit_top == -1440, "phase 4 pulls the camera back threefold")
-	check(not stage.get_node("DoomArena/Floor/CollisionShape2D").disabled and stage.get_node("WallR/CollisionShape2D").disabled, "the arena of doom opens: the floor runs on past the old wall")
+	check(player.frozen and hud.bars[0].scale.y > 0.9 and not hud.boss_box.visible, "a cutscene starts: letterbox bars in, the player frozen")
+	var doom_floor: StaticBody2D = stage.get_node("DoomArena/Floor")
+	check(doom_floor.collision_layer == 1 and stage.doom.can_process() and stage.get_node("WallR/CollisionShape2D").disabled, "the arena of doom opens: the floor runs on past the old wall")
+	check(stage.get_node("DoomArena/Set/Platforms").get_child_count() >= 20 and stage.get_node("DoomArena/Set/Lava").get_child_count() > 0, "...broken by lava, with platforms climbing high")
+	var back := stage.safe_spot(3000.0).x
+	var back_far := stage.safe_spot(5300.0).x
+	var on_lava := func(x: float) -> bool: return (x > 2560.0 and x < 3360.0) or (x > 5040.0 and x < 5520.0)
+	check(not on_lava.call(back) and not on_lava.call(back_far), "falling in the lava puts you back on solid ground")
 	var helper: TrainingBot = game.helper
-	check(is_instance_valid(helper) and helper.link.visible and helper.power_target == boss.weak_point(), "Lil' Watt flies in and powers the giant")
+	check(is_instance_valid(helper) and camera.target == helper and not helper.link.visible, "Lil' Watt flies in, the camera following it")
+	await create_timer(4.2).timeout  # at the fallen crown: "...DAD?", then it turns on you
+	check(helper.face == &"angry" and hud.coach_label.text == "YOU BROKE MY DAD!!", "Lil' Watt finds the wreck and gets angry")
+	await create_timer(9.8).timeout  # flies to the wreck, beams in, and the king rises
+	check(boss.rig.scale.is_equal_approx(Vector2.ONE * Boss.GROWN_SCALE) and boss.state != Boss.State.PHASE_SHIFT, "Lil' Watt's power revives the king, giant-sized")
+	check(not player.frozen and camera.target == player and hud.bars[0].scale.y < 0.05 and hud.boss_box.visible, "the cutscene ends: bars out, control back")
+	check(helper.link.visible and helper.power_target == boss.weak_point() and helper.follow_y and not helper.shot_timer.is_stopped(), "Lil' Watt fights beside him: powering him, following you, shooting")
 	check(hud.boss_name.text == "LIL' WATT" and hud.boss_bar.value == TrainingBot.HITS, "the boss bar now shows Lil' Watt")
+	var shots := projectiles_of(game, "res://scenes/boss/zap_ball.tscn")
+	helper.shoot()
+	check(projectiles_of(game, "res://scenes/boss/zap_ball.tscn") == shots + 1, "Lil' Watt shoots zap balls")
+	stage.strike_near_player()
+	check(stage.get_children().any(func(n: Node) -> bool: return n.scene_file_path == "res://scenes/stage/sky_strike.tscn"), "lightning strikes out of the red sky")
 	var won := [false]
 	boss.defeated.connect(func() -> void: won[0] = true)
 	for i in TrainingBot.HITS:
@@ -444,6 +475,10 @@ func _test_final_phase() -> void:
 	game.queue_free()
 	await process_frame
 	Engine.time_scale = 1.0
+
+
+func projectiles_of(game: Node, scene: String) -> int:
+	return game.get_node("Projectiles").get_children().filter(func(n: Node) -> bool: return n.scene_file_path == scene).size()
 
 
 func _test_game_wiring() -> void:

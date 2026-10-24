@@ -1,0 +1,32 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/world/lava.png" id="1_04df1"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rg05y"]
+atlas = ExtResource("1_04df1")
+region = Rect2(0, 0, 40, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nls7n"]
+atlas = ExtResource("1_04df1")
+region = Rect2(40, 0, 40, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qxbfg"]
+atlas = ExtResource("1_04df1")
+region = Rect2(80, 0, 40, 20)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rg05y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nls7n")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qxbfg")
+}],
+"loop": 1,
+"name": &"bubble",
+"speed": 5.0
+}]

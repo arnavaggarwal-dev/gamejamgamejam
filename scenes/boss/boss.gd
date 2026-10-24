@@ -2,9 +2,10 @@ class_name Boss
 extends Node2D
 ## King Kilowatt, too big for the screen. Stage 1 only his legs fit in frame (weak spot: the
 ## front knee); break them and the torso crashes down, head on its shoulders (chest core);
-## break that and the head pops off and flies on jet boosters (the eye). Break the head and he
-## rebuilds himself into a giant (phase 4) that Lil' Watt powers: hits on Lil' Watt reach him
-## through power_hit(). Only thrown bombs hurt, and each hit cracks the part being fought.
+## break that and the head pops off and flies on jet boosters (the eye). Break the head and it
+## shatters; he lies in pieces until Lil' Watt's power reaches the wreck (revive()), then rises
+## as a giant as tall as the zoomed-out screen (phase 4). Hits on Lil' Watt reach him through
+## power_hit(). Only thrown bombs hurt, and each hit cracks the part being fought.
 ## Attacks live in the AnimationPlayer: value tracks move the rig and toggle hitboxes, method
 ## tracks call stomp_* / aim_* / swoop / rain_bomb / spawn_bomb / spit_bomb / boom / land / shake.
 ## Moves that chase the player (the stomp's walk, the head's dash) are tweens started there.
@@ -14,6 +15,7 @@ signal health_changed(hits_left: int, hits_total: int)
 signal phase_changed(phase: int)  # 0-based: the second phase emits 1
 signal defeated
 signal attack_started(attack: StringName)
+signal revived  # phase 4: back on his feet, giant-sized, and about to fight
 
 enum State { INTRO, IDLE, ATTACK, STAGGER, PHASE_SHIFT, DEAD }
 
@@ -31,8 +33,10 @@ const PHASES := [
 	{attacks = [&"stomp", &"rain", &"laser", &"rain"], speed = 1.0, rest = 1.1},  # rebuilt giant
 ]
 const FINAL := 3  # the rebuilt giant's phase: no weak spot of his own, Lil' Watt powers him
-const GROWN_POS := Vector2(-570, -320)  # Rig offset once he has grown 1.5x about his feet
-const FINAL_X := 1650.0  # where the giant rebuilds: torso near x 2700, mid arena of doom
+const GROWN_SCALE := 1.55  # the giant's crown reaches the top of the 3x zoomed-out view
+const GROWN_POS := Vector2(-627, -352)  # Rig offset once he has grown, scaled about his feet (1140, 640)
+const FINAL_X := 1950.0  # where the giant rises: torso near x 3000, standing in the first lava pool
+const STOMP_REACH := 1600.0  # px the giant's stomping leg reaches either side of his torso
 
 @export var projectiles: Node2D
 
@@ -74,6 +78,7 @@ var _dash_target := Vector2.ZERO
 @onready var mouth: Marker2D = $Rig/Upper/Head/Mouth
 @onready var eye_beam: Node2D = $Rig/Upper/Head/EyeBeam
 @onready var dash_beam: Node2D = $Rig/Upper/Head/DashBeam
+@onready var fallen_crown: Node2D = $Rig/Upper/FallenCrown
 @onready var body: Node2D = $Rig/Upper/Body
 @onready var fist_l: Node2D = $Rig/Upper/Body/FistL
 @onready var bomb_spawn: Marker2D = $Rig/Upper/Body/FistL/BombSpawn
@@ -206,7 +211,7 @@ func take_hit() -> bool:
 
 
 func restart_phase() -> void:
-	if state == State.DEAD:
+	if state == State.DEAD or state == State.PHASE_SHIFT:  # never cut a stage break short
 		return
 	hp = HITS_PER_PHASE
 	_attack_index = 0
@@ -229,6 +234,9 @@ func skip_phase() -> void:
 ## Stage 1: the lifted front leg walks over to the player; a red ring marks where it lands.
 func stomp_aim() -> void:
 	var x := _player_x()
+	if phase == FINAL:
+		var torso := weak_point().global_position.x
+		x = clampf(x, torso - STOMP_REACH, torso + STOMP_REACH)
 	stomp_ring.global_position.x = x
 	_chase().tween_property(stomp_anchor, "global_position:x", x, 0.45 / anim.speed_scale).set_trans(Tween.TRANS_SINE)
 
@@ -288,6 +296,15 @@ func rain_bomb() -> void:
 	_drop_bomb(Vector2(x, -1500.0 if phase == FINAL else -60.0), Vector2.ZERO)
 
 
+## Phase 4, once Lil' Watt's power reaches the wreck: the pieces gather mid arena of doom (out
+## of sight, he is all in pieces) and rise into the giant. Emits `revived` when he is up.
+func revive() -> void:
+	if phase != FINAL or state != State.PHASE_SHIFT:
+		return
+	position.x = FINAL_X
+	_play(&"revive", State.PHASE_SHIFT)
+
+
 ## The rebuild in phase 4 mends every crack.
 func heal_cracks() -> void:
 	for part: Node2D in cracks:
@@ -297,6 +314,13 @@ func heal_cracks() -> void:
 
 func spit_bomb() -> void:
 	_drop_bomb(mouth.global_position, Vector2(randf_range(-700.0, -350.0), -420.0))
+
+
+## A huge moment (the head shattering, re-forming, the giant's roar): full white flash and a freeze.
+func blast() -> void:
+	shake(30.0)
+	get_tree().call_group("hud", "flash", 1.0)
+	get_tree().call_group("camera", "hitstop", 0.15)
 
 
 func laser_fire() -> void:
@@ -377,10 +401,8 @@ func _advance_phase() -> void:
 	hp = HITS_PER_PHASE
 	_attack_index = 0
 	state = State.PHASE_SHIFT
-	if phase == FINAL:
-		create_tween().tween_property(self, "position:x", FINAL_X, 3.0).set_trans(Tween.TRANS_SINE)  # pieces gather mid arena
 	phase_changed.emit(phase)
-	_play.call_deferred(StringName("phase_%d" % (phase + 1)), State.PHASE_SHIFT)
+	_play.call_deferred(&"shatter" if phase == FINAL else StringName("phase_%d" % (phase + 1)), State.PHASE_SHIFT)
 
 
 func _rest() -> void:
@@ -426,9 +448,13 @@ func _spawn_parent() -> Node:
 	return projectiles if projectiles else get_parent()
 
 
-func _on_animation_finished(_anim_name: StringName) -> void:
+func _on_animation_finished(anim_name: StringName) -> void:
+	if anim_name == &"shatter":
+		return  # he lies in pieces until revive()
 	if state == State.PHASE_SHIFT:
 		_capture_rest_pose()
+	if anim_name == &"revive":
+		revived.emit()
 	if state in [State.INTRO, State.ATTACK, State.STAGGER, State.PHASE_SHIFT]:
 		_rest()
 

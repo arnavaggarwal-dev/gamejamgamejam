@@ -41,6 +41,7 @@ var _air_dash_ready := true  # one dash per jump
 var _air_jump_ready := true  # one jump in mid-air (after a dash, off a ledge, or a double jump)
 var _dash_dir := Vector2.RIGHT
 var _dash_grounded := false  # started on the floor (and not upward): you can still jump out of it
+var frozen := false  # cutscenes: no control and no harm, he just stands and watches
 
 @onready var art: Node2D = $Art
 @onready var flip: Node2D = $Art/Flip
@@ -70,6 +71,9 @@ func _physics_process(delta: float) -> void:
 		return
 	if global_position.y > PIT_Y:
 		fell_in_pit.emit()
+		return
+	if frozen:
+		_stand_still(delta)
 		return
 	var dir := Input.get_axis("move_left", "move_right")
 	if dir != 0.0 and not dashing:
@@ -130,8 +134,20 @@ func _physics_process(delta: float) -> void:
 	_update_pose(dir)
 
 
+## Frozen for a cutscene: he slows to a stop and drops onto the floor, nothing else.
+func _stand_still(delta: float) -> void:
+	velocity.x = move_toward(velocity.x, 0.0, accel * delta)
+	velocity.y += gravity * delta
+	move_and_slide()
+	if not is_instance_valid(held_bomb):
+		held_bomb = null  # the cutscene clears the bombs
+	aim.points = PackedVector2Array()
+	prompt.hide()
+	_update_pose(0.0)
+
+
 func take_hit() -> void:
-	if _dead or dashing or not invuln.is_stopped():
+	if _dead or frozen or dashing or not invuln.is_stopped():
 		return
 	hp -= 1
 	hp_changed.emit(hp)

@@ -12,7 +12,9 @@ var _banner_id := 0
 var _hint_id := 0
 var _flash: Tween
 
+@onready var hearts_row: Control = $Hearts
 @onready var hearts: Array = $Hearts.get_children()
+@onready var boss_box: Control = $BossBar
 @onready var boss_bar: ProgressBar = $BossBar/Bar
 @onready var boss_name: Label = $BossBar/Name
 @onready var banner: Label = $Banner
@@ -23,6 +25,7 @@ var _flash: Tween
 @onready var end_label: Label = $EndPanel/VBox/Label
 @onready var retry: Button = $EndPanel/VBox/Retry
 @onready var skip_button: Button = $SkipPhase
+@onready var bars: Array = [$Cinema/Top, $Cinema/Bottom]
 
 
 func _ready() -> void:
@@ -94,6 +97,18 @@ func flash(strength := 0.7, hold := 0.0) -> void:
 	_flash = create_tween()
 	_flash.tween_interval(hold)
 	_flash.tween_property(flash_rect, "modulate:a", 0.0, 0.35)
+
+
+## Cutscene letterbox: black bars slide in top and bottom while the hearts and boss bar step
+## aside (and the hint clears), or slide back out.
+func cinema(on: bool) -> void:
+	hearts_row.visible = not on
+	boss_box.visible = not on
+	if on:
+		show_hint("")
+	var slide := create_tween().set_parallel()
+	for bar: Control in bars:
+		slide.tween_property(bar, "scale:y", 1.0 if on else 0.0, 0.5).set_trans(Tween.TRANS_SINE)
 
 
 func show_end(text: String) -> void:

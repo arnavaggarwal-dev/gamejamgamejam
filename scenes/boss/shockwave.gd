@@ -12,5 +12,5 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	position.x += speed * direction * delta
-	if position.x < -150.0 or position.x > 2710.0:
+	if position.x < -150.0 or position.x > Stage.DOOM_W + 150.0:
 		queue_free()

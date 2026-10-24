@@ -377,3 +377,32 @@ static func core_hub_frames() -> Array:
 		c.outline()
 		frames.append(c)
 	return frames
+
+
+## Lava for the gaps in the arena of doom: a glowing crust that bubbles (3 frames).
+static func lava_frames() -> Array:
+	var frames := []
+	for f in 3:
+		var c = Canvas.new(40, 20)
+		c.rect(0, 0, 40, 20, P.PLUM)
+		c.rect(0, 0, 40, 6, P.ROSE)
+		c.rect(0, 0, 40, 2, P.SALMON)
+		for x in range(0, 40):
+			if (x + f * 3) % 9 < 4:
+				c.px(x, 0, P.PEACH)
+		for b in [[6, 9], [19, 13], [31, 8]]:
+			var r: int = (f + b[0]) % 3
+			c.ellipse(b[0], b[1] - f, 1.5 + r * 0.5, 1.5 + r * 0.5, P.SALMON)
+			c.px(b[0], b[1] - f - 1, P.BUTTER)
+		frames.append(c)
+	return frames
+
+
+## The arena of doom's huge red moon.
+static func moon():
+	var c = Canvas.new(80, 80)
+	c.glow_disc(39.5, 39.5, 38.0, [P.PLUM, P.ROSE, P.SALMON, P.PEACH])
+	for cr in [[26, 30, 6.0], [50, 46, 8.0], [36, 58, 4.0], [56, 24, 3.5]]:
+		c.ellipse(cr[0], cr[1], cr[2], cr[2] * 0.8, P.ROSE)
+		c.ellipse(cr[0] + 1, cr[1] + 1, cr[2] - 1.5, cr[2] * 0.8 - 1.5, P.PLUM)
+	return c

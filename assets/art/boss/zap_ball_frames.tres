@@ -1,0 +1,25 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/boss/zap_ball.png" id="1_ji24w"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3kj1m"]
+atlas = ExtResource("1_ji24w")
+region = Rect2(0, 0, 12, 12)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_127cf"]
+atlas = ExtResource("1_ji24w")
+region = Rect2(12, 0, 12, 12)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3kj1m")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_127cf")
+}],
+"loop": 1,
+"name": &"spark",
+"speed": 12.0
+}]

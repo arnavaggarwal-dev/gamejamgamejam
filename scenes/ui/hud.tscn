@@ -17,6 +17,37 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.988, 0.984, 0.988, 1)
 
+[node name="Cinema" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Top" type="ColorRect" parent="Cinema"]
+layout_mode = 1
+anchor_right = 1.0
+offset_bottom = 80.0
+grow_horizontal = 2
+scale = Vector2(1, 0)
+mouse_filter = 2
+color = Color(0.176, 0.153, 0.188, 1)
+
+[node name="Bottom" type="ColorRect" parent="Cinema"]
+layout_mode = 1
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -80.0
+grow_horizontal = 2
+grow_vertical = 0
+scale = Vector2(1, 0)
+pivot_offset = Vector2(0, 80)
+mouse_filter = 2
+color = Color(0.176, 0.153, 0.188, 1)
+
 [node name="Hearts" type="HBoxContainer" parent="."]
 offset_left = 24.0
 offset_top = 24.0

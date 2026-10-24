@@ -4,6 +4,9 @@ extends Node2D
 const GOAL_HINT := "GRAB BOMBS [Z] AND THROW THEM AT THE CORE!"
 const HELPER := preload("res://scenes/boss/training_bot.tscn")
 const DOOM_ZOOM := Vector2.ONE / 3.0  # phase 4 pulls the camera back threefold
+const WATT_SPOT := Vector2(3650.0, -350.0)  # phase 4: Lil' Watt beams into the rising king from here
+const WATT_SIZE := Vector2(2.0, 2.0)  # phase 4's Lil' Watt is powered up (and readable zoomed out)
+const CINEMA_DROP := 240  # world px the view drops during the letterbox, so the floor clears the bottom bar
 
 @onready var player: Player = $Player
 @onready var boss: Boss = $Boss
@@ -58,8 +61,10 @@ func _on_player_died() -> void:
 		child.queue_free()
 	player.reset(respawn.global_position)
 	boss.restart_phase()
-	if boss.phase == Boss.FINAL:
-		_spawn_helper()  # a fresh Lil' Watt for the retry
+	if boss.phase == Boss.FINAL and boss.state != Boss.State.PHASE_SHIFT:
+		_spawn_helper(Vector2(player.global_position.x + TrainingBot.LEAD, 200.0))  # a fresh Lil' Watt for the retry
+		helper.power_target = boss.weak_point()
+		helper.fight()
 	hud.show_banner("AGAIN!", 1.0)
 
 
@@ -76,34 +81,83 @@ func _on_player_fell() -> void:
 
 func _on_boss_phase_changed(phase: int) -> void:
 	hud.flash()
-	hud.show_banner("PHASE %d" % (phase + 1), 1.2)
 	stage.set_phase(phase)
 	backdrop.set_phase(phase)
-	if phase == 2:
-		get_tree().call_group("camera", "shake", 14.0)
 	if phase == Boss.FINAL:
 		_final_phase()
+		return
+	hud.show_banner("PHASE %d" % (phase + 1), 1.2)
+	if phase == 2:
+		get_tree().call_group("camera", "shake", 14.0)
 
 
-## Phase 4: the camera pulls back threefold over the arena of doom while the king rebuilds
-## himself, and Lil' Watt flies in to power him. Breaking Lil' Watt finishes him.
+## Phase 4 cutscene. His head shatters and the camera pulls back threefold over the arena of
+## doom; Lil' Watt flies in to the fallen crown ("...DAD?"), turns on you, then beams his power
+## into the wreck and the king rises again, as tall as the screen. The camera follows Lil' Watt
+## until the fight resumes, with Lil' Watt fighting beside the king: break it to finish him.
 func _final_phase() -> void:
+	player.frozen = true
+	hud.cinema(true)
+	for child in projectiles.get_children():
+		child.queue_free()
 	camera.limit_top = -1440  # 720 x 3 tall, floor still at the bottom of the view
 	camera.limit_right = int(Stage.DOOM_W)
+	camera.limit_bottom = 720 + CINEMA_DROP
 	create_tween().tween_property(camera, "zoom", DOOM_ZOOM, 2.5).set_trans(Tween.TRANS_SINE)
-	await get_tree().create_timer(1.2, false).timeout
-	_spawn_helper()
+	await _wait(2.6)
+	if boss.state == Boss.State.DEAD:
+		return  # (debug skip) knocked out mid-cutscene
+	var crown := boss.fallen_crown.global_position
+	_spawn_helper(crown + Vector2(1800.0, -1500.0))
+	camera.target = helper
+	await _fly(crown + Vector2(0.0, -300.0), 1.8)
+	hud.coach("...DAD?")
+	await _wait(1.8)
+	helper.get_angry()
+	hud.coach("YOU BROKE MY DAD!!")
+	await _wait(2.2)
+	if boss.state == Boss.State.DEAD:
+		return
+	hud.coach("")
+	await _fly(WATT_SPOT, 1.4)
+	hud.coach("RISE, FATHER!!")
+	helper.channel()
+	helper.power_target = boss.weak_point()
+	boss.revive()
+	await boss.revived
+	hud.coach("")
+	hud.cinema(false)
+	create_tween().tween_property(camera, "limit_bottom", 720, 0.5).set_trans(Tween.TRANS_SINE)
+	camera.target = player
+	player.frozen = false
+	helper.fight()
+	stage.start_strikes()
+	hud.show_banner("FINAL PHASE", 1.4)
 	hud.show_tip("LIL' WATT IS POWERING THE KING!  BREAK LIL' WATT!", 5.0)
 
 
-func _spawn_helper() -> void:
+func _wait(seconds: float) -> void:
+	await get_tree().create_timer(seconds, false).timeout
+
+
+## Cutscene move: flies Lil' Watt somewhere (the camera follows it).
+func _fly(to: Vector2, seconds: float) -> void:
+	var trip := create_tween()
+	trip.tween_property(helper, "global_position", to, seconds).set_trans(Tween.TRANS_SINE)
+	await trip.finished
+
+
+## A fresh Lil' Watt for phase 4, parked at `at` (the caller sets it fighting or flying).
+func _spawn_helper(at: Vector2) -> void:
 	if is_instance_valid(helper):
 		helper.queue_free()
 	helper = HELPER.instantiate()
 	add_child(helper)
-	helper.global_position = Vector2(boss.weak_point().global_position.x, 420.0)
-	helper.power_target = boss.weak_point()
+	helper.global_position = at
+	helper.scale = WATT_SIZE
+	helper.roaming = false
 	helper.roam_max = Stage.DOOM_W - 120.0
+	helper.projectiles = projectiles
 	helper.hit.connect(func(_left: int) -> void: boss.power_hit())
 	hud.set_boss_name("LIL' WATT")
 	hud.set_boss_health(helper.hp, TrainingBot.HITS)
@@ -111,6 +165,10 @@ func _spawn_helper() -> void:
 
 func _on_boss_defeated() -> void:
 	player.hurtbox.set_deferred("monitoring", false)  # deferred: defeated fires inside the WeakPoint physics callback
+	player.frozen = false
+	camera.target = player
+	camera.limit_bottom = 720
+	hud.cinema(false)
 	stage.stop()
 	if is_instance_valid(helper) and helper.hp > 0:
 		helper.break_down()  # (debug skip) the power source goes with him

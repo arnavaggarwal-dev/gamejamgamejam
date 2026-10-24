@@ -240,7 +240,7 @@ static func reticle():
 ## Frames: hover a, hover b (jet flicker), hurt (eye shut), broken (X eye, no jet, cracked).
 static func bot_frames() -> Array:
 	var frames := []
-	for kind in ["hover_a", "hover_b", "hurt", "broken"]:
+	for kind in ["hover_a", "hover_b", "hurt", "broken", "angry"]:
 		var c = Canvas.new(40, 44)
 		if kind != "broken":
 			var flame := [P.CREAM, P.BUTTER, P.BUTTER, P.PEACH, P.PEACH, P.SALMON, P.SALMON]
@@ -262,6 +262,12 @@ static func bot_frames() -> Array:
 			"broken":
 				c.line(17, 13, 21, 16, P.SALMON)
 				c.line(21, 13, 17, 16, P.SALMON)
+			"angry":
+				c.rect(18, 13, 4, 4, P.SALMON)
+				c.px(18, 13, P.CREAM)
+				c.vline(20, 14, 15, P.INK)
+				c.line(12, 9, 18, 11, P.INK)  # a furious V brow over the visor
+				c.line(27, 9, 21, 11, P.INK)
 			_:
 				c.rect(18, 13, 4, 4, P.SKY)
 				c.px(18, 13, P.CREAM)
@@ -378,3 +384,28 @@ static func crack(seed: int):
 	for d in [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1)]:
 		c.px(8 + d.x, 8 + d.y, P.INK)  # the impact point
 	return c
+
+
+## A shard of the king's head armour, for the shatter burst.
+static func shard():
+	var c = Canvas.new(8, 8)
+	for p in [[2, 2], [3, 2], [4, 3], [2, 3], [3, 3], [3, 4], [4, 4], [5, 5], [4, 5]]:
+		c.px(p[0], p[1], P.BLUE)
+	c.px(2, 2, P.PERI)
+	c.px(3, 2, P.PERI)
+	c.outline()
+	return c
+
+
+## Lil' Watt's zap shot: a crackling butter ball (2 frames).
+static func zap_ball_frames() -> Array:
+	var frames := []
+	for f in 2:
+		var c = Canvas.new(12, 12)
+		c.glow_disc(5.5, 5.5, 3.5 + f * 0.6, [P.PEACH, P.BUTTER, P.CREAM])
+		for k in 4:
+			var a := TAU * (k + f * 0.5) / 4.0
+			c.px(roundi(5.5 + cos(a) * 5.0), roundi(5.5 + sin(a) * 5.0), P.BUTTER)
+		c.outline()
+		frames.append(c)
+	return frames
