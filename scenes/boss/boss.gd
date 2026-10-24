@@ -18,6 +18,7 @@ signal phase_changed(phase: int)  # 0-based: the second phase emits 1
 signal defeated
 signal attack_started(attack: StringName)
 signal revived  # phase 4: back on his feet, giant-sized, and about to fight
+signal crown_popped(at: Vector2)  # the knockout: his crown flies off his head (the game takes it from there)
 
 enum State { INTRO, IDLE, ATTACK, STAGGER, PHASE_SHIFT, DEAD }
 
@@ -420,6 +421,13 @@ func heal_cracks() -> void:
 
 func spit_bomb() -> void:
 	_drop_bomb(mouth.global_position, Vector2(randf_range(-700.0, -350.0), -420.0))
+
+
+## The knockout: his crown pops off his head; the game flies it up and later drops it on the hero.
+func pop_crown() -> void:
+	var crown: Node2D = head.get_node("Crown")
+	crown.hide()
+	crown_popped.emit(crown.global_position)
 
 
 ## A huge moment (the head shattering, re-forming, the giant's roar): full white flash and a freeze.

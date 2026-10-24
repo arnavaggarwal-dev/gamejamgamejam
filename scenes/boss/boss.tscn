@@ -1487,7 +1487,7 @@ tracks/5/keys = {
 
 [sub_resource type="Animation" id="Animation_death"]
 resource_name = "death"
-length = 2.5
+length = 5
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -1495,10 +1495,10 @@ tracks/0/path = NodePath("Rig:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.15, 0.3, 0.45, 0.6, 2.5),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 2, 1),
+"times": PackedFloat32Array(0, 0.15, 0.3, 0.45, 0.6, 1.6, 2.1, 4.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 0.5, 2, 1),
 "update": 0,
-"values": [Vector2(-661, -371), Vector2(-645, -371), Vector2(-677, -371), Vector2(-649, -371), Vector2(-673, -371), Vector2(-661, 900)]
+"values": [Vector2(-661, -371), Vector2(-645, -371), Vector2(-677, -371), Vector2(-649, -371), Vector2(-661, -371), Vector2(-661, -371), Vector2(-661, -301), Vector2(-661, 2429)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -1507,35 +1507,110 @@ tracks/1/path = NodePath("Rig:modulate")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 2.5),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0, 1.8, 4.6),
+"transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Color(1, 1, 1, 1), Color(0.5, 0.5, 0.5, 1)]
+"values": [Color(1, 1, 1, 1), Color(0.75, 0.72, 0.82, 1), Color(0.4, 0.38, 0.48, 1)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("Rig/Upper/Head/Jets:visible")
+tracks/2/path = NodePath("Rig/Upper/Head/Eye:modulate")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.45, 0.6, 0.9),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Color(0.25, 0.22, 0.3, 1), Color(1, 1, 1, 1), Color(0.25, 0.22, 0.3, 1), Color(1, 1, 1, 1), Color(0.25, 0.22, 0.3, 1), Color(1, 1, 1, 1), Color(0.25, 0.22, 0.3, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Rig/Upper/Body/Core/Glow:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [false, true, false, true, false]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Rig/Upper/Body/FistL:position")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0.6, 1.3),
+"transitions": PackedFloat32Array(2, 1),
+"update": 0,
+"values": [Vector2(870, 470), Vector2(950, 614)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Rig/Upper/Body/FistR:position")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0.6, 1.3),
+"transitions": PackedFloat32Array(2, 1),
+"update": 0,
+"values": [Vector2(1290, 470), Vector2(1210, 614)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Rig/Upper/Head:rotation")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0.8, 1.6),
+"transitions": PackedFloat32Array(2, 1),
+"update": 0,
+"values": [0.0, -0.3]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Rig/Upper/Head/Jets:visible")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [false]
 }
-tracks/3/type = "method"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath(".")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.3, 0.7, 1.1, 1.5, 1.9),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+tracks/8/type = "method"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath(".")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.9, 1.6, 2, 2.4, 2.42, 2.8, 3.2, 3.6, 4, 4.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "values": [{
 "args": [25.0],
 "method": &"shake"
+}, {
+"args": [NodePath("Rig/Upper/Body/Torso")],
+"method": &"boom"
+}, {
+"args": [NodePath("Rig/Upper/Body/ArmL/Elbow")],
+"method": &"boom"
+}, {
+"args": [NodePath("Rig/Legs/StompAnchor/LegF/Art")],
+"method": &"boom"
+}, {
+"args": [NodePath("Rig/Legs/LegB/Art")],
+"method": &"boom"
+}, {
+"args": [],
+"method": &"pop_crown"
 }, {
 "args": [NodePath("Rig/Upper/Head")],
 "method": &"boom"
@@ -1546,11 +1621,14 @@ tracks/3/keys = {
 "args": [NodePath("Rig/Legs/StompAnchor/LegF/Art")],
 "method": &"boom"
 }, {
+"args": [NodePath("Rig/Upper/Head")],
+"method": &"boom"
+}, {
 "args": [NodePath("Rig/Upper/Body/Torso")],
 "method": &"boom"
 }, {
-"args": [NodePath("Rig/Upper/Head")],
-"method": &"boom"
+"args": [],
+"method": &"blast"
 }]
 }
 

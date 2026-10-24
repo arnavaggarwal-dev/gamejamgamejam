@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://scenes/player/aim.gd" id="3_aim"]
 [ext_resource type="Texture2D" path="res://assets/art/ui/key_z.png" id="4_key"]
 [ext_resource type="Texture2D" path="res://assets/art/fx/streak.png" id="5_streak"]
+[ext_resource type="Texture2D" path="res://assets/art/boss/crown.png" id="6_crown"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
 radius = 22.0
@@ -148,6 +149,13 @@ scale = Vector2(4, 4)
 sprite_frames = ExtResource("2_frames")
 animation = &"idle"
 autoplay = "idle"
+
+[node name="Crown" type="Sprite2D" parent="Art"]
+visible = false
+z_index = 1
+position = Vector2(0, -66)
+scale = Vector2(4.5, 4.5)
+texture = ExtResource("6_crown")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CapsuleShape2D_body")

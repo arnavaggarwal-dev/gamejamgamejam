@@ -25,6 +25,7 @@ var roaming := true  # follows the player (off while a cutscene flies it around)
 var follow_y := false  # phase 4: climbs with the player too
 var projectiles: Node  # where its shots go (the arena's Projectiles, cleared when the player dies)
 var face := &"hover"  # the Art animation it wears between hurt frames (angry once you broke its dad)
+var out_cold := false  # phase 4's last hit knocks it out instead of blowing it up
 
 @onready var anim: AnimationPlayer = $AnimationPlayer
 @onready var juice: AnimationPlayer = $Juice
@@ -122,8 +123,32 @@ func rumble(amount: float) -> void:
 	get_tree().call_group("camera", "shake", amount)
 
 
+## Phase 4 knockout: the last hit knocks it out of the sky instead of blowing it up. One pop, the
+## power link snaps, and it drops onto the floor at `spot` and lies there tipped over, steaming.
+func knock_out(spot: Vector2) -> void:
+	out_cold = true
+	hp = 0
+	roaming = false
+	shot_timer.stop()
+	boom(Vector2.ZERO)
+	anim.play(&"konk")
+	create_tween().tween_property(self, "global_position", spot, 0.9).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+
+
+## The ending: it comes round...
+func sit_up() -> void:
+	anim.play(&"sit_up")
+
+
+## ...and bows to the new king.
+func bow() -> void:
+	anim.play(&"bow")
+
+
 ## Blows the bot apart (the tutorial also calls this when the lesson is skipped).
 func break_down() -> void:
+	if out_cold:
+		return
 	hp = 0
 	if anim.current_animation != &"die":
 		anim.play(&"die")

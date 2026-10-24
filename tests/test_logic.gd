@@ -20,7 +20,7 @@ var _errors := ErrorCounter.new()
 func _initialize() -> void:
 	OS.add_logger(_errors)
 	# A runtime error inside a test stops _run before quit(); the watchdog ends the process instead of hanging.
-	create_timer(180.0, true, false, true).timeout.connect(_on_timeout)
+	create_timer(240.0, true, false, true).timeout.connect(_on_timeout)
 	_run.call_deferred()
 
 
@@ -557,6 +557,14 @@ func _test_final_phase() -> void:
 		bomb.global_position = helper.core.global_position
 		await create_timer(0.4).timeout
 	check(won[0] and boss.state == Boss.State.DEAD, "breaking Lil' Watt knocks the giant out")
+	check(is_instance_valid(helper) and helper.out_cold and not helper.link.visible and player.frozen and hud.bars[0].scale.y > 0.0, "the last hit knocks Lil' Watt out (no explosion), snaps the power link and starts the ending")
+	await create_timer(7.0).timeout
+	check(boss.rig.position.y > Boss.GROWN_POS.y + 1000.0 and not boss.head.get_node("Crown").visible, "the powerless king comes apart and sinks into his moat, his crown popped off")
+	check(player.crown.visible and player.frozen, "the king's crown drops onto the little guy")
+	await create_timer(5.0).timeout
+	check(not player.frozen and hud.bars[0].scale.y < 0.05 and helper.anim.current_animation in [&"bow", &""], "Lil' Watt comes round and bows; the letterbox lifts")
+	await create_timer(3.4).timeout
+	check(hud.end_panel.visible and hud.end_label.text == "YOU WIN!" and not hud.boss_box.visible, "then the win screen (no boss bar left)")
 	game.queue_free()
 	await process_frame
 	Engine.time_scale = 1.0

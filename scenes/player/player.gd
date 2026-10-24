@@ -62,6 +62,7 @@ var _thrown: Bomb = null  # the last bomb he threw, for [A] to set off
 @onready var trail: CPUParticles2D = $Trail
 @onready var juice: AnimationPlayer = $Juice
 @onready var ghost_timer: Timer = $GhostTimer
+@onready var crown: Sprite2D = $Art/Crown
 
 
 func _ready() -> void:
@@ -150,6 +151,13 @@ func _stand_still(delta: float) -> void:
 	aim.points = PackedVector2Array()
 	prompt.hide()
 	_update_pose(0.0)
+
+
+## The ending: the king's crown lands on his head (much too big). Clonk.
+func wear_crown() -> void:
+	crown.show()
+	_squash(Vector2(1.4, 0.6))
+	_puff(DUST, _feet())
 
 
 func take_hit() -> void:

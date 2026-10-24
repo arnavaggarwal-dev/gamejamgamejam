@@ -30,6 +30,7 @@
 [ext_resource type="Texture2D" path="res://assets/art/world/floor_tile.png" id="28_floortile"]
 [ext_resource type="SpriteFrames" path="res://assets/art/world/lava_frames.tres" id="29_lava"]
 [ext_resource type="Texture2D" path="res://assets/art/world/moon.png" id="30_moon"]
+[ext_resource type="Texture2D" path="res://assets/art/boss/crown.png" id="31_crown"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_spot"]
 shader = ExtResource("25_spot")
@@ -1094,6 +1095,12 @@ scale = Vector2(4, 4)
 sprite_frames = ExtResource("24_arrow")
 animation = &"bob"
 autoplay = "bob"
+
+[node name="KingsCrown" type="Sprite2D" parent="."]
+visible = false
+z_index = 5
+scale = Vector2(6.3, 6.3)
+texture = ExtResource("31_crown")
 
 [node name="HUD" parent="." instance=ExtResource("5_hud")]
 

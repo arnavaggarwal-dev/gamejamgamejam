@@ -7,6 +7,7 @@ const DOOM_ZOOM := Vector2.ONE / 3.0  # phase 4 pulls the camera back threefold
 const WATT_SPOT := Vector2(2450.0, -560.0)  # phase 4: Lil' Watt beams into the rising king from here
 const WATT_SIZE := Vector2(2.0, 2.0)  # phase 4's Lil' Watt is powered up (and readable zoomed out)
 const CINEMA_DROP := 240  # world px the view drops during the letterbox, so the floor clears the bottom bar
+const WATT_DOWN_Y := 496.0  # Lil' Watt (2x) lying on the floor
 
 @onready var player: Player = $Player
 @onready var boss: Boss = $Boss
@@ -17,6 +18,7 @@ const CINEMA_DROP := 240  # world px the view drops during the letterbox, so the
 @onready var projectiles: Node2D = $Projectiles
 @onready var respawn: Marker2D = $RespawnPoint
 @onready var camera: Camera2D = $Camera2D
+@onready var kings_crown: Sprite2D = $KingsCrown
 
 var helper: TrainingBot  # Lil' Watt powering the giant in phase 4
 
@@ -30,6 +32,7 @@ func _ready() -> void:
 	boss.health_changed.connect(func(_left: int, _total: int) -> void: backdrop.cheer())
 	boss.phase_changed.connect(_on_boss_phase_changed)
 	boss.defeated.connect(_on_boss_defeated)
+	boss.crown_popped.connect(_on_crown_popped)
 	hud.retry_pressed.connect(get_tree().reload_current_scene)
 	hud.skip_phase_pressed.connect(boss.skip_phase)
 	tutorial.setup(player, boss, hud, stage, projectiles)
@@ -166,15 +169,61 @@ func _spawn_helper(at: Vector2) -> void:
 
 func _on_boss_defeated() -> void:
 	player.hurtbox.set_deferred("monitoring", false)  # deferred: defeated fires inside the WeakPoint physics callback
-	player.frozen = false
-	camera.target = player
-	camera.limit_bottom = 720
-	hud.cinema(false)
 	stage.stop()
-	if is_instance_valid(helper) and helper.hp > 0:
-		helper.break_down()  # (debug skip) the power source goes with him
-	backdrop.cheer(6.0)
-	hud.flash()
+	for child in projectiles.get_children():
+		child.queue_free()
+	await _ending()
 	hud.show_hint("")
-	await hud.show_banner("KNOCKOUT!", 2.5)
+	await hud.show_banner("LONG LIVE THE LITTLE GUY!", 3.0)
 	hud.show_end("YOU WIN!")
+
+
+## The knockout, letterboxed. Lil' Watt is knocked out of the sky and the power link snaps; the
+## king goes limp and comes apart in his moat (his "death" clip), his crown popping off into the
+## sky. Once he is gone the crown drops out of the sky onto the little guy (much too big); Lil'
+## Watt comes round, takes it in, and bows to the new king.
+func _ending() -> void:
+	player.frozen = true
+	camera.target = player
+	camera.limit_bottom = 720 + CINEMA_DROP
+	hud.cinema(true)
+	hud.coach("")
+	hud.flash(1.0, 0.1)
+	if is_instance_valid(helper):
+		helper.knock_out(Vector2(stage.safe_spot(helper.global_position.x).x, WATT_DOWN_Y))
+	await _wait(5.4)  # the king comes apart and sinks; the white-out fades
+	kings_crown.global_position = Vector2(player.global_position.x, -1700.0)
+	kings_crown.rotation = 0.8
+	kings_crown.scale = Vector2(6.3, 6.3)
+	kings_crown.show()
+	var drop := create_tween().set_parallel()
+	drop.tween_property(kings_crown, "global_position", player.crown.global_position, 0.9).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	drop.tween_property(kings_crown, "rotation", 0.0, 0.9)
+	drop.tween_property(kings_crown, "scale", player.crown.global_scale, 0.9)
+	await drop.finished
+	kings_crown.hide()
+	player.wear_crown()
+	get_tree().call_group("camera", "shake", 12.0)
+	await _wait(1.0)
+	if is_instance_valid(helper):
+		helper.sit_up()
+		hud.coach("...DAD?")
+		await _wait(1.8)
+		helper.bow()
+		hud.coach("...FINE.  YOU'RE THE KING NOW.")
+		await _wait(2.6)
+	hud.coach("")
+	hud.cinema(false)
+	hud.boss_box.hide()  # nobody left to fight
+	create_tween().tween_property(camera, "limit_bottom", 720, 0.5).set_trans(Tween.TRANS_SINE)
+	player.frozen = false
+
+
+## The king's crown pops off as he comes apart: it spins up out of sight (it comes back down
+## on the hero at the end of the knockout).
+func _on_crown_popped(at: Vector2) -> void:
+	kings_crown.global_position = at
+	kings_crown.show()
+	var fly := create_tween().set_parallel()
+	fly.tween_property(kings_crown, "global_position:y", -1900.0, 0.9).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	fly.tween_property(kings_crown, "rotation", TAU * 2.0, 0.9)
