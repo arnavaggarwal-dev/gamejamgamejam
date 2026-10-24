@@ -2,39 +2,32 @@ class_name Stage
 extends Node2D
 ## The arena's own moves. Phase 1 is plain stone so the king's attacks read cleanly; phase 2
 ## switches on the conveyors, the lifts, zaps near the player and the core platforms that fall
-## apart underfoot; phase 3 flips the belts, zaps more often and collapses two panels into pits
-## under falling rubble.
+## apart underfoot; phase 3 flips the belts, zaps more often and collapses two panels into pits.
 
 signal zap_started
 signal collapsed
 
-const DEBRIS := preload("res://scenes/stage/debris.tscn")
 const PANEL_W := 160.0
 const BELTS := {4: 140.0, 5: 140.0, 11: -140.0, 12: -140.0}
 const PITS := [7, 14]
 const ZAP_EVERY := [0.0, 5.0, 4.0]  # seconds between zaps, per phase (none in phase 1)
 const ZAP_WIDTH := [2, 2, 3]  # panels per zap, per phase
-const DEBRIS_EVERY := 1.4
 const ARENA_W := 2560.0
 
 var phase := 0
 
 @onready var panels: Array = $Floor.get_children()
-@onready var hazards: Node2D = $Hazards
 @onready var zap_timer: Timer = $ZapTimer
-@onready var debris_timer: Timer = $DebrisTimer
 @onready var lifts: Array = [$Piston, $Slider]
 @onready var core_platforms: Array = $CorePlatforms.get_children()
 
 
 func _ready() -> void:
 	zap_timer.timeout.connect(zap_near_player)
-	debris_timer.timeout.connect(_drop_debris)
 
 
 func stop() -> void:
 	zap_timer.stop()
-	debris_timer.stop()
 
 
 func set_phase(p: int) -> void:
@@ -51,7 +44,6 @@ func set_phase(p: int) -> void:
 			panels[i].set_belt(-panels[i].belt_speed)
 		for i in PITS:
 			panels[i].collapse()
-		debris_timer.start(DEBRIS_EVERY)
 		collapsed.emit()
 	zap_timer.start(ZAP_EVERY[phase])
 
@@ -87,12 +79,3 @@ func panel_at(x: float) -> FloorPanel:
 
 func _panel_x(i: int) -> float:
 	return (i + 0.5) * PANEL_W
-
-
-func _drop_debris() -> void:
-	var player := get_tree().get_first_node_in_group("player") as Node2D
-	if player == null:
-		return
-	var rock: Node2D = DEBRIS.instantiate()
-	hazards.add_child(rock)
-	rock.global_position = Vector2(clampf(player.global_position.x + randf_range(-380.0, 380.0), 80.0, ARENA_W - 80.0), -60.0)

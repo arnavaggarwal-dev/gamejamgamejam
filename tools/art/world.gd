@@ -328,33 +328,6 @@ static func lift_frames() -> Array:
 	return frames
 
 
-## Ceiling rubble that falls in the last phase (2 tumble frames).
-static func debris_frames() -> Array:
-	var frames := []
-	for f in 2:
-		var c = Canvas.new(14, 12)
-		var rows := [
-			"...#####....",
-			"..#######...",
-			".#########..",
-			"###########.",
-			"############",
-			".##########.",
-			"..#######...",
-			"....###.....",
-		]
-		c.grid(1, 2, rows, {"#": P.ROSE})
-		c.shade_ellipse(6.5, 6.0, 5.5, 4.0, [P.PLUM, P.ROSE, P.PEACH, P.CREAM], [-0.2, 0.4, 0.88])
-		c.px(4, 4, P.CHARCOAL)
-		c.px(9, 7, P.CHARCOAL)
-		if f == 1:
-			c.img.flip_x()
-			c.img.flip_y()
-		c.outline()
-		frames.append(c)
-	return frames
-
-
 ## One-way girder platform.
 static func platform():
 	var c = Canvas.new(50, 6)

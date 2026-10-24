@@ -418,7 +418,6 @@ func _test_phase_extras() -> void:
 	boss.phase_changed.emit(2)
 	var stage: Stage = game.get_node("Arena")
 	check(stage.panels[7].collapsed and stage.panels[14].collapsed, "phase 3 opens the pits")
-	check(not stage.debris_timer.is_stopped(), "phase 3 starts the falling rubble")
 	game.queue_free()
 	await process_frame
 

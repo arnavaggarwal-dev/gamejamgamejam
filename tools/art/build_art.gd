@@ -56,7 +56,6 @@ func _world() -> void:
 	_save_sheet("world/core_plate.png", [World.core_plate(false)])
 	_save_sheet("world/core_plate_end.png", [World.core_plate(true)])
 	_save_sheet("world/core_hub.png", World.core_hub_frames())
-	_save_sheet("world/debris.png", World.debris_frames())
 	_save_sheet("world/gear.png", World.gear_frames())
 	_save_sheet("world/banner.png", World.banner_frames())
 	_save_sheet("world/torch.png", World.torch_frames())

@@ -51,8 +51,6 @@ func _on_player_died() -> void:
 	await get_tree().create_timer(1.0, false).timeout
 	for child in projectiles.get_children():
 		child.queue_free()
-	for child in stage.hazards.get_children():
-		child.queue_free()
 	player.reset(respawn.global_position)
 	boss.restart_phase()
 	hud.show_banner("AGAIN!", 1.0)

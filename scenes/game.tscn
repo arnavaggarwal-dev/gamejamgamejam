@@ -353,11 +353,7 @@ position = Vector2(540, 330)
 [node name="CoreR" parent="Arena/CorePlatforms" instance=ExtResource("27_coreplat")]
 position = Vector2(1760, 320)
 
-[node name="Hazards" type="Node2D" parent="Arena"]
-
 [node name="ZapTimer" type="Timer" parent="Arena"]
-
-[node name="DebrisTimer" type="Timer" parent="Arena"]
 
 [node name="Projectiles" type="Node2D" parent="."]
 
