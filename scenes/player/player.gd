@@ -128,7 +128,7 @@ func _physics_process(delta: float) -> void:
 		else:
 			_grab()
 	if held_bomb:
-		held_bomb.global_position = hold_point.global_position
+		held_bomb.global_position = hold_point.global_position + Vector2(0.0, -24.0 * (held_bomb.size - 1.0))  # a big bomb sits higher
 	_update_aim()
 	_update_prompt()
 	_update_pose(dir)
@@ -262,7 +262,7 @@ func _update_aim() -> void:
 	if held_bomb:
 		var g := Vector2(0.0, ProjectSettings.get_setting("physics/2d/default_gravity") * held_bomb.gravity_scale)
 		var v := _throw_velocity()
-		var start := hold_point.global_position
+		var start := held_bomb.global_position
 		for i in range(1, AIM_DOTS + 1):
 			var t := i * AIM_STEP
 			var p := start + v * t + 0.5 * g * t * t

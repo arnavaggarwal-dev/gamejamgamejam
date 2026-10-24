@@ -196,6 +196,8 @@ func _on_attack_started(attack: StringName) -> void:
 	match attack:
 		&"stomp":
 			_tip("stomp", "HIS FOOT WALKS TO THE RED RING.  MOVE!")
+		&"step":
+			_tip("step", "THE GIANT STEPS TO THE RED RING.  MOVE!")
 		&"swipe":
 			_tip("swipe", "HAND SWIPE!  JUMP OVER IT  (OR DASH THROUGH).")
 		&"swoop":

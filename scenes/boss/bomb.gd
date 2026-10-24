@@ -11,6 +11,7 @@ const SPIN := 12.0  # rad/s while airborne
 
 var thrown := false
 var exploded := false
+var size := 1.0  # set before it enters the tree: phase 4's bombs come bigger, blast and all
 
 @onready var art: Node2D = $Art
 @onready var arrow: Node2D = $Arrow
@@ -19,6 +20,11 @@ var exploded := false
 
 
 func _ready() -> void:
+	art.scale *= size
+	$CollisionShape2D.scale *= size
+	blast_shape.scale *= size
+	particles.scale_amount_min *= size
+	particles.scale_amount_max *= size
 	$FuseTimer.timeout.connect(explode)
 	$AnimationPlayer.play(&"fuse")
 
@@ -39,7 +45,7 @@ func _process(delta: float) -> void:
 	else:
 		art.global_rotation = lerp_angle(art.global_rotation, 0.0, minf(1.0, 20.0 * delta))
 	arrow.global_rotation = 0.0
-	arrow.global_position = global_position + ARROW_OFFSET
+	arrow.global_position = global_position + ARROW_OFFSET * size
 	if global_position.y > PIT_Y:
 		queue_free()  # rolled into a pit
 
@@ -71,6 +77,7 @@ func explode() -> void:
 	var boom: Node2D = EXPLOSION.instantiate()
 	get_parent().add_child.call_deferred(boom)
 	boom.position = position
+	boom.scale = Vector2.ONE * size
 	get_tree().call_group("camera", "shake", 10.0)
 	await get_tree().create_timer(0.15).timeout
 	blast_shape.set_deferred("disabled", true)

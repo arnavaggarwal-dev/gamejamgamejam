@@ -305,11 +305,26 @@ func _test_giant_stages() -> void:
 	await create_timer(6.8).timeout  # the whole rise
 	var torso_x: float = boss.body.get_node("Torso").global_position.x
 	var legs_x: float = (boss.leg_f.global_position.x + boss.leg_b.global_position.x) / 2.0
-	check(absf(torso_x - legs_x) < 20.0, "the rebuilt giant's torso sits centred on his legs")
+	var leg_gap := absf(boss.leg_b.global_position.x - boss.leg_f.global_position.x)
+	check(absf(torso_x - legs_x) < 20.0 and leg_gap < 160.0 * Boss.GROWN_SCALE, "the rebuilt giant's legs sit together under the middle of his torso")
+	check(boss.leg_b.modulate == Color.WHITE and not boss.cores[0].visible and boss.stomp_anchor.z_index == 0, "...both legs match, and their tops tuck behind his hips")
 	check(up[0] and is_equal_approx(boss.position.x, Boss.FINAL_X) and boss.legs.visible and boss.body.visible and boss.head.visible and boss.head.position == Vector2(1090, 170), "revive() rebuilds him mid arena of doom: legs, torso, head back together")
 	var crown_y: float = boss.head.get_node("Crown").global_position.y
 	check(boss.rig.scale.is_equal_approx(Vector2.ONE * Boss.GROWN_SCALE) and boss.rig.position.is_equal_approx(Boss.GROWN_POS) and crown_y < -1300.0 and crown_y > -1440.0, "...and he grows as tall as the zoomed-out screen, feet still on the floor")
 	check(not armed.call(0) and not armed.call(1) and not armed.call(2), "the giant has no weak spot of his own")
+	var giant_moves: Array = Boss.PHASES[Boss.FINAL].attacks
+	check(giant_moves.has(&"step") and not giant_moves.has(&"stomp"), "the giant steps instead of sending a lone leg over")
+	boss.rest_timer.stop()
+	var anchor_rest := boss.stomp_anchor.position
+	var from_x := boss.position.x
+	boss.step_aim()  # no player in this scene: he steps toward x 400, at most GIANT_STEP
+	await create_timer(0.6).timeout
+	check(is_equal_approx(boss.position.x, from_x - Boss.GIANT_STEP) and boss.stomp_anchor.position == anchor_rest, "a step moves his whole body; the leg stays under him")
+	check(absf(boss.stomp_ring.global_position.x - boss.stomp_anchor.global_position.x) < 2.0, "the red ring marks where the foot comes down")
+	boss.rain_bomb()
+	var big: Bomb = root.get_children().filter(func(n: Node) -> bool: return n is Bomb).back()
+	check(is_equal_approx(big.size, Boss.GIANT_BIG_BOMB) and big.art.scale.is_equal_approx(Vector2.ONE * Boss.GIANT_BIG_BOMB), "the giant's rain bombs come big")
+	big.queue_free()
 	check(boss.state == Boss.State.IDLE and boss.anim.current_animation == &"idle_4", "the giant fights on")
 	boss.queue_free()
 	await process_frame

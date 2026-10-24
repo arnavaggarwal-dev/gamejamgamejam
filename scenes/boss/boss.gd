@@ -30,13 +30,14 @@ const PHASES := [
 	{attacks = [&"stomp", &"rain"], speed = 1.0, rest = 1.2},  # legs
 	{attacks = [&"swipe", &"bombs"], speed = 1.2, rest = 0.9},  # torso (moves by roaming, no charge)
 	{attacks = [&"swoop", &"spit", &"laser", &"spit"], speed = 1.3, rest = 0.7},  # head
-	{attacks = [&"stomp", &"rain", &"laser", &"rain"], speed = 1.0, rest = 1.1},  # rebuilt giant
+	{attacks = [&"step", &"rain", &"laser", &"rain"], speed = 1.0, rest = 1.1},  # rebuilt giant
 ]
 const FINAL := 3  # the rebuilt giant's phase: no weak spot of his own, Lil' Watt powers him
-const GROWN_SCALE := 1.55  # the giant's crown reaches the top of the 3x zoomed-out view
-const GROWN_POS := Vector2(-627, -352)  # Rig offset once he has grown, scaled about his feet (1140, 640)
+const GROWN_SCALE := 1.58  # the giant's crown reaches the top of the 3x zoomed-out view
+const GROWN_POS := Vector2(-661, -371)  # Rig offset once he has grown, scaled about his feet (1140, 640)
 const FINAL_X := 1950.0  # where the giant rises: torso near x 3000, standing in the first lava pool
-const STOMP_REACH := 1600.0  # px the giant's stomping leg reaches either side of his torso
+const GIANT_STEP := 900.0  # px the giant's whole body moves per step toward the player
+const GIANT_BIG_BOMB := 2.5  # phase 4's rain bombs, scaled up for the zoomed-out view
 
 @export var projectiles: Node2D
 
@@ -234,9 +235,6 @@ func skip_phase() -> void:
 ## Stage 1: the lifted front leg walks over to the player; a red ring marks where it lands.
 func stomp_aim() -> void:
 	var x := _player_x()
-	if phase == FINAL:
-		var torso := weak_point().global_position.x
-		x = clampf(x, torso - STOMP_REACH, torso + STOMP_REACH)
 	stomp_ring.global_position.x = x
 	_chase().tween_property(stomp_anchor, "global_position:x", x, 0.45 / anim.speed_scale).set_trans(Tween.TRANS_SINE)
 
@@ -248,6 +246,19 @@ func stomp_impact() -> void:
 ## ...and walks back to stand under him.
 func stomp_return() -> void:
 	_chase().tween_property(stomp_anchor, "position:x", _rest_pose[stomp_anchor].x, 0.4 / anim.speed_scale).set_trans(Tween.TRANS_SINE)
+
+
+## Stage 4: with his front leg raised, the giant steps his whole body (up to GIANT_STEP) toward
+## the player, so the foot comes down by him while staying under the torso. The red ring is held
+## on its floor spot while the rig carries it along.
+func step_aim() -> void:
+	var step := clampf(_player_x() - stomp_anchor.global_position.x, -GIANT_STEP, GIANT_STEP)
+	var goal := clampf(position.x + step, 0.0, DOOM_W - 1800.0)  # torso (at x + 1140) stays in the arena
+	var spot := stomp_anchor.global_position.x + goal - position.x
+	stomp_ring.global_position.x = spot
+	var walk := _chase().set_parallel()
+	walk.tween_property(self, "position:x", goal, 0.45 / anim.speed_scale).set_trans(Tween.TRANS_SINE)
+	walk.tween_property(stomp_ring, "global_position:x", spot, 0.45 / anim.speed_scale)
 
 
 ## Stage 3 tell: aim the dash at the player (called repeatedly, then it locks) and lay the
@@ -293,7 +304,10 @@ func spawn_bomb() -> void:
 ## (from above the zoomed-out view in phase 4).
 func rain_bomb() -> void:
 	var x := clampf(_player_x() + randf_range(-320.0, 320.0), 80.0, (DOOM_W if phase == FINAL else ARENA_W) - 80.0)
-	_drop_bomb(Vector2(x, -1500.0 if phase == FINAL else -60.0), Vector2.ZERO)
+	if phase == FINAL:
+		_drop_bomb(Vector2(x, -1500.0), Vector2.ZERO, GIANT_BIG_BOMB)
+	else:
+		_drop_bomb(Vector2(x, -60.0), Vector2.ZERO)
 
 
 ## Phase 4, once Lil' Watt's power reaches the wreck: the pieces gather mid arena of doom (out
@@ -369,8 +383,9 @@ func _chase() -> Tween:
 	return _move
 
 
-func _drop_bomb(at: Vector2, velocity: Vector2) -> void:
+func _drop_bomb(at: Vector2, velocity: Vector2, size := 1.0) -> void:
 	var bomb: Bomb = BOMB_SCENE.instantiate()
+	bomb.size = size
 	_spawn_parent().add_child(bomb)
 	bomb.global_position = at
 	bomb.linear_velocity = velocity
