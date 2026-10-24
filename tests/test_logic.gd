@@ -107,8 +107,43 @@ func _test_arena() -> void:
 	check(player.hp == hp_before, "a dash dodges hits")
 	await create_timer(0.3).timeout
 	check(not player.dashing and absf(player.velocity.x) < player.dash_speed, "the dash ends on its own")
+	await _land(player)
+	var up: Vector2 = await _aimed_dash(player, ["aim_up"])
+	check(up.is_equal_approx(Vector2(0, -player.dash_speed)), "Up + C dashes straight up")
+	await _land(player)
+	var diag: Vector2 = await _aimed_dash(player, ["move_right", "aim_up"])
+	check(diag.is_equal_approx(Vector2(1, -1).normalized() * player.dash_speed), "a diagonal dash goes just as far (normalized)")
+	await _land(player)
+	var ground_down: Vector2 = await _aimed_dash(player, ["move_down"])
+	check(ground_down.y == 0.0 and absf(ground_down.x) == player.dash_speed, "Down + C on the ground dashes along the floor instead")
+	await _land(player)
+	Input.action_press("jump")
+	await physics_frame
+	Input.action_release("jump")
+	await create_timer(0.25).timeout
+	var air_down: Vector2 = await _aimed_dash(player, ["move_down"])
+	check(air_down.is_equal_approx(Vector2(0, player.dash_speed)), "Down + C in the air dashes straight down")
 	game.queue_free()
 	await process_frame
+
+
+## Holds the given arrows, taps dash and returns the dash velocity.
+func _aimed_dash(player: Player, arrows: Array) -> Vector2:
+	for a: String in arrows:
+		Input.action_press(a)
+	Input.action_press("dash")
+	await physics_frame
+	await physics_frame
+	var v := player.velocity
+	Input.action_release("dash")
+	for a: String in arrows:
+		Input.action_release(a)
+	return v
+
+
+func _land(player: Player) -> void:
+	while not player.is_on_floor() or not player.dash_cooldown.is_stopped():
+		await physics_frame
 
 
 func _on_timeout() -> void:

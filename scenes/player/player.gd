@@ -35,6 +35,7 @@ var _jump_buffer := 0.0
 var _was_on_floor := true
 var _dead := false
 var _air_dash_ready := true  # one dash per jump
+var _dash_dir := Vector2.RIGHT
 
 @onready var art: Node2D = $Art
 @onready var flip: Node2D = $Art/Flip
@@ -77,7 +78,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("dash") and dash_cooldown.is_stopped() and _air_dash_ready:
 		_start_dash()
 	if dashing:
-		velocity = Vector2(facing * dash_speed, 0.0)
+		velocity = _dash_dir * dash_speed
 	else:
 		velocity.x = move_toward(velocity.x, dir * speed, accel * delta)
 		if not is_on_floor():
@@ -127,21 +128,30 @@ func take_hit() -> void:
 	velocity = Vector2(-facing * 260.0, -380.0)
 
 
-## Short burst in the facing direction with i-frames, a stretch and a streak trail.
+## Short burst with i-frames, a stretch and a streak trail, in any of 8 directions: the held
+## arrows aim it (same distance diagonally), no arrows means straight ahead. On the ground a
+## downward aim can't dig in, so only its sideways part counts.
 func _start_dash() -> void:
-	if not is_on_floor():
-		_air_dash_ready = false
+	var aim := Input.get_vector("move_left", "move_right", "aim_up", "move_down")
+	if is_on_floor():
+		aim.y = minf(aim.y, 0.0)
+	_dash_dir = Vector2(facing, 0.0) if aim.is_zero_approx() else aim.normalized()
+	if not is_on_floor() or _dash_dir.y < 0.0:
+		_air_dash_ready = false  # an upward dash off the ground is the air dash
 	dash_timer.start()
 	dash_cooldown.start()
+	trail.rotation = _dash_dir.angle()  # spreads the streaks along the path...
+	trail.angle_min = rad_to_deg(trail.rotation)  # ...and points each one along it
+	trail.angle_max = trail.angle_min
 	trail.emitting = true
-	juice.play(&"dash")
+	juice.play(&"dash_v" if absf(_dash_dir.y) > absf(_dash_dir.x) else &"dash")
 	_puff(DUST, _feet())
 
 
 ## DashTimer.timeout (connected in the scene). If the dash ended inside a hazard, it still hurts.
 func _end_dash() -> void:
 	trail.emitting = false
-	velocity.x = facing * speed
+	velocity = _dash_dir * speed  # a little carry, not the full burst
 	if hurtbox.monitoring and hurtbox.has_overlapping_areas():
 		take_hit()
 
@@ -246,8 +256,8 @@ func _update_pose(dir: float) -> void:
 	var pose := &"idle"
 	if invuln.time_left > invuln.wait_time - 0.25:
 		pose = &"hurt"
-	elif dashing and not held_bomb:
-		pose = &"dash"
+	elif dashing and not held_bomb and absf(_dash_dir.x) >= absf(_dash_dir.y):
+		pose = &"dash"  # steep dashes fall through to the jump / fall poses
 	elif held_bomb:
 		pose = &"carry_run" if moving else &"carry"
 	elif not is_on_floor():
