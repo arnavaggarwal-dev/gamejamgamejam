@@ -33,6 +33,7 @@ func _run() -> void:
 	await _test_boss()
 	await _test_giant_stages()
 	await _test_boss_moves()
+	await _test_target_spin()
 	await _test_game_wiring()
 	await _test_phase_extras()
 	await _test_skip_phase()
@@ -302,13 +303,28 @@ func _test_boss_moves() -> void:
 	await create_timer(0.25).timeout
 	check(boss.body.position.x < -400.0, "the torso lunges ~420 px toward the player")
 	boss.phase = 2
+	var hover := Vector2(1030, 380)  # the stage-3 hover spot the tell quivers around
 	boss._play(&"swoop", Boss.State.ATTACK)
+	await create_timer(0.65).timeout  # ~0.85 s of the tell at stage-3 speed
+	check(boss.head.position.distance_to(hover) < 12.0 and boss.anim.current_animation == &"swoop", "the swoop tells for most of a second (eye flashing, head quivering) before it moves")
 	var closest := [INF]
 	for i in 90:
 		await physics_frame
 		closest[0] = minf(closest[0], boss.head.global_position.distance_to(Vector2(400, 530)))
 	check(closest[0] < 70.0, "the head swoops right through the player's spot (closest %.0f px)" % closest[0])
 	boss.queue_free()
+	await process_frame
+
+
+func _test_target_spin() -> void:
+	var target: Node2D = load("res://scenes/fx/target.tscn").instantiate()
+	root.add_child(target)
+	var turned := [0.0]
+	for i in 200:
+		await physics_frame
+		turned[0] = maxf(turned[0], target.rotation)
+	check(turned[0] > 1.4, "the target brackets snap a quarter turn every few seconds")
+	target.queue_free()
 	await process_frame
 
 

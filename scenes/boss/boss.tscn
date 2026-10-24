@@ -4,7 +4,6 @@
 [ext_resource type="Texture2D" path="res://assets/art/boss/torso.png" id="2_torso"]
 [ext_resource type="Texture2D" path="res://assets/art/boss/armor.png" id="3_armor"]
 [ext_resource type="SpriteFrames" path="res://assets/art/boss/core_frames.tres" id="4_core"]
-[ext_resource type="SpriteFrames" path="res://assets/art/boss/target_frames.tres" id="5_target"]
 [ext_resource type="Texture2D" path="res://assets/art/boss/head.png" id="6_head"]
 [ext_resource type="Texture2D" path="res://assets/art/boss/crown.png" id="7_crown"]
 [ext_resource type="SpriteFrames" path="res://assets/art/boss/eye_frames.tres" id="8_eye"]
@@ -16,6 +15,7 @@
 [ext_resource type="Texture2D" path="res://assets/art/boss/foot.png" id="17_foot"]
 [ext_resource type="Texture2D" path="res://assets/art/boss/neck.png" id="18_neck"]
 [ext_resource type="SpriteFrames" path="res://assets/art/boss/jet_frames.tres" id="19_jet"]
+[ext_resource type="PackedScene" path="res://scenes/fx/target.tscn" id="20_target"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_core"]
 radius = 70.0
@@ -589,7 +589,7 @@ tracks/9/keys = {
 
 [sub_resource type="Animation" id="Animation_swoop"]
 resource_name = "swoop"
-length = 2
+length = 2.6
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -597,31 +597,43 @@ tracks/0/path = NodePath("Rig/Upper/Head/Eye:modulate")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "update": 1,
-"values": [Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1), Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1), Color(1, 0.45, 0.45, 1)]
+"values": [Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1), Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1), Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1), Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1), Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1), Color(1, 0.45, 0.45, 1)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("Rig/Upper/Head/RamHitbox/CollisionShape2D:disabled")
+tracks/1/path = NodePath("Rig/Upper/Head:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.75, 1.35),
+"times": PackedFloat32Array(0, 0.08, 0.16, 0.24, 0.32, 0.4, 0.48, 0.56, 0.64, 0.72, 0.8, 0.88, 0.96, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Vector2(1036, 378), Vector2(1024, 382), Vector2(1036, 378), Vector2(1024, 382), Vector2(1036, 378), Vector2(1024, 382), Vector2(1036, 378), Vector2(1024, 382), Vector2(1036, 378), Vector2(1024, 382), Vector2(1036, 378), Vector2(1024, 382), Vector2(1036, 378), Vector2(1030, 380)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Rig/Upper/Head/RamHitbox/CollisionShape2D:disabled")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 1.35, 1.95),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
 "values": [true, false, true]
 }
-tracks/2/type = "method"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath(".")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0.4, 2),
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(1, 2.6),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
 "args": [],
@@ -974,11 +986,7 @@ sprite_frames = ExtResource("4_core")
 animation = &"pulse"
 autoplay = "pulse"
 
-[node name="Target" type="AnimatedSprite2D" parent="Rig/Legs/StompAnchor/LegF/KneeCore"]
-scale = Vector2(4, 4)
-sprite_frames = ExtResource("5_target")
-animation = &"blink"
-autoplay = "blink"
+[node name="Target" parent="Rig/Legs/StompAnchor/LegF/KneeCore" instance=ExtResource("20_target")]
 
 [node name="WeakPoint" type="Area2D" parent="Rig/Legs/StompAnchor/LegF/KneeCore"]
 collision_layer = 16
@@ -1033,11 +1041,7 @@ sprite_frames = ExtResource("4_core")
 animation = &"pulse"
 autoplay = "pulse"
 
-[node name="Target" type="AnimatedSprite2D" parent="Rig/Upper/Body/Core"]
-scale = Vector2(4, 4)
-sprite_frames = ExtResource("5_target")
-animation = &"blink"
-autoplay = "blink"
+[node name="Target" parent="Rig/Upper/Body/Core" instance=ExtResource("20_target")]
 
 [node name="WeakPoint" type="Area2D" parent="Rig/Upper/Body/Core"]
 collision_layer = 16
@@ -1118,12 +1122,8 @@ autoplay = "burn"
 [node name="EyeCore" type="Node2D" parent="Rig/Upper/Head"]
 position = Vector2(-50, 0)
 
-[node name="Target" type="AnimatedSprite2D" parent="Rig/Upper/Head/EyeCore"]
+[node name="Target" parent="Rig/Upper/Head/EyeCore" instance=ExtResource("20_target")]
 visible = false
-scale = Vector2(4, 4)
-sprite_frames = ExtResource("5_target")
-animation = &"blink"
-autoplay = "blink"
 
 [node name="WeakPoint" type="Area2D" parent="Rig/Upper/Head/EyeCore"]
 collision_layer = 16

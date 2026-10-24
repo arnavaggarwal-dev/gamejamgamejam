@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scenes/boss/training_bot.gd" id="1_script"]
 [ext_resource type="SpriteFrames" path="res://assets/art/boss/bot_frames.tres" id="2_bot"]
 [ext_resource type="SpriteFrames" path="res://assets/art/boss/core_frames.tres" id="3_core"]
-[ext_resource type="SpriteFrames" path="res://assets/art/boss/target_frames.tres" id="4_target"]
+[ext_resource type="PackedScene" path="res://scenes/fx/target.tscn" id="4_target"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_core"]
 radius = 48.0
@@ -193,11 +193,8 @@ sprite_frames = ExtResource("3_core")
 animation = &"pulse"
 autoplay = "pulse"
 
-[node name="Target" type="AnimatedSprite2D" parent="Hover/Core"]
+[node name="Target" parent="Hover/Core" instance=ExtResource("4_target")]
 scale = Vector2(2, 2)
-sprite_frames = ExtResource("4_target")
-animation = &"blink"
-autoplay = "blink"
 
 [node name="WeakPoint" type="Area2D" parent="Hover/Core"]
 collision_layer = 16
