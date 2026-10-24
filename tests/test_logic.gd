@@ -30,6 +30,7 @@ func _run() -> void:
 	await _test_player()
 	await _test_arena()
 	await _test_boss()
+	await _test_giant_stages()
 	await _test_game_wiring()
 	await _test_phase_extras()
 	await _test_skip_phase()
@@ -121,8 +122,8 @@ func _test_boss() -> void:
 	await process_frame
 	check(not boss.take_hit(), "boss ignores hits during the intro")
 	boss.start_fight()
-	check(is_equal_approx(boss.rig.position.y, 520.0), "intro starts with the boss sunk, no first-frame pop")
-	check([boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"slam", &"bombs", &"slam"], "phase 1 cycles slam, bombs")
+	check(is_equal_approx(boss.rig.position.y, -760.0), "intro drops the king in from above, no first-frame pop")
+	check([boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"stomp", &"rain", &"stomp"], "stage 1 (legs) cycles stomp, bomb rain")
 	var phases := []
 	var won := [false]
 	boss.phase_changed.connect(func(p: int) -> void: phases.append(p))
@@ -143,7 +144,7 @@ func _test_boss() -> void:
 	bomb.global_position = Vector2(200, 560)  # held here first, like a real throw
 	bomb.pick_up()
 	await physics_frame
-	var core_at: Vector2 = boss2.get_node("Rig/Core").global_position
+	var core_at: Vector2 = boss2.weak_point().global_position
 	bomb.throw(Vector2.ZERO)
 	bomb.global_position = core_at
 	for i in 5:
@@ -151,6 +152,31 @@ func _test_boss() -> void:
 	check(boss2.hp == Boss.HITS_PER_PHASE - 1 and bomb.exploded, "a thrown bomb on the core hurts the boss")
 	check(bomb.global_position.distance_to(core_at) < 40.0, "the blast stays on the core, not back where the bomb was thrown from")
 	boss2.queue_free()
+	await process_frame
+
+
+## Legs, then the torso falls into view, then the head; each stage has its own core.
+func _test_giant_stages() -> void:
+	var boss: Boss = load("res://scenes/boss/boss.tscn").instantiate()
+	root.add_child(boss)
+	await process_frame
+	var armed := func(i: int) -> bool: return boss.cores[i].get_node("WeakPoint").monitoring
+	check(boss.weak_point() == boss.cores[0] and armed.call(0) and not armed.call(1) and not armed.call(2), "stage 1: only the knee core can be hit")
+	check(boss.legs.visible and boss.upper.position.y < -600.0, "stage 1: his legs fill the screen, the torso is out of frame above")
+	for i in Boss.HITS_PER_PHASE:
+		boss.state = Boss.State.IDLE
+		boss.take_hit()
+	await create_timer(2.6).timeout
+	check(not boss.legs.visible and is_zero_approx(boss.upper.position.y) and armed.call(1) and not armed.call(0), "breaking the legs drops the torso into view and arms the chest core")
+	check(boss.head.global_position.y < 0.0, "stage 2: his head is still out of frame")
+	for i in Boss.HITS_PER_PHASE:
+		boss.state = Boss.State.IDLE
+		boss.take_hit()
+	await create_timer(2.1).timeout  # the drop is over, his first attack is not yet
+	check(not boss.get_node("Rig/Upper/Body").visible and boss.head.global_position.y > 400.0 and armed.call(2) and not armed.call(1), "breaking the torso drops the head onto the floor and arms the eye")
+	check(boss.state == Boss.State.IDLE and boss.anim.current_animation == &"idle_3", "the head fights on")
+	check([boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"hop", &"spit", &"laser"], "stage 3 hops, spits bombs and fires the laser")
+	boss.queue_free()
 	await process_frame
 
 

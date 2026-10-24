@@ -283,3 +283,71 @@ static func bot_frames() -> Array:
 		c.outline()
 		frames.append(c)
 	return frames
+
+
+## A giant leg (thigh into shin), from out of frame down to the ankle. Knee socket at (15, 106):
+## the front leg's knee core sits there; the back leg's stays dark.
+static func leg():
+	var c = Canvas.new(32, 146)
+	for y in 146:
+		var half := 14
+		if y > 112:
+			half = 11  # narrower shin
+		elif y > 98:
+			half = 13
+		_metal_span(c, 16 - half, 15 + half, y, -10)
+	# Plate seams, rivets, a gold thigh band and an ankle cuff.
+	for sy in [40, 74, 128]:
+		for x in 32:
+			if c.solid(x, sy):
+				c.px(x, sy, P.INK)
+	for ry in [20, 56, 90]:
+		_rivet(c, 6, ry)
+		_rivet(c, 24, ry)
+	_gold_band(c, 2, 12, 28, 5)
+	_gold_band(c, 5, 138, 22, 5)
+	# Knee socket.
+	c.ellipse(15.5, 106, 11, 11, P.INK)
+	c.ring(15.5, 106, 10, 2, P.CHARCOAL)
+	for b in [[9, 100], [22, 100], [9, 112], [22, 112]]:
+		c.px(b[0], b[1], P.BUTTER)
+	c.outline()
+	return c
+
+
+## A giant boot, toe to the left (the king faces left), gold toe cap, dark sole.
+static func foot():
+	var c = Canvas.new(66, 24)
+	for y in range(1, 23):
+		var left := 1
+		if y < 9:
+			left = 26 - y * 2  # instep slopes down to the toe
+		var right := 64
+		if y < 4:
+			right = 52
+		_metal_span(c, maxi(left, 1), right, y, 1)
+	for y in range(9, 19):
+		for x in range(1, 13):
+			if c.solid(x, y):
+				c.px(x, y, P.BUTTER if y > 10 else P.CREAM)
+	c.vline(13, 9, 18, P.PEACH)
+	c.rect(1, 19, 64, 4, P.CHARCOAL)
+	c.hline(1, 64, 19, P.INK)
+	for rx in [22, 36, 50]:
+		_rivet(c, rx, 12)
+	c.outline()
+	return c
+
+
+## The long neck that holds his head out of frame until the torso is destroyed.
+static func neck():
+	var c = Canvas.new(22, 140)
+	for y in 140:
+		_metal_span(c, 3, 18, y, -10)
+		if y % 14 == 0:
+			c.hline(3, 18, y, P.INK)
+			c.hline(3, 18, y + 1, P.SLATE)
+			c.px(5, y + 4, P.BUTTER)
+			c.px(16, y + 4, P.BUTTER)
+	c.outline()
+	return c

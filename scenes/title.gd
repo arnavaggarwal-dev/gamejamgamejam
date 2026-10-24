@@ -3,11 +3,17 @@ extends Control
 
 
 func _ready() -> void:
+	# Poster pose: the giant fight starts with only his legs in frame, so the title shows him
+	# squashed into one screen instead (torso down, head on his shoulders, no legs or neck).
 	var boss: Boss = $Boss
 	boss.rig.position = Vector2.ZERO
-	boss.get_node("Rig/FistL").hide()
-	boss.get_node("Rig/Core/Target").hide()
-	boss.anim.play(&"idle")
+	boss.legs.hide()
+	boss.upper.position = Vector2.ZERO
+	boss.head.position = Vector2(1090, 170)
+	boss.get_node("Rig/Upper/Body/Neck").hide()
+	boss.fist_l.hide()
+	boss.get_node("Rig/Upper/Body/Core/Target").hide()
+	boss.anim.play(&"idle_2")
 	var start: Button = $Card/VBox/Start
 	start.grab_focus()
 	start.pressed.connect(func() -> void: get_tree().change_scene_to_file("res://scenes/game.tscn"))

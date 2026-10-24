@@ -9,8 +9,8 @@ Jam theme: "I'm just a little guy". Target: Godot 4.7, GL Compatibility.
 | Dimension | 2D side-view platformer, single arena | Only sane 2-day option; Mario boss feel | - |
 | Authority | Single-player | - | - |
 | Damage model | Hero cannot hit boss directly; picks up the boss's bombs and throws them back | One extra verb (grab/throw); readable dodge-grab-throw-stagger loop | playtests say it's too easy or too hard |
-| Boss | Giant robot king; armor falls off each phase | Rigid parts animate with simple tweens; visible progress | - |
-| Length | One boss, 3 phases (no boss rush); phase 3 reuses phase-2 attacks, faster, plus platform breaks | Polish over quantity; drawing eats ~1 day | Day 1 finishes early |
+| Boss | A giant robot king too big for the screen, broken apart in three stages: legs only (front-knee core; foot stomp at a red ring, bombs raining from his off-screen hands), then the torso crashes into view (chest core; fist slam, bombs, laser; head still out of frame on a long neck), then the head drops onto the floor (the eye is the core; hop with shockwaves, spat bombs, eye laser) | User asked for a huge boss that comes apart: legs, torso, head, kill | - |
+| Length | One boss, 3 stages of 3 hits each (no boss rush) | Polish over quantity | Day 1 finishes early |
 | Art | Pixel art at 4x (320x180 art canvas), drawn by code in `tools/art/` (regenerate with `build_art.gd` then `build_frames.gd`). Jame-gam palette only, ink outlines on foreground, outline-free background, top-left light with hue-shifted ramps. Replaced the rubber-hose plan (2026-10-23, user found the placeholder look unreadable) | Consistent, repeatable, no artist bottleneck | the user wants to hand-draw over it |
 | Boss art | One sprite per puppet part, as 4x-scaled children so hitboxes and animation paths are unchanged | Cut-out animation in AnimationPlayer | - |
 | Stage size | 2560 px wide arena, camera follows the player; the king rides a rail and stays ~560 px to the player's right between attacks; backdrop in two Parallax2D layers | User found one screen too small when upscaled | the fight feels too spread out |

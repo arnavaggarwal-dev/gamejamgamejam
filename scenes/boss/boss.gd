@@ -1,8 +1,10 @@
 class_name Boss
 extends Node2D
-## King Kilowatt. Cycles a fixed attack pattern per phase; only thrown bombs hurt him.
-## Attacks live in the AnimationPlayer: value tracks move the rig and toggle hitboxes,
-## method tracks call aim_slam / slam_impact / spawn_bomb / laser_fire / death_boom / shake at the right frames.
+## King Kilowatt, too big for the screen. Stage 1 only his legs fit in frame (weak spot: the
+## front knee); break them and the torso crashes down (chest core); break that and the head
+## drops onto the floor (the eye). Only thrown bombs hurt him.
+## Attacks live in the AnimationPlayer: value tracks move the rig and toggle hitboxes, method
+## tracks call aim_* / *_impact / rain_bomb / spawn_bomb / spit_bomb / boom / land / shake.
 
 signal health_changed(hits_left: int, hits_total: int)
 signal phase_changed(phase: int)  # 0-based: the second phase emits 1
@@ -19,15 +21,16 @@ const SPARK_SCENE := preload("res://scenes/fx/spark.tscn")
 const EXPLOSION_SCENE := preload("res://scenes/fx/explosion.tscn")
 const DUST_SCENE := preload("res://scenes/fx/dust.tscn")
 const PHASES := [
-	{attacks = [&"slam", &"bombs"], speed = 1.0, rest = 1.2},
-	{attacks = [&"slam", &"bombs", &"laser", &"bombs"], speed = 1.2, rest = 0.9},
-	{attacks = [&"slam", &"bombs", &"laser", &"bombs"], speed = 1.45, rest = 0.6},
+	{attacks = [&"stomp", &"rain"], speed = 1.0, rest = 1.2},  # legs
+	{attacks = [&"slam", &"bombs", &"laser", &"bombs"], speed = 1.2, rest = 0.9},  # torso
+	{attacks = [&"hop", &"spit", &"laser", &"spit"], speed = 1.4, rest = 0.7},  # head
 ]
 
 @export var projectiles: Node2D
 
 # The king rides a rail behind the arena: between attacks he slides to stay RAIL_LEAD px
-# right of the player. Boss.position.x offsets the whole rig (torso rests at local x 1080).
+# right of the player. Boss.position.x offsets the whole rig (torso rests at local x 1080;
+# the knee, chest and eye cores all sit near it, so the same throw reaches each stage).
 const RAIL_MIN := 0.0
 const RAIL_MAX := 1280.0
 const RAIL_LEAD := 560.0
@@ -43,13 +46,19 @@ var _rest_pose := {}
 var _rail_dust := 0.0
 
 @onready var rig: Node2D = $Rig
-@onready var head: Node2D = $Rig/Head
-@onready var eye: Node2D = $Rig/Head/Eye
-@onready var fist_l: Node2D = $Rig/FistL
-@onready var slam_anchor: Node2D = $Rig/SlamAnchor
-@onready var fist_r: Node2D = $Rig/SlamAnchor/FistR
-@onready var shadow: Node2D = $Rig/SlamAnchor/Shadow
-@onready var bomb_spawn: Marker2D = $Rig/FistL/BombSpawn
+@onready var legs: Node2D = $Rig/Legs
+@onready var stomp_anchor: Node2D = $Rig/Legs/StompAnchor
+@onready var leg_f: Node2D = $Rig/Legs/StompAnchor/LegF
+@onready var upper: Node2D = $Rig/Upper
+@onready var head: Node2D = $Rig/Upper/Head
+@onready var eye: Node2D = $Rig/Upper/Head/Eye
+@onready var mouth: Marker2D = $Rig/Upper/Head/Mouth
+@onready var fist_l: Node2D = $Rig/Upper/Body/FistL
+@onready var slam_anchor: Node2D = $Rig/Upper/Body/SlamAnchor
+@onready var fist_r: Node2D = $Rig/Upper/Body/SlamAnchor/FistR
+@onready var shadow: Node2D = $Rig/Upper/Body/SlamAnchor/Shadow
+@onready var bomb_spawn: Marker2D = $Rig/Upper/Body/FistL/BombSpawn
+@onready var cores: Array = [$Rig/Legs/StompAnchor/LegF/KneeCore, $Rig/Upper/Body/Core, $Rig/Upper/Head/EyeCore]
 @onready var anim: AnimationPlayer = $AnimationPlayer
 @onready var rest_timer: Timer = $RestTimer
 @onready var laser_low: Node2D = $LaserLow
@@ -57,14 +66,14 @@ var _rail_dust := 0.0
 
 
 func _ready() -> void:
-	for n: Node2D in [head, fist_l, fist_r]:
-		_rest_pose[n] = n.position
-	$Rig/Core/WeakPoint.body_entered.connect(_on_weak_point_body_entered)
+	_capture_rest_pose()
+	for core: Node2D in cores:
+		core.get_node("WeakPoint").body_entered.connect(_on_weak_point_body_entered)
 	anim.animation_finished.connect(_on_animation_finished)
 	rest_timer.timeout.connect(_on_rest_timer_timeout)
 
 
-## Rises out of the floor right next to the player (hidden until now in the arena scene).
+## Drops into the arena right next to the player (hidden until now in the arena scene).
 func start_fight() -> void:
 	var player := get_tree().get_first_node_in_group("player") as Node2D
 	if player:
@@ -86,11 +95,16 @@ func _physics_process(delta: float) -> void:
 		_rail_dust -= delta
 		if _rail_dust <= 0.0:
 			_rail_dust = 0.2
-			_fx(DUST_SCENE, Vector2($Rig/Torso.global_position.x + randf_range(-150.0, 150.0), FLOOR_Y - 16.0))
+			_fx(DUST_SCENE, Vector2(weak_point().global_position.x + randf_range(-150.0, 150.0), FLOOR_Y - 16.0))
 
 
 func _rail_goal(player: Node2D) -> float:
 	return clampf(player.global_position.x + RAIL_LEAD - TORSO_X, RAIL_MIN, RAIL_MAX)
+
+
+## The core to hit right now: the front knee, then the chest, then the eye.
+func weak_point() -> Node2D:
+	return cores[phase]
 
 
 func hits_total() -> int:
@@ -115,7 +129,7 @@ func take_hit() -> bool:
 	hp -= 1
 	health_changed.emit(hits_left(), hits_total())
 	get_tree().call_group("camera", "hitstop", 0.08)
-	_fx(SPARK_SCENE, $Rig/Core.global_position)
+	_fx(SPARK_SCENE, weak_point().global_position)
 	if hp <= 0:
 		_advance_phase()
 	else:
@@ -144,37 +158,55 @@ func skip_phase() -> void:
 # --- called from animation method tracks ---
 
 func aim_slam() -> void:
-	var player := get_tree().get_first_node_in_group("player") as Node2D
-	var x := player.global_position.x if player else 400.0
-	slam_anchor.global_position.x = clampf(x, 80.0, ARENA_W - 80.0)
+	slam_anchor.global_position.x = _player_x()
+
+
+func aim_stomp() -> void:
+	stomp_anchor.global_position.x = _player_x()
 
 
 func slam_impact() -> void:
-	shake(18.0)
-	for dir in [-1, 1]:
-		var wave: Shockwave = SHOCKWAVE_SCENE.instantiate()
-		wave.direction = dir
-		_spawn_parent().add_child(wave)
-		wave.global_position = Vector2(slam_anchor.global_position.x, FLOOR_Y)
-		_fx(DUST_SCENE, Vector2(slam_anchor.global_position.x + dir * 72.0, FLOOR_Y - 16.0))
+	_quake(slam_anchor.global_position.x, 18.0)
+
+
+func stomp_impact() -> void:
+	_quake(stomp_anchor.global_position.x, 20.0)
+
+
+func hop_impact() -> void:
+	_quake(head.global_position.x, 16.0)
 
 
 func spawn_bomb() -> void:
-	var bomb: Bomb = BOMB_SCENE.instantiate()
-	_spawn_parent().add_child(bomb)
-	bomb.global_position = bomb_spawn.global_position
-	bomb.linear_velocity = Vector2(randf_range(-650.0, -250.0), -350.0)
+	_drop_bomb(bomb_spawn.global_position, Vector2(randf_range(-650.0, -250.0), -350.0))
+
+
+## Stage 1: his hands are out of frame, so bombs fall from the sky near the player.
+func rain_bomb() -> void:
+	_drop_bomb(Vector2(clampf(_player_x() + randf_range(-320.0, 320.0), 80.0, ARENA_W - 80.0), -60.0), Vector2.ZERO)
+
+
+func spit_bomb() -> void:
+	_drop_bomb(mouth.global_position, Vector2(randf_range(-700.0, -350.0), -420.0))
 
 
 func laser_fire() -> void:
 	shake(6.0)
 
 
-## A chain of blasts across the king's body while he goes down.
-func death_boom() -> void:
+## One blast somewhere on a body part (stage breaks and the knockout chain these).
+func boom(part: NodePath) -> void:
 	shake(16.0)
-	var torso: Vector2 = $Rig/Torso.global_position
-	_fx(EXPLOSION_SCENE, torso + Vector2(randf_range(-150.0, 150.0), randf_range(-220.0, 120.0)))
+	var at: Vector2 = get_node(part).global_position
+	_fx(EXPLOSION_SCENE, at + Vector2(randf_range(-150.0, 150.0), randf_range(-150.0, 120.0)))
+
+
+## A body part hitting the floor: a big shake and dust either side.
+func land(part: NodePath) -> void:
+	shake(24.0)
+	var x: float = get_node(part).global_position.x
+	for dir in [-1, 1]:
+		_fx(DUST_SCENE, Vector2(x + dir * 120.0, FLOOR_Y - 16.0))
 
 
 func _fx(scene: PackedScene, at: Vector2) -> void:
@@ -187,24 +219,49 @@ func shake(amount: float) -> void:
 	get_tree().call_group("camera", "shake", amount)
 
 
+func _quake(x: float, amount: float) -> void:
+	shake(amount)
+	for dir in [-1, 1]:
+		var wave: Shockwave = SHOCKWAVE_SCENE.instantiate()
+		wave.direction = dir
+		_spawn_parent().add_child(wave)
+		wave.global_position = Vector2(x, FLOOR_Y)
+		_fx(DUST_SCENE, Vector2(x + dir * 72.0, FLOOR_Y - 16.0))
+
+
+func _drop_bomb(at: Vector2, velocity: Vector2) -> void:
+	var bomb: Bomb = BOMB_SCENE.instantiate()
+	_spawn_parent().add_child(bomb)
+	bomb.global_position = at
+	bomb.linear_velocity = velocity
+
+
+func _player_x() -> float:
+	var player := get_tree().get_first_node_in_group("player") as Node2D
+	return clampf(player.global_position.x if player else 400.0, 80.0, ARENA_W - 80.0)
+
+
 # --- internals ---
 
+## The state changes now; the animation starts deferred, because a hit arrives inside the
+## WeakPoint physics callback and the stage breaks switch weak points on and off.
 func _advance_phase() -> void:
 	rest_timer.stop()
 	if phase == PHASES.size() - 1:
-		slam_anchor.hide()  # the parked slam fist would sink into view with the rig
-		_play(&"death", State.DEAD)
+		state = State.DEAD
+		_play.call_deferred(&"death", State.DEAD)
 		defeated.emit()
 		return
 	phase += 1
 	hp = HITS_PER_PHASE
 	_attack_index = 0
+	state = State.PHASE_SHIFT
 	phase_changed.emit(phase)
-	_play(StringName("phase_%d" % (phase + 1)), State.PHASE_SHIFT)
+	_play.call_deferred(StringName("phase_%d" % (phase + 1)), State.PHASE_SHIFT)
 
 
 func _rest() -> void:
-	_play(&"idle", State.IDLE)
+	_play(StringName("idle_%d" % (phase + 1)), State.IDLE)
 	rest_timer.start(PHASES[phase].rest)
 
 
@@ -223,11 +280,19 @@ func _reset_rig() -> void:
 	rig.modulate = Color.WHITE
 	eye.modulate = Color.WHITE
 	shadow.hide()
-	$Rig/SlamAnchor/FistR/Hitbox/CollisionShape2D.set_deferred("disabled", true)
+	stomp_anchor.get_node("Shadow").hide()
+	for box in [fist_r.get_node("Hitbox"), leg_f.get_node("Hitbox"), head.get_node("HopHitbox")]:
+		box.get_node("CollisionShape2D").set_deferred("disabled", true)
 	for laser: Node2D in [laser_low, laser_high]:
 		laser.get_node("Warn").hide()
 		laser.get_node("Beam").hide()
 		laser.get_node("Hitbox/CollisionShape2D").set_deferred("disabled", true)
+
+
+## Where each part sits at rest in this stage (a stage break moves the torso and head).
+func _capture_rest_pose() -> void:
+	for n: Node2D in [legs, stomp_anchor, leg_f, upper, head, fist_l, fist_r]:
+		_rest_pose[n] = n.position
 
 
 func _spawn_parent() -> Node:
@@ -235,6 +300,8 @@ func _spawn_parent() -> Node:
 
 
 func _on_animation_finished(_anim_name: StringName) -> void:
+	if state == State.PHASE_SHIFT:
+		_capture_rest_pose()
 	if state in [State.INTRO, State.ATTACK, State.STAGGER, State.PHASE_SHIFT]:
 		_rest()
 

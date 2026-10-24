@@ -13,6 +13,9 @@
 [ext_resource type="Texture2D" path="res://assets/art/boss/reticle.png" id="11_reticle"]
 [ext_resource type="SpriteFrames" path="res://assets/art/fx/laser_warn_frames.tres" id="12_warn"]
 [ext_resource type="SpriteFrames" path="res://assets/art/fx/laser_beam_frames.tres" id="13_beam"]
+[ext_resource type="Texture2D" path="res://assets/art/boss/leg.png" id="16_leg"]
+[ext_resource type="Texture2D" path="res://assets/art/boss/foot.png" id="17_foot"]
+[ext_resource type="Texture2D" path="res://assets/art/boss/neck.png" id="18_neck"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_core"]
 radius = 70.0
@@ -20,38 +23,69 @@ radius = 70.0
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_fist"]
 size = Vector2(150, 130)
 
-[sub_resource type="Animation" id="Animation_idle"]
-resource_name = "idle"
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_foot"]
+size = Vector2(240, 100)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_head"]
+size = Vector2(260, 200)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_beam"]
+size = Vector2(2560, 30)
+
+[sub_resource type="Animation" id="Animation_idle_1"]
+resource_name = "idle_1"
 length = 1.6
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Rig/Head:position")
+tracks/0/path = NodePath("Rig/Legs:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.8, 1.6),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector2(1090, 170), Vector2(1090, 182), Vector2(1090, 170)]
+"values": [Vector2(0, 0), Vector2(0, 4), Vector2(0, 0)]
 }
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Rig/FistL:position")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
+
+[sub_resource type="Animation" id="Animation_idle_2"]
+resource_name = "idle_2"
+length = 1.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Upper/Body/FistL:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.8, 1.6),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
 "values": [Vector2(880, 540), Vector2(880, 556), Vector2(880, 540)]
 }
 
+[sub_resource type="Animation" id="Animation_idle_3"]
+resource_name = "idle_3"
+length = 1.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Upper/Head:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.8, 1.6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1140, 520), Vector2(1140, 510), Vector2(1140, 520)]
+}
+
 [sub_resource type="Animation" id="Animation_intro"]
 resource_name = "intro"
-length = 1.5
+length = 1.3
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -59,10 +93,10 @@ tracks/0/path = NodePath("Rig:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 1.2),
-"transitions": PackedFloat32Array(0.4, 1),
+"times": PackedFloat32Array(0, 0.7),
+"transitions": PackedFloat32Array(2, 1),
 "update": 0,
-"values": [Vector2(0, 520), Vector2(0, 0)]
+"values": [Vector2(0, -760), Vector2(0, 0)]
 }
 tracks/1/type = "method"
 tracks/1/imported = false
@@ -71,11 +105,503 @@ tracks/1/path = NodePath(".")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(1.2),
+"times": PackedFloat32Array(0.7),
 "transitions": PackedFloat32Array(1),
 "values": [{
-"args": [14.0],
+"args": [NodePath("Rig/Legs/StompAnchor/LegF/Foot")],
+"method": &"land"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_stomp"]
+resource_name = "stomp"
+length = 2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Legs/StompAnchor:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.75),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [Vector2(1020, 0), Vector2(1020, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig/Legs/StompAnchor/LegF:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.4, 0.7, 0.85, 1.3, 1.6, 1.75, 2),
+"transitions": PackedFloat32Array(0.5, 1, 2, 1, 0.5, 1, 2, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, -720), Vector2(0, -720), Vector2(0, 0), Vector2(0, 0), Vector2(0, -720), Vector2(0, -720), Vector2(0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Rig/Legs/StompAnchor/Shadow:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.45, 0.85),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [false, true, false]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Rig/Legs/StompAnchor/Shadow:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.45, 0.85),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1.2, 1.2), Vector2(4, 4)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Rig/Legs/StompAnchor/LegF/Hitbox/CollisionShape2D:disabled")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.8, 1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [true, false, true]
+}
+tracks/5/type = "method"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath(".")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0.45, 0.85, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"values": [{
+"args": [],
+"method": &"aim_stomp"
+}, {
+"args": [],
+"method": &"stomp_impact"
+}, {
+"args": [6.0],
 "method": &"shake"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_rain"]
+resource_name = "rain"
+length = 1.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Legs:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(8, 0), Vector2(-8, 0), Vector2(0, 0)]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.3, 0.4, 1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"values": [{
+"args": [5.0],
+"method": &"shake"
+}, {
+"args": [],
+"method": &"rain_bomb"
+}, {
+"args": [],
+"method": &"rain_bomb"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_phase_2"]
+resource_name = "phase_2"
+length = 2.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig/Legs:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.4, 0.9),
+"transitions": PackedFloat32Array(2, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, 200)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Rig/Legs:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.4, 0.9),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Rig/Legs:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.95),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Rig/Legs/StompAnchor/LegF/KneeCore/WeakPoint:monitoring")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Rig/Upper/Body/Core/WeakPoint:monitoring")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 1.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Rig/Upper:position")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.8, 1.2, 1.32, 1.45),
+"transitions": PackedFloat32Array(1, 2, 0.5, 2, 1),
+"update": 0,
+"values": [Vector2(0, -700), Vector2(0, -700), Vector2(0, 0), Vector2(0, -26), Vector2(0, 0)]
+}
+tracks/7/type = "method"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath(".")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0, 0.02, 0.25, 0.5, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"values": [{
+"args": [20.0],
+"method": &"shake"
+}, {
+"args": [NodePath("Rig/Legs/StompAnchor/LegF/KneeCore")],
+"method": &"boom"
+}, {
+"args": [NodePath("Rig/Legs/LegB/Art")],
+"method": &"boom"
+}, {
+"args": [NodePath("Rig/Legs/StompAnchor/LegF/KneeCore")],
+"method": &"boom"
+}, {
+"args": [NodePath("Rig/Upper/Body/Torso")],
+"method": &"land"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_phase_3"]
+resource_name = "phase_3"
+length = 2.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig/Upper/Body:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.4, 1),
+"transitions": PackedFloat32Array(2, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, 520)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Rig/Upper/Body:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.4, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Rig/Upper/Body:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Rig/Upper/Body/Core/WeakPoint:monitoring")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Rig/Upper/Head/EyeCore/WeakPoint:monitoring")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 1.45),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Rig/Upper/Head/EyeCore/Target:visible")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 1.45),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Rig/Upper/Head:position")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0, 0.9, 1.3, 1.42, 1.55),
+"transitions": PackedFloat32Array(1, 2, 0.5, 2, 1),
+"update": 0,
+"values": [Vector2(1090, -330), Vector2(1140, -330), Vector2(1140, 520), Vector2(1140, 492), Vector2(1140, 520)]
+}
+tracks/8/type = "method"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath(".")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0, 0.02, 0.25, 0.5, 1.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"values": [{
+"args": [20.0],
+"method": &"shake"
+}, {
+"args": [NodePath("Rig/Upper/Body/Torso")],
+"method": &"boom"
+}, {
+"args": [NodePath("Rig/Upper/Body/ArmorL")],
+"method": &"boom"
+}, {
+"args": [NodePath("Rig/Upper/Body/Torso")],
+"method": &"boom"
+}, {
+"args": [NodePath("Rig/Upper/Head")],
+"method": &"land"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_hop"]
+resource_name = "hop"
+length = 1.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Upper/Head:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.25, 0.55, 0.85, 0.95, 1.1),
+"transitions": PackedFloat32Array(1, 0.5, 2, 0.5, 1, 1),
+"update": 0,
+"values": [Vector2(1140, 520), Vector2(1140, 544), Vector2(1140, 170), Vector2(1140, 520), Vector2(1140, 500), Vector2(1140, 520)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig/Upper/Head/HopHitbox/CollisionShape2D:disabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.75, 0.95),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [true, false, true]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.85),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"hop_impact"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_spit"]
+resource_name = "spit"
+length = 1.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Upper/Head:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.4, 0.7, 0.8, 1.1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(1140, 520), Vector2(1172, 514), Vector2(1112, 522), Vector2(1172, 514), Vector2(1112, 522), Vector2(1140, 520)]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.4, 0.8),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"spit_bomb"
+}, {
+"args": [],
+"method": &"spit_bomb"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_death"]
+resource_name = "death"
+length = 2.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.15, 0.3, 0.45, 0.6, 2.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 2, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(16, 0), Vector2(-16, 0), Vector2(12, 0), Vector2(-12, 0), Vector2(0, 700)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 2.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(0.5, 0.5, 0.5, 1)]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.7, 1.1, 1.5, 1.9),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"values": [{
+"args": [25.0],
+"method": &"shake"
+}, {
+"args": [NodePath("Rig/Upper/Head")],
+"method": &"boom"
+}, {
+"args": [NodePath("Rig/Upper/Head")],
+"method": &"boom"
+}, {
+"args": [NodePath("Rig/Upper/Head")],
+"method": &"boom"
+}, {
+"args": [NodePath("Rig/Upper/Head")],
+"method": &"boom"
+}, {
+"args": [NodePath("Rig/Upper/Head")],
+"method": &"boom"
 }]
 }
 
@@ -85,7 +611,7 @@ length = 1.4
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Rig/SlamAnchor/FistR:position")
+tracks/0/path = NodePath("Rig/Upper/Body/SlamAnchor/FistR:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -97,7 +623,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("Rig/SlamAnchor/Shadow:visible")
+tracks/1/path = NodePath("Rig/Upper/Body/SlamAnchor/Shadow:visible")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -109,7 +635,7 @@ tracks/1/keys = {
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("Rig/SlamAnchor/Shadow:scale")
+tracks/2/path = NodePath("Rig/Upper/Body/SlamAnchor/Shadow:scale")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -121,7 +647,7 @@ tracks/2/keys = {
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("Rig/SlamAnchor/FistR/Hitbox/CollisionShape2D:disabled")
+tracks/3/path = NodePath("Rig/Upper/Body/SlamAnchor/FistR/Hitbox/CollisionShape2D:disabled")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
@@ -154,7 +680,7 @@ length = 1.5
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Rig/FistL:position")
+tracks/0/path = NodePath("Rig/Upper/Body/FistL:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -208,185 +734,6 @@ tracks/1/keys = {
 "update": 0,
 "values": [Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1)]
 }
-
-[sub_resource type="Animation" id="Animation_phase_2"]
-resource_name = "phase_2"
-length = 1.4
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Rig/ArmorL:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 1.2),
-"transitions": PackedFloat32Array(2, 1),
-"update": 0,
-"values": [Vector2(960, 320), Vector2(880, 900)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Rig/ArmorL:rotation")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 1.2),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [0.0, 2.5]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Rig:modulate")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.6),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1)]
-}
-tracks/3/type = "method"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath(".")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"values": [{
-"args": [20.0],
-"method": &"shake"
-}]
-}
-
-[sub_resource type="Animation" id="Animation_phase_3"]
-resource_name = "phase_3"
-length = 1.4
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Rig/ArmorR:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 1.2),
-"transitions": PackedFloat32Array(2, 1),
-"update": 0,
-"values": [Vector2(1200, 320), Vector2(1280, 900)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Rig/ArmorR:rotation")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 1.2),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [0.0, -2.5]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Rig:modulate")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.6),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1)]
-}
-tracks/3/type = "method"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath(".")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"values": [{
-"args": [20.0],
-"method": &"shake"
-}]
-}
-
-[sub_resource type="Animation" id="Animation_death"]
-resource_name = "death"
-length = 2.5
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Rig:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.15, 0.3, 0.45, 0.6, 2.5),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 2, 1),
-"update": 0,
-"values": [Vector2(0, 0), Vector2(16, 0), Vector2(-16, 0), Vector2(12, 0), Vector2(-12, 0), Vector2(0, 700)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Rig:modulate")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 2.5),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Color(1, 1, 1, 1), Color(0.5, 0.5, 0.5, 1)]
-}
-tracks/2/type = "method"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath(".")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"values": [{
-"args": [25.0],
-"method": &"shake"
-}]
-}
-tracks/3/type = "method"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath(".")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0.3, 0.7, 1.1, 1.5, 1.9),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
-"values": [{
-"args": [],
-"method": &"death_boom"
-}, {
-"args": [],
-"method": &"death_boom"
-}, {
-"args": [],
-"method": &"death_boom"
-}, {
-"args": [],
-"method": &"death_boom"
-}, {
-"args": [],
-"method": &"death_boom"
-}]
-}
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_beam"]
-size = Vector2(2560, 30)
 
 [sub_resource type="Animation" id="Animation_laser"]
 resource_name = "laser"
@@ -466,7 +813,7 @@ tracks/5/keys = {
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("Rig/Head/Eye:modulate")
+tracks/6/path = NodePath("Rig/Upper/Head/Eye:modulate")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
@@ -497,113 +844,233 @@ tracks/7/keys = {
 _data = {
 &"bombs": SubResource("Animation_bombs"),
 &"death": SubResource("Animation_death"),
-&"idle": SubResource("Animation_idle"),
+&"hop": SubResource("Animation_hop"),
+&"idle_1": SubResource("Animation_idle_1"),
+&"idle_2": SubResource("Animation_idle_2"),
+&"idle_3": SubResource("Animation_idle_3"),
 &"intro": SubResource("Animation_intro"),
 &"laser": SubResource("Animation_laser"),
 &"phase_2": SubResource("Animation_phase_2"),
 &"phase_3": SubResource("Animation_phase_3"),
+&"rain": SubResource("Animation_rain"),
 &"slam": SubResource("Animation_slam"),
-&"stagger": SubResource("Animation_stagger")
+&"spit": SubResource("Animation_spit"),
+&"stagger": SubResource("Animation_stagger"),
+&"stomp": SubResource("Animation_stomp")
 }
 
 [node name="Boss" type="Node2D"]
 script = ExtResource("1_boss")
 
 [node name="Rig" type="Node2D" parent="."]
-position = Vector2(0, 520)
+position = Vector2(0, -760)
 
-[node name="Torso" type="Sprite2D" parent="Rig"]
-position = Vector2(1080, 470)
+[node name="Legs" type="Node2D" parent="Rig"]
+
+[node name="LegB" type="Node2D" parent="Rig/Legs"]
+modulate = Color(0.78, 0.76, 0.86, 1)
+position = Vector2(1260, 0)
+
+[node name="Art" type="Sprite2D" parent="Rig/Legs/LegB"]
+position = Vector2(0, 268)
 scale = Vector2(4, 4)
-texture = ExtResource("2_torso")
+texture = ExtResource("16_leg")
 
-[node name="ArmorL" type="Sprite2D" parent="Rig"]
-position = Vector2(960, 320)
+[node name="Foot" type="Sprite2D" parent="Rig/Legs/LegB"]
+position = Vector2(-40, 596)
 scale = Vector2(4, 4)
-texture = ExtResource("3_armor")
+texture = ExtResource("17_foot")
 
-[node name="ArmorR" type="Sprite2D" parent="Rig"]
-position = Vector2(1200, 320)
+[node name="StompAnchor" type="Node2D" parent="Rig/Legs"]
+z_index = 1
+position = Vector2(1020, 0)
+
+[node name="Shadow" type="Sprite2D" parent="Rig/Legs/StompAnchor"]
+visible = false
+position = Vector2(0, 640)
 scale = Vector2(4, 4)
-texture = ExtResource("3_armor")
-flip_h = true
+texture = ExtResource("11_reticle")
 
-[node name="Core" type="Node2D" parent="Rig"]
-position = Vector2(1060, 420)
+[node name="LegF" type="Node2D" parent="Rig/Legs/StompAnchor"]
 
-[node name="Glow" type="AnimatedSprite2D" parent="Rig/Core"]
+[node name="Art" type="Sprite2D" parent="Rig/Legs/StompAnchor/LegF"]
+position = Vector2(0, 268)
+scale = Vector2(4, 4)
+texture = ExtResource("16_leg")
+
+[node name="Foot" type="Sprite2D" parent="Rig/Legs/StompAnchor/LegF"]
+position = Vector2(-40, 596)
+scale = Vector2(4, 4)
+texture = ExtResource("17_foot")
+
+[node name="KneeCore" type="Node2D" parent="Rig/Legs/StompAnchor/LegF"]
+position = Vector2(-2, 400)
+
+[node name="Glow" type="AnimatedSprite2D" parent="Rig/Legs/StompAnchor/LegF/KneeCore"]
 scale = Vector2(4, 4)
 sprite_frames = ExtResource("4_core")
 animation = &"pulse"
 autoplay = "pulse"
 
-[node name="Target" type="AnimatedSprite2D" parent="Rig/Core"]
+[node name="Target" type="AnimatedSprite2D" parent="Rig/Legs/StompAnchor/LegF/KneeCore"]
 scale = Vector2(4, 4)
 sprite_frames = ExtResource("5_target")
 animation = &"blink"
 autoplay = "blink"
 
-[node name="WeakPoint" type="Area2D" parent="Rig/Core"]
+[node name="WeakPoint" type="Area2D" parent="Rig/Legs/StompAnchor/LegF/KneeCore"]
 collision_layer = 16
 collision_mask = 4
 monitorable = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Rig/Core/WeakPoint"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rig/Legs/StompAnchor/LegF/KneeCore/WeakPoint"]
 shape = SubResource("CircleShape2D_core")
 
-[node name="Head" type="Node2D" parent="Rig"]
-position = Vector2(1090, 170)
+[node name="Hitbox" type="Area2D" parent="Rig/Legs/StompAnchor/LegF"]
+position = Vector2(-40, 590)
+collision_layer = 8
+collision_mask = 0
+monitoring = false
 
-[node name="Face" type="Sprite2D" parent="Rig/Head"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rig/Legs/StompAnchor/LegF/Hitbox"]
+shape = SubResource("RectangleShape2D_foot")
+disabled = true
+
+[node name="Upper" type="Node2D" parent="Rig"]
+position = Vector2(0, -700)
+
+[node name="Body" type="Node2D" parent="Rig/Upper"]
+
+[node name="Neck" type="Sprite2D" parent="Rig/Upper/Body"]
+position = Vector2(1090, -10)
+scale = Vector2(4, 4)
+texture = ExtResource("18_neck")
+
+[node name="Torso" type="Sprite2D" parent="Rig/Upper/Body"]
+position = Vector2(1080, 470)
+scale = Vector2(4, 4)
+texture = ExtResource("2_torso")
+
+[node name="ArmorL" type="Sprite2D" parent="Rig/Upper/Body"]
+position = Vector2(960, 320)
+scale = Vector2(4, 4)
+texture = ExtResource("3_armor")
+
+[node name="ArmorR" type="Sprite2D" parent="Rig/Upper/Body"]
+position = Vector2(1200, 320)
+scale = Vector2(4, 4)
+texture = ExtResource("3_armor")
+flip_h = true
+
+[node name="Core" type="Node2D" parent="Rig/Upper/Body"]
+position = Vector2(1060, 420)
+
+[node name="Glow" type="AnimatedSprite2D" parent="Rig/Upper/Body/Core"]
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("4_core")
+animation = &"pulse"
+autoplay = "pulse"
+
+[node name="Target" type="AnimatedSprite2D" parent="Rig/Upper/Body/Core"]
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("5_target")
+animation = &"blink"
+autoplay = "blink"
+
+[node name="WeakPoint" type="Area2D" parent="Rig/Upper/Body/Core"]
+collision_layer = 16
+collision_mask = 4
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rig/Upper/Body/Core/WeakPoint"]
+shape = SubResource("CircleShape2D_core")
+
+[node name="FistL" type="Node2D" parent="Rig/Upper/Body"]
+position = Vector2(880, 540)
+
+[node name="Hand" type="Sprite2D" parent="Rig/Upper/Body/FistL"]
+scale = Vector2(4, 4)
+texture = ExtResource("9_open")
+
+[node name="BombSpawn" type="Marker2D" parent="Rig/Upper/Body/FistL"]
+position = Vector2(-20, -60)
+
+[node name="SlamAnchor" type="Node2D" parent="Rig/Upper/Body"]
+z_index = 1
+position = Vector2(500, 0)
+
+[node name="Shadow" type="Sprite2D" parent="Rig/Upper/Body/SlamAnchor"]
+visible = false
+position = Vector2(0, 640)
+scale = Vector2(4, 4)
+texture = ExtResource("11_reticle")
+
+[node name="FistR" type="Node2D" parent="Rig/Upper/Body/SlamAnchor"]
+position = Vector2(0, -260)
+
+[node name="Hand" type="Sprite2D" parent="Rig/Upper/Body/SlamAnchor/FistR"]
+scale = Vector2(4, 4)
+texture = ExtResource("10_closed")
+
+[node name="Hitbox" type="Area2D" parent="Rig/Upper/Body/SlamAnchor/FistR"]
+collision_layer = 8
+collision_mask = 0
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rig/Upper/Body/SlamAnchor/FistR/Hitbox"]
+shape = SubResource("RectangleShape2D_fist")
+disabled = true
+
+[node name="Head" type="Node2D" parent="Rig/Upper"]
+position = Vector2(1090, -330)
+
+[node name="Face" type="Sprite2D" parent="Rig/Upper/Head"]
 scale = Vector2(4, 4)
 texture = ExtResource("6_head")
 
-[node name="Crown" type="Sprite2D" parent="Rig/Head"]
+[node name="Crown" type="Sprite2D" parent="Rig/Upper/Head"]
 position = Vector2(0, -125)
 scale = Vector2(4, 4)
 texture = ExtResource("7_crown")
 
-[node name="Eye" type="AnimatedSprite2D" parent="Rig/Head"]
+[node name="Eye" type="AnimatedSprite2D" parent="Rig/Upper/Head"]
 position = Vector2(-50, 0)
 scale = Vector2(4, 4)
 sprite_frames = ExtResource("8_eye")
 animation = &"look"
 autoplay = "look"
 
-[node name="FistL" type="Node2D" parent="Rig"]
-position = Vector2(880, 540)
+[node name="EyeCore" type="Node2D" parent="Rig/Upper/Head"]
+position = Vector2(-50, 0)
 
-[node name="Hand" type="Sprite2D" parent="Rig/FistL"]
-scale = Vector2(4, 4)
-texture = ExtResource("9_open")
-
-[node name="BombSpawn" type="Marker2D" parent="Rig/FistL"]
-position = Vector2(-20, -60)
-
-[node name="SlamAnchor" type="Node2D" parent="Rig"]
-z_index = 1
-position = Vector2(500, 0)
-
-[node name="Shadow" type="Sprite2D" parent="Rig/SlamAnchor"]
+[node name="Target" type="AnimatedSprite2D" parent="Rig/Upper/Head/EyeCore"]
 visible = false
-position = Vector2(0, 640)
 scale = Vector2(4, 4)
-texture = ExtResource("11_reticle")
+sprite_frames = ExtResource("5_target")
+animation = &"blink"
+autoplay = "blink"
 
-[node name="FistR" type="Node2D" parent="Rig/SlamAnchor"]
-position = Vector2(0, -260)
+[node name="WeakPoint" type="Area2D" parent="Rig/Upper/Head/EyeCore"]
+collision_layer = 16
+collision_mask = 4
+monitoring = false
+monitorable = false
 
-[node name="Hand" type="Sprite2D" parent="Rig/SlamAnchor/FistR"]
-scale = Vector2(4, 4)
-texture = ExtResource("10_closed")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rig/Upper/Head/EyeCore/WeakPoint"]
+shape = SubResource("CircleShape2D_core")
 
-[node name="Hitbox" type="Area2D" parent="Rig/SlamAnchor/FistR"]
+[node name="Mouth" type="Marker2D" parent="Rig/Upper/Head"]
+position = Vector2(-70, 70)
+
+[node name="HopHitbox" type="Area2D" parent="Rig/Upper/Head"]
+position = Vector2(0, 0)
 collision_layer = 8
 collision_mask = 0
 monitoring = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Rig/SlamAnchor/FistR/Hitbox"]
-shape = SubResource("RectangleShape2D_fist")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rig/Upper/Head/HopHitbox"]
+shape = SubResource("RectangleShape2D_head")
 disabled = true
 
 [node name="LaserLow" type="Node2D" parent="."]
