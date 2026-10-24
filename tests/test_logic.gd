@@ -29,6 +29,7 @@ func _run() -> void:
 	_test_bomb()
 	await _test_player()
 	await _test_arena()
+	await _test_hero_juice()
 	await _test_boss()
 	await _test_giant_stages()
 	await _test_boss_moves()
@@ -176,6 +177,39 @@ func _count_scenes(parent: Node, file: String) -> int:
 func _land(player: Player) -> void:
 	while not player.is_on_floor() or not player.dash_cooldown.is_stopped():
 		await physics_frame
+
+
+func _test_hero_juice() -> void:
+	var game: Node2D = load("res://scenes/game.tscn").instantiate()
+	root.add_child(game)
+	var player: Player = game.get_node("Player")
+	player.hurtbox.monitoring = false
+	await _land(player)
+	Input.action_press("dash")
+	await physics_frame
+	await physics_frame
+	Input.action_release("dash")
+	await create_timer(0.1).timeout
+	check(_count_scenes(game, "afterimage.tscn") >= 2, "a dash leaves fading afterimages behind")
+	await _land(player)
+	var dust_before := _count_scenes(game, "dust.tscn")
+	Input.action_press("move_right")
+	await create_timer(0.7).timeout
+	Input.action_release("move_right")
+	check(_count_scenes(game, "dust.tscn") > dust_before, "running kicks up dust each stride")
+	player.global_position = Vector2(200, 120)  # clear of the platforms, ~480 px above the floor
+	player.velocity = Vector2.ZERO
+	while player.is_on_floor():  # still flagged from before the teleport
+		await physics_frame
+	while not player.is_on_floor():
+		await physics_frame
+	check(player.art.scale.y < 0.9, "landing from a drop squashes him (%.2f)" % player.art.scale.y)
+	player._land(0.0)
+	var soft := player.art.scale.y
+	player._land(1.0)
+	check(is_equal_approx(soft, 0.9) and is_equal_approx(player.art.scale.y, 0.65), "the landing squash grows with the fall (hop 0.9, big drop 0.65)")
+	game.queue_free()
+	await process_frame
 
 
 func _on_timeout() -> void:

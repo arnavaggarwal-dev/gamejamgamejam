@@ -81,11 +81,45 @@ tracks/0/keys = {
 "values": [Vector2(1.3, 0.7), Vector2(0.7, 1.35), Vector2(1.06, 0.95), Vector2(1, 1)]
 }
 
+[sub_resource type="Animation" id="Animation_grab"]
+resource_name = "grab"
+length = 0.18
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Art:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.18),
+"transitions": PackedFloat32Array(0.5, 1),
+"update": 0,
+"values": [Vector2(1.25, 0.8), Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_throw"]
+resource_name = "throw"
+length = 0.22
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Art:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.08, 0.22),
+"transitions": PackedFloat32Array(1, 0.5, 1),
+"update": 0,
+"values": [Vector2(0.8, 1.2), Vector2(1.12, 0.92), Vector2(1, 1)]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_juice"]
 _data = {
 &"dash": SubResource("Animation_dash"),
 &"dash_v": SubResource("Animation_dash_v"),
-&"jump": SubResource("Animation_jump")
+&"grab": SubResource("Animation_grab"),
+&"jump": SubResource("Animation_jump"),
+&"throw": SubResource("Animation_throw")
 }
 
 [sub_resource type="Gradient" id="Gradient_trail"]
@@ -184,4 +218,9 @@ libraries = {
 &"": SubResource("AnimationLibrary_juice")
 }
 
+[node name="GhostTimer" type="Timer" parent="."]
+wait_time = 0.035
+
 [connection signal="timeout" from="DashTimer" to="." method="_end_dash"]
+[connection signal="timeout" from="GhostTimer" to="." method="_spawn_ghost"]
+[connection signal="frame_changed" from="Art/Flip/Body" to="." method="_on_body_frame_changed"]

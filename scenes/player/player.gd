@@ -16,6 +16,8 @@ const AIM_STEP := 0.06
 const DUST := preload("res://scenes/fx/dust.tscn")
 const POOF := preload("res://scenes/fx/poof.tscn")
 const SLIME := preload("res://scenes/fx/slime.tscn")
+const GHOST := preload("res://scenes/fx/afterimage.tscn")
+const HARD_LANDING := 1500.0  # px/s fall speed for the biggest landing squash
 
 @export var speed := 330.0
 @export var accel := 2600.0
@@ -54,6 +56,7 @@ var _dash_grounded := false  # started on the floor (and not upward): you can st
 @onready var dash_cooldown: Timer = $DashCooldown
 @onready var trail: CPUParticles2D = $Trail
 @onready var juice: AnimationPlayer = $Juice
+@onready var ghost_timer: Timer = $GhostTimer
 
 
 func _ready() -> void:
@@ -70,8 +73,12 @@ func _physics_process(delta: float) -> void:
 		return
 	var dir := Input.get_axis("move_left", "move_right")
 	if dir != 0.0 and not dashing:
+		var turned := (1 if dir > 0.0 else -1) != facing
 		facing = 1 if dir > 0.0 else -1
 		flip.scale.x = facing
+		if turned and is_on_floor() and absf(velocity.x) > speed * 0.5:
+			_squash(Vector2(0.85, 1.1))  # skid into the turn
+			_puff(DUST, _feet())
 
 	if is_on_floor() or (dashing and _dash_grounded):
 		_coyote = COYOTE_TIME  # a ground dash off a ledge can still jump at the end
@@ -103,10 +110,10 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_released("jump") and velocity.y < 0.0:
 		velocity.y *= 0.5
 
+	var fall := velocity.y
 	move_and_slide()
 	if is_on_floor() and not _was_on_floor:
-		_squash(Vector2(1.15, 0.85))
-		_puff(DUST, _feet())
+		_land(clampf(fall / HARD_LANDING, 0.0, 1.0))
 	_was_on_floor = is_on_floor()
 
 	if not is_instance_valid(held_bomb) or held_bomb.exploded:
@@ -136,6 +143,7 @@ func take_hit() -> void:
 		return
 	invuln.start()
 	anim.play(&"hurt")
+	_squash(Vector2(1.3, 0.7))
 	velocity = Vector2(-facing * 260.0, -380.0)
 
 
@@ -156,6 +164,8 @@ func _start_dash() -> void:
 	trail.angle_min = rad_to_deg(trail.rotation)  # ...and points each one along it
 	trail.angle_max = trail.angle_min
 	trail.emitting = true
+	ghost_timer.start()
+	_spawn_ghost()
 	juice.play(&"dash_v" if absf(_dash_dir.y) > absf(_dash_dir.x) else &"dash")
 	_puff(DUST if is_on_floor() else SLIME, _feet())
 
@@ -163,12 +173,14 @@ func _start_dash() -> void:
 ## Jump pressed mid-dash: the dash ends early and the jump keeps most of its sideways speed.
 func _cancel_dash() -> void:
 	dash_timer.stop()
+	ghost_timer.stop()
 	trail.emitting = false
 	velocity.x = _dash_dir.x * dash_speed * 0.7
 
 
 ## DashTimer.timeout (connected in the scene). If the dash ended inside a hazard, it still hurts.
 func _end_dash() -> void:
+	ghost_timer.stop()
 	trail.emitting = false
 	velocity = _dash_dir * speed  # a little carry, not the full burst
 	if hurtbox.monitoring and hurtbox.has_overlapping_areas():
@@ -214,6 +226,7 @@ func _grab() -> void:
 	if best:
 		best.pick_up()
 		held_bomb = best
+		juice.play(&"grab")
 
 
 func _throw_velocity() -> Vector2:
@@ -224,6 +237,7 @@ func _throw_velocity() -> Vector2:
 func _throw() -> void:
 	held_bomb.throw(_throw_velocity())
 	held_bomb = null
+	juice.play(&"throw")
 
 
 ## Predicts the bomb's flight with the same gravity the RigidBody2D will feel.
@@ -248,6 +262,31 @@ func _update_prompt() -> void:
 	prompt.visible = target != null
 	if target:
 		prompt.global_position = target.global_position + Vector2(0, -96)
+
+
+## Landing squash that grows with the fall: a hop barely squashes, a big drop flattens him,
+## kicks up extra dust and bumps the camera.
+func _land(impact: float) -> void:
+	_squash(Vector2(1.1 + 0.3 * impact, 0.9 - 0.25 * impact))
+	_puff(DUST, _feet())
+	if impact > 0.7:
+		_puff(DUST, _feet() + Vector2(-36, 0))
+		_puff(DUST, _feet() + Vector2(36, 0))
+		get_tree().call_group("camera", "shake", 5.0)
+
+
+## GhostTimer.timeout (connected in the scene): leave a fading mint copy of this frame behind.
+func _spawn_ghost() -> void:
+	var ghost: Sprite2D = GHOST.instantiate()
+	ghost.texture = body.sprite_frames.get_frame_texture(body.animation, body.frame)
+	get_parent().add_child(ghost)
+	ghost.global_transform = body.global_transform
+
+
+## Body.frame_changed (connected in the scene): a dust kick once per running stride.
+func _on_body_frame_changed() -> void:
+	if body.animation in [&"run", &"carry_run"] and body.frame == 1 and is_on_floor():
+		_puff(DUST, _feet() - Vector2(facing * 20, 0))
 
 
 func _feet() -> Vector2:
