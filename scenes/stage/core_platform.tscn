@@ -5,6 +5,11 @@
 [ext_resource type="Texture2D" path="res://assets/art/world/core_plate_end.png" id="3_end"]
 [ext_resource type="SpriteFrames" path="res://assets/art/world/core_hub_frames.tres" id="4_hub"]
 [ext_resource type="Texture2D" path="res://assets/art/world/glow.png" id="5_glow"]
+[ext_resource type="Texture2D" path="res://assets/art/fx/zap_bit.png" id="6_spark"]
+
+[sub_resource type="Gradient" id="Gradient_spark"]
+offsets = PackedFloat32Array(0, 0.6, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_top"]
 size = Vector2(200, 24)
@@ -235,6 +240,42 @@ tracks/13/keys = {
 "update": 1,
 "values": [true, false, true]
 }
+tracks/14/type = "value"
+tracks/14/imported = false
+tracks/14/enabled = true
+tracks/14/path = NodePath("Aura:emitting")
+tracks/14/interp = 1
+tracks/14/loop_wrap = true
+tracks/14/keys = {
+"times": PackedFloat32Array(0, 0.6, 3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [true, false, true]
+}
+tracks/15/type = "value"
+tracks/15/imported = false
+tracks/15/enabled = true
+tracks/15/path = NodePath("Parts/Tethers:visible")
+tracks/15/interp = 1
+tracks/15/loop_wrap = true
+tracks/15/keys = {
+"times": PackedFloat32Array(0, 0.6, 3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [false, true, false]
+}
+tracks/16/type = "value"
+tracks/16/imported = false
+tracks/16/enabled = true
+tracks/16/path = NodePath("Parts/Tethers:modulate")
+tracks/16/interp = 1
+tracks/16/loop_wrap = true
+tracks/16/keys = {
+"times": PackedFloat32Array(0.6, 0.9, 2.5, 2.6, 3),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0.7), Color(1, 1, 1, 0.7), Color(1, 1, 1, 1), Color(1, 1, 1, 1)]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_core"]
 _data = {
@@ -256,6 +297,41 @@ visible = false
 modulate = Color(1, 1, 1, 0.7)
 scale = Vector2(4, 4)
 texture = ExtResource("5_glow")
+
+[node name="Tethers" type="Node2D" parent="Parts"]
+visible = false
+
+[node name="Tether0" type="Line2D" parent="Parts/Tethers"]
+width = 10.0
+default_color = Color(0.176, 0.153, 0.188, 1)
+
+[node name="Bolt" type="Line2D" parent="Parts/Tethers/Tether0"]
+width = 4.0
+default_color = Color(0.859, 0.851, 0.569, 1)
+
+[node name="Tether1" type="Line2D" parent="Parts/Tethers"]
+width = 10.0
+default_color = Color(0.176, 0.153, 0.188, 1)
+
+[node name="Bolt" type="Line2D" parent="Parts/Tethers/Tether1"]
+width = 4.0
+default_color = Color(0.859, 0.851, 0.569, 1)
+
+[node name="Tether2" type="Line2D" parent="Parts/Tethers"]
+width = 10.0
+default_color = Color(0.176, 0.153, 0.188, 1)
+
+[node name="Bolt" type="Line2D" parent="Parts/Tethers/Tether2"]
+width = 4.0
+default_color = Color(0.859, 0.851, 0.569, 1)
+
+[node name="Tether3" type="Line2D" parent="Parts/Tethers"]
+width = 10.0
+default_color = Color(0.176, 0.153, 0.188, 1)
+
+[node name="Bolt" type="Line2D" parent="Parts/Tethers/Tether3"]
+width = 4.0
+default_color = Color(0.859, 0.851, 0.569, 1)
 
 [node name="L1" type="Sprite2D" parent="Parts"]
 position = Vector2(-80, 0)
@@ -283,6 +359,18 @@ scale = Vector2(4, 4)
 sprite_frames = ExtResource("4_hub")
 animation = &"dim"
 autoplay = "dim"
+
+[node name="Aura" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 6
+lifetime = 0.22
+texture = ExtResource("6_spark")
+emission_shape = 4
+emission_points = PackedVector2Array(-104, -18, -88, -18, -72, -18, -56, -18, -40, -18, -24, -18, -8, -18, 8, -18, 24, -18, 40, -18, 56, -18, 72, -18, 88, -18, 104, -18, -104, 18, -88, 18, -72, 18, -56, 18, -40, 18, -24, 18, -8, 18, 8, 18, 24, 18, 40, 18, 56, 18, 72, 18, 88, 18, 104, 18, -108, -8, -108, 8, 108, -8, 108, 8)
+gravity = Vector2(0, 0)
+scale_amount_min = 4.0
+scale_amount_max = 4.0
+color_ramp = SubResource("Gradient_spark")
 
 [node name="Sensor" type="Area2D" parent="."]
 position = Vector2(0, -18)

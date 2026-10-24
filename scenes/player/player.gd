@@ -6,7 +6,7 @@ signal hp_changed(hp: int)
 signal died
 signal fell_in_pit
 
-const MAX_HP := 3
+const MAX_HP := 5
 const COYOTE_TIME := 0.1
 const JUMP_BUFFER := 0.12
 const FLOOR_Y := 640.0
@@ -88,7 +88,7 @@ func _physics_process(delta: float) -> void:
 		velocity.y = jump_velocity
 		_jump_buffer = 0.0
 		_coyote = 0.0
-		_squash(Vector2(0.85, 1.15))
+		juice.play(&"jump")  # squash, then a big stretch off the ground
 		_puff(DUST, _feet())
 	if Input.is_action_just_released("jump") and velocity.y < 0.0:
 		velocity.y *= 0.5

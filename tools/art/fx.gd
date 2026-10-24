@@ -55,6 +55,17 @@ static func streak():
 	return c
 
 
+## A tiny zig-zag spark for the core platforms' electric aura (ink-outlined to read on the pale wall).
+static func zap_bit():
+	var c = Canvas.new(6, 7)
+	for p in [[3, 1], [2, 2], [2, 3], [3, 3], [3, 4], [2, 5]]:
+		c.px(p[0], p[1], P.BUTTER)
+	c.px(3, 1, P.CREAM)
+	c.px(2, 2, P.CREAM)
+	c.outline()
+	return c
+
+
 ## 8-frame explosion: flash, fireball, breakup, smoke.
 static func explosion_frames() -> Array:
 	var frames := []

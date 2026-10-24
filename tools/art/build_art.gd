@@ -69,6 +69,7 @@ func _fx() -> void:
 	_save_sheet("fx/bomb.png", Fx.bomb_frames())
 	_save_sheet("fx/arrow.png", Fx.arrow_frames())
 	_save_sheet("fx/streak.png", [Fx.streak()])
+	_save_sheet("fx/zap_bit.png", [Fx.zap_bit()])
 	_save_sheet("fx/explosion.png", Fx.explosion_frames())
 	_save_sheet("fx/spark.png", Fx.spark_frames())
 	_save_sheet("fx/dust.png", Fx.dust_frames())

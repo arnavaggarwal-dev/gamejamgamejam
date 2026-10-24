@@ -56,6 +56,7 @@ func check(ok: bool, what: String) -> void:
 func _test_bomb() -> void:
 	var bomb: Bomb = load("res://scenes/boss/bomb.tscn").instantiate()
 	root.add_child(bomb)
+	bomb.global_position = Vector2(-4000, -4000)  # its blast must not reach the next test's player at the origin
 	bomb.pick_up()
 	check(bomb.freeze and bomb.collision_layer == 0, "picked-up bomb is frozen and ghosted")
 	bomb.throw(Vector2(100, -100))
@@ -71,14 +72,14 @@ func _test_player() -> void:
 	await process_frame
 	var died := [false]
 	player.died.connect(func() -> void: died[0] = true)
+	check(Player.MAX_HP == 5 and player.hp == 5, "the hero starts with 5 hearts")
 	player.take_hit()
-	check(player.hp == 2, "a hit costs one heart")
+	check(player.hp == Player.MAX_HP - 1, "a hit costs one heart")
 	player.take_hit()
-	check(player.hp == 2, "invulnerable right after a hit")
-	player.invuln.stop()
-	player.take_hit()
-	player.invuln.stop()
-	player.take_hit()
+	check(player.hp == Player.MAX_HP - 1, "invulnerable right after a hit")
+	for i in Player.MAX_HP - 1:
+		player.invuln.stop()
+		player.take_hit()
 	check(player.hp == 0 and died[0], "losing the last heart emits died")
 	player.reset(Vector2(100, 100))
 	check(player.hp == Player.MAX_HP and player.visible, "reset refills hearts and shows the player")
@@ -161,7 +162,7 @@ func _test_game_wiring() -> void:
 	var boss: Boss = game.get_node("Boss")
 	var hud: HUD = game.get_node("HUD")
 	player.take_hit()
-	check(hud.hearts[2].texture == HUD.HEART_EMPTY and hud.hearts[1].texture == HUD.HEART_FULL, "losing a heart updates the HUD")
+	check(hud.hearts.size() == Player.MAX_HP and hud.hearts[Player.MAX_HP - 1].texture == HUD.HEART_EMPTY and hud.hearts[Player.MAX_HP - 2].texture == HUD.HEART_FULL, "losing a heart updates the HUD")
 	boss.state = Boss.State.IDLE
 	boss.take_hit()
 	check(hud.boss_bar.value == boss.hits_total() - 1, "a boss hit updates the boss bar")
@@ -277,13 +278,14 @@ func _test_core_platform() -> void:
 	check(drift[0] > 0.0 and drift[0] <= 3.0, "its plates hum about fixed spots (max drift %.1f px)" % drift[0])
 	check(plat.hub.animation == &"dim" and not plat.halo.visible, "unarmed in phase 1, its core is dark")
 	stage.set_phase(1)
-	check(plat.hub.animation == &"pulse" and plat.halo.visible, "armed in phase 2, its core glows")
+	check(plat.hub.animation == &"pulse" and plat.halo.visible and plat.aura.emitting, "armed in phase 2, its core glows and an electric aura crackles")
 	await create_timer(0.9).timeout
 	check(plat.anim.current_animation == &"break" and plat.shape.disabled and player.global_position.y > plat.global_position.y - 40.0, "phase 2: standing on it shakes it apart and drops the player")
-	check(plat.hub.animation == &"dim" and not plat.halo.visible, "the core goes dark while it is broken")
+	check(plat.hub.animation == &"dim" and not plat.halo.visible and not plat.aura.emitting, "the core goes dark while it is broken")
+	check(plat.tethers.visible and plat.tethers.get_child(0).points.size() == CorePlatform.SEGMENTS + 1 and plat.tethers.get_child(0).points[CorePlatform.SEGMENTS].distance_to(plat.plates[0].position) < 2.0, "electric tethers run from the core to each loose plate")
 	await create_timer(2.6).timeout
 	check(not plat.shape.disabled and plat.get_node("Parts/L1").position.distance_to(home[0]) <= 3.0, "then the core pulls the plates back into place")
-	check(plat.hub.animation == &"pulse" and plat.halo.visible, "and glows again once whole")
+	check(plat.hub.animation == &"pulse" and plat.halo.visible and plat.aura.emitting and not plat.tethers.visible, "and glows again once whole")
 	game.queue_free()
 	await process_frame
 	Engine.time_scale = 1.0

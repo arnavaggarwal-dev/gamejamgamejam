@@ -20,7 +20,7 @@ color = Color(0.988, 0.984, 0.988, 1)
 [node name="Hearts" type="HBoxContainer" parent="."]
 offset_left = 24.0
 offset_top = 24.0
-offset_right = 172.0
+offset_right = 276.0
 offset_bottom = 64.0
 theme_override_constants/separation = 8
 
@@ -37,6 +37,18 @@ texture = ExtResource("2_heart")
 expand_mode = 1
 
 [node name="Heart3" type="TextureRect" parent="Hearts"]
+custom_minimum_size = Vector2(44, 40)
+layout_mode = 2
+texture = ExtResource("2_heart")
+expand_mode = 1
+
+[node name="Heart4" type="TextureRect" parent="Hearts"]
+custom_minimum_size = Vector2(44, 40)
+layout_mode = 2
+texture = ExtResource("2_heart")
+expand_mode = 1
+
+[node name="Heart5" type="TextureRect" parent="Hearts"]
 custom_minimum_size = Vector2(44, 40)
 layout_mode = 2
 texture = ExtResource("2_heart")
