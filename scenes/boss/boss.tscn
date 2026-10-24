@@ -1181,7 +1181,7 @@ sprite_frames = ExtResource("21_dashbeam")
 animation = &"shimmer"
 autoplay = "shimmer"
 centered = false
-offset = Vector2(0, -3.5)
+offset = Vector2(0, -25)
 
 [node name="EyeBeam" type="Node2D" parent="Rig/Upper/Head"]
 position = Vector2(-50, 0)

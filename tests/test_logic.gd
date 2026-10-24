@@ -310,6 +310,8 @@ func _test_boss_moves() -> void:
 	await create_timer(0.65).timeout  # ~0.85 s of the tell at stage-3 speed
 	check(boss.head.position.distance_to(hover) < 12.0 and boss.anim.current_animation == &"swoop", "the swoop tells for most of a second (eye flashing, head quivering) before it moves")
 	check(boss.dash_beam.visible and absf(angle_difference(boss.dash_beam.global_rotation, (Vector2(400, 540) - boss.head.global_position).angle())) < 0.05, "a light beam shows the line he is about to dash along")
+	var beam_art: Texture2D = boss.dash_beam.get_node("Beam").sprite_frames.get_frame_texture(&"shimmer", 0)
+	check(beam_art.get_height() * 4.0 >= 200.0, "the light beam is as wide as his head (%d px)" % (beam_art.get_height() * 4))
 	var aim := Vector2(400, 540)  # no player here: he aims at x 400, kept above the floor
 	var closest := [INF]
 	var flashed := [0.0]
