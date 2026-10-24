@@ -48,8 +48,8 @@ _data = {
 point_count = 2
 
 [sub_resource type="Gradient" id="Gradient_doom"]
-offsets = PackedFloat32Array(0, 0.55, 0.85, 1)
-colors = PackedColorArray(0.176, 0.153, 0.188, 1, 0.451, 0.373, 0.694, 1, 0.565, 0.337, 0.467, 1, 0.859, 0.588, 0.573, 1)
+offsets = PackedFloat32Array(0, 0.5, 0.8, 1)
+colors = PackedColorArray(0.176, 0.153, 0.188, 1, 0.451, 0.373, 0.694, 1, 0.565, 0.337, 0.467, 1, 0.36, 0.22, 0.33, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_doom"]
 gradient = SubResource("Gradient_doom")
@@ -61,15 +61,21 @@ fill_to = Vector2(0, 1)
 offsets = PackedFloat32Array(0, 0.5, 1)
 colors = PackedColorArray(0.859, 0.851, 0.569, 1, 0.859, 0.588, 0.573, 1, 0.565, 0.337, 0.467, 0)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_doomshort"]
-size = Vector2(1680, 80)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_slab240"]
+size = Vector2(240, 24)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_doomlong"]
-size = Vector2(2160, 80)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_slab280"]
+size = Vector2(280, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_slab320"]
+size = Vector2(320, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_slab600"]
+size = Vector2(600, 24)
 
 [sub_resource type="Curve2D" id="Curve2D_tall"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1100)
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -810)
 }
 point_count = 2
 
@@ -118,55 +124,57 @@ tracks/2/keys = {
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("Floor/Tiles:position")
+tracks/3/path = NodePath("Set:position")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.6, 2),
-"transitions": PackedFloat32Array(1, 0.5, 1),
+"times": PackedFloat32Array(0, 0.8, 2.4),
+"transitions": PackedFloat32Array(1, 0.4, 1),
 "update": 0,
-"values": [Vector2(0, 120), Vector2(0, 120), Vector2(0, 0)]
+"values": [Vector2(0, 160), Vector2(0, 160), Vector2(0, 0)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Floor:collision_layer")
+tracks/4/path = NodePath("../WallR/CollisionShape2D:disabled")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0, 2),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [0, 1]
+"values": [false, true]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("../WallR/CollisionShape2D:disabled")
+tracks/5/path = NodePath("Embers:emitting")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0, 2),
-"transitions": PackedFloat32Array(1, 1),
-"update": 1,
-"values": [false, true]
-}
-tracks/6/type = "value"
-tracks/6/imported = false
-tracks/6/enabled = true
-tracks/6/path = NodePath("Embers:emitting")
-tracks/6/interp = 1
-tracks/6/loop_wrap = true
-tracks/6/keys = {
 "times": PackedFloat32Array(0, 1),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [false, true]
 }
+tracks/6/type = "method"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Set/LiftL/AnimationPlayer")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(2),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [&"glide"],
+"method": &"play"
+}]
+}
 tracks/7/type = "method"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("Set/Lift/AnimationPlayer")
+tracks/7/path = NodePath("Set/LiftR/AnimationPlayer")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
@@ -421,6 +429,30 @@ position = Vector2(2320, 680)
 [node name="Panel15" parent="Arena/Floor" instance=ExtResource("8_panel")]
 position = Vector2(2480, 680)
 
+[node name="Panel16" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(2640, 680)
+
+[node name="Panel17" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(2800, 680)
+
+[node name="Panel18" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(2960, 680)
+
+[node name="Panel19" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(3120, 680)
+
+[node name="Panel20" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(3280, 680)
+
+[node name="Panel21" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(3440, 680)
+
+[node name="Panel22" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(3600, 680)
+
+[node name="Panel23" parent="Arena/Floor" instance=ExtResource("8_panel")]
+position = Vector2(3760, 680)
+
 [node name="WallL" type="StaticBody2D" parent="Arena"]
 position = Vector2(-20, 360)
 
@@ -433,7 +465,7 @@ position = Vector2(2580, 360)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/WallR"]
 shape = SubResource("RectangleShape2D_wall")
 
-[node name="PlatL" type="StaticBody2D" parent="Arena"]
+[node name="PlatL" type="StaticBody2D" parent="Arena" groups=["castle_set"]]
 position = Vector2(360, 480)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/PlatL"]
@@ -444,7 +476,7 @@ one_way_collision = true
 scale = Vector2(4, 4)
 texture = ExtResource("10_platform")
 
-[node name="PlatML" type="StaticBody2D" parent="Arena"]
+[node name="PlatML" type="StaticBody2D" parent="Arena" groups=["castle_set"]]
 position = Vector2(980, 500)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/PlatML"]
@@ -455,7 +487,7 @@ one_way_collision = true
 scale = Vector2(4, 4)
 texture = ExtResource("10_platform")
 
-[node name="PlatM" type="StaticBody2D" parent="Arena"]
+[node name="PlatM" type="StaticBody2D" parent="Arena" groups=["castle_set"]]
 position = Vector2(1180, 380)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/PlatM"]
@@ -466,7 +498,7 @@ one_way_collision = true
 scale = Vector2(4, 4)
 texture = ExtResource("10_platform")
 
-[node name="PlatR" type="StaticBody2D" parent="Arena"]
+[node name="PlatR" type="StaticBody2D" parent="Arena" groups=["castle_set"]]
 position = Vector2(2250, 480)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/PlatR"]
@@ -477,14 +509,14 @@ one_way_collision = true
 scale = Vector2(4, 4)
 texture = ExtResource("10_platform")
 
-[node name="Piston" parent="Arena" instance=ExtResource("9_lift")]
+[node name="Piston" parent="Arena" groups=["castle_set"] instance=ExtResource("9_lift")]
 position = Vector2(760, 560)
 
-[node name="Slider" parent="Arena" instance=ExtResource("9_lift")]
+[node name="Slider" parent="Arena" groups=["castle_set"] instance=ExtResource("9_lift")]
 position = Vector2(1500, 470)
 curve = SubResource("Curve2D_slide")
 
-[node name="CorePlatforms" type="Node2D" parent="Arena"]
+[node name="CorePlatforms" type="Node2D" parent="Arena" groups=["castle_set"]]
 
 [node name="CoreL" parent="Arena/CorePlatforms" instance=ExtResource("27_coreplat")]
 position = Vector2(540, 330)
@@ -511,8 +543,8 @@ modulate = Color(1, 1, 1, 0)
 
 [node name="Moon" type="Sprite2D" parent="Arena/DoomArena/Set"]
 z_index = -19
-position = Vector2(5400, -950)
-scale = Vector2(8, 8)
+position = Vector2(1920, -1160)
+scale = Vector2(11, 11)
 texture = ExtResource("30_moon")
 
 [node name="Spires" type="Node2D" parent="Arena/DoomArena/Set"]
@@ -520,24 +552,25 @@ z_index = -18
 
 [node name="Spire1" type="Polygon2D" parent="Arena/DoomArena/Set/Spires"]
 color = Color(0.3, 0.2, 0.3, 1)
-polygon = PackedVector2Array(200, 720, 260, -200, 230, -220, 320, -800, 410, -220, 380, -200, 450, 720)
+polygon = PackedVector2Array(0, 720, 60, -300, 30, -320, 150, -1250, 270, -320, 240, -300, 300, 720)
 
 [node name="Spire2" type="Polygon2D" parent="Arena/DoomArena/Set/Spires"]
 color = Color(0.3, 0.2, 0.3, 1)
-polygon = PackedVector2Array(5100, 720, 5160, 200, 5130, 180, 5200, -300, 5180, -320, 5240, -900, 5300, -320, 5280, -300, 5350, 180, 5320, 200, 5380, 720)
-
-[node name="Spire3" type="Polygon2D" parent="Arena/DoomArena/Set/Spires"]
-color = Color(0.3, 0.2, 0.3, 1)
-polygon = PackedVector2Array(6150, 720, 6250, 100, 6220, 80, 6330, -500, 6300, -520, 6420, -1250, 6460, -1100, 6500, -1180, 6560, -520, 6530, -500, 6650, 80, 6620, 100, 6750, 720)
-
-[node name="Spire4" type="Polygon2D" parent="Arena/DoomArena/Set/Spires"]
-color = Color(0.3, 0.2, 0.3, 1)
-polygon = PackedVector2Array(7250, 720, 7330, 0, 7300, -20, 7400, -650, 7500, -20, 7470, 0, 7560, 720)
+polygon = PackedVector2Array(3540, 720, 3600, -300, 3570, -320, 3690, -1250, 3810, -320, 3780, -300, 3840, 720)
 
 [node name="Lava" type="Node2D" parent="Arena/DoomArena/Set"]
 
 [node name="Tile1" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
-position = Vector2(2560, 656)
+position = Vector2(1120, 656)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("29_lava")
+animation = &"bubble"
+autoplay = "bubble"
+frame_progress = 0
+centered = false
+
+[node name="Tile2" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
+position = Vector2(1280, 656)
 scale = Vector2(4, 4)
 sprite_frames = ExtResource("29_lava")
 animation = &"bubble"
@@ -545,8 +578,8 @@ autoplay = "bubble"
 frame_progress = 0.37
 centered = false
 
-[node name="Tile2" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
-position = Vector2(2720, 656)
+[node name="Tile3" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
+position = Vector2(1440, 656)
 scale = Vector2(4, 4)
 sprite_frames = ExtResource("29_lava")
 animation = &"bubble"
@@ -554,8 +587,8 @@ autoplay = "bubble"
 frame_progress = 0.74
 centered = false
 
-[node name="Tile3" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
-position = Vector2(2880, 656)
+[node name="Tile4" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
+position = Vector2(1600, 656)
 scale = Vector2(4, 4)
 sprite_frames = ExtResource("29_lava")
 animation = &"bubble"
@@ -563,8 +596,8 @@ autoplay = "bubble"
 frame_progress = 0.11
 centered = false
 
-[node name="Tile4" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
-position = Vector2(3040, 656)
+[node name="Tile5" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
+position = Vector2(1760, 656)
 scale = Vector2(4, 4)
 sprite_frames = ExtResource("29_lava")
 animation = &"bubble"
@@ -572,8 +605,8 @@ autoplay = "bubble"
 frame_progress = 0.48
 centered = false
 
-[node name="Tile5" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
-position = Vector2(3200, 656)
+[node name="Tile6" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
+position = Vector2(1920, 656)
 scale = Vector2(4, 4)
 sprite_frames = ExtResource("29_lava")
 animation = &"bubble"
@@ -581,8 +614,8 @@ autoplay = "bubble"
 frame_progress = 0.85
 centered = false
 
-[node name="Tile6" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
-position = Vector2(5040, 656)
+[node name="Tile7" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
+position = Vector2(2080, 656)
 scale = Vector2(4, 4)
 sprite_frames = ExtResource("29_lava")
 animation = &"bubble"
@@ -590,8 +623,8 @@ autoplay = "bubble"
 frame_progress = 0.22
 centered = false
 
-[node name="Tile7" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
-position = Vector2(5200, 656)
+[node name="Tile8" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
+position = Vector2(2240, 656)
 scale = Vector2(4, 4)
 sprite_frames = ExtResource("29_lava")
 animation = &"bubble"
@@ -599,8 +632,8 @@ autoplay = "bubble"
 frame_progress = 0.59
 centered = false
 
-[node name="Tile8" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
-position = Vector2(5360, 656)
+[node name="Tile9" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
+position = Vector2(2400, 656)
 scale = Vector2(4, 4)
 sprite_frames = ExtResource("29_lava")
 animation = &"bubble"
@@ -608,322 +641,398 @@ autoplay = "bubble"
 frame_progress = 0.96
 centered = false
 
-[node name="Platforms" type="Node2D" parent="Arena/DoomArena/Set"]
+[node name="Tile10" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
+position = Vector2(2560, 656)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("29_lava")
+animation = &"bubble"
+autoplay = "bubble"
+frame_progress = 0.33
+centered = false
 
-[node name="Plat1" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(2760, 500)
+[node name="Ramparts" type="Node2D" parent="Arena/DoomArena/Set"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat1"]
-shape = SubResource("RectangleShape2D_platform")
+[node name="L1" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
+position = Vector2(380, 470)
+
+[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L1"]
+z_index = -1
+points = PackedVector2Array(-132, 80, -132, 170)
+width = 24.0
+default_color = Color(0.29, 0.2, 0.29, 1)
+
+[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L1"]
+z_index = -1
+points = PackedVector2Array(132, 80, 132, 170)
+width = 24.0
+default_color = Color(0.29, 0.2, 0.29, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/L1"]
+position = Vector2(0, 12)
+shape = SubResource("RectangleShape2D_slab320")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat1"]
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/L1"]
+texture_repeat = 2
+position = Vector2(-160, 0)
 scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
+texture = ExtResource("28_floortile")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 80, 20)
 
-[node name="Plat2" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(3160, 500)
+[node name="L2" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
+position = Vector2(700, 300)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat2"]
-shape = SubResource("RectangleShape2D_platform")
+[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L2"]
+z_index = -1
+points = PackedVector2Array(-132, 80, -132, 340)
+width = 24.0
+default_color = Color(0.29, 0.2, 0.29, 1)
+
+[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L2"]
+z_index = -1
+points = PackedVector2Array(132, 80, 132, 340)
+width = 24.0
+default_color = Color(0.29, 0.2, 0.29, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/L2"]
+position = Vector2(0, 12)
+shape = SubResource("RectangleShape2D_slab320")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat2"]
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/L2"]
+texture_repeat = 2
+position = Vector2(-160, 0)
 scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
+texture = ExtResource("28_floortile")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 80, 20)
 
-[node name="Plat3" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(5280, 500)
+[node name="L3" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
+position = Vector2(1020, 130)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat3"]
-shape = SubResource("RectangleShape2D_platform")
+[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L3"]
+z_index = -1
+points = PackedVector2Array(-112, 80, -112, 510)
+width = 24.0
+default_color = Color(0.29, 0.2, 0.29, 1)
+
+[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L3"]
+z_index = -1
+points = PackedVector2Array(112, 80, 112, 510)
+width = 24.0
+default_color = Color(0.29, 0.2, 0.29, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/L3"]
+position = Vector2(0, 12)
+shape = SubResource("RectangleShape2D_slab280")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat3"]
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/L3"]
+texture_repeat = 2
+position = Vector2(-140, 0)
 scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
+texture = ExtResource("28_floortile")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 70, 20)
 
-[node name="Plat4" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(3660, 470)
+[node name="L4" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
+position = Vector2(760, -40)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat4"]
-shape = SubResource("RectangleShape2D_platform")
+[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L4"]
+z_index = -1
+points = PackedVector2Array(-112, 0, -112, -1400)
+width = 8.0
+default_color = Color(0.18, 0.15, 0.2, 1)
+
+[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L4"]
+z_index = -1
+points = PackedVector2Array(112, 0, 112, -1400)
+width = 8.0
+default_color = Color(0.18, 0.15, 0.2, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/L4"]
+position = Vector2(0, 12)
+shape = SubResource("RectangleShape2D_slab280")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat4"]
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/L4"]
+texture_repeat = 2
+position = Vector2(-140, 0)
 scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
+texture = ExtResource("28_floortile")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 70, 20)
 
-[node name="Plat5" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(4010, 310)
+[node name="L5" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
+position = Vector2(520, -210)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat5"]
-shape = SubResource("RectangleShape2D_platform")
+[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L5"]
+z_index = -1
+points = PackedVector2Array(-272, 0, -272, -1230)
+width = 8.0
+default_color = Color(0.18, 0.15, 0.2, 1)
+
+[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L5"]
+z_index = -1
+points = PackedVector2Array(272, 0, 272, -1230)
+width = 8.0
+default_color = Color(0.18, 0.15, 0.2, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/L5"]
+position = Vector2(0, 12)
+shape = SubResource("RectangleShape2D_slab600")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat5"]
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/L5"]
+texture_repeat = 2
+position = Vector2(-300, 0)
 scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
+texture = ExtResource("28_floortile")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 150, 20)
 
-[node name="Plat6" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(4360, 150)
+[node name="L6" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
+position = Vector2(1060, -380)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat6"]
-shape = SubResource("RectangleShape2D_platform")
+[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L6"]
+z_index = -1
+points = PackedVector2Array(-92, 0, -92, -1060)
+width = 8.0
+default_color = Color(0.18, 0.15, 0.2, 1)
+
+[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L6"]
+z_index = -1
+points = PackedVector2Array(92, 0, 92, -1060)
+width = 8.0
+default_color = Color(0.18, 0.15, 0.2, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/L6"]
+position = Vector2(0, 12)
+shape = SubResource("RectangleShape2D_slab240")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat6"]
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/L6"]
+texture_repeat = 2
+position = Vector2(-120, 0)
 scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
+texture = ExtResource("28_floortile")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 60, 20)
 
-[node name="Plat7" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(4710, -10)
+[node name="R1" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
+position = Vector2(3460, 470)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat7"]
-shape = SubResource("RectangleShape2D_platform")
+[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R1"]
+z_index = -1
+points = PackedVector2Array(-132, 80, -132, 170)
+width = 24.0
+default_color = Color(0.29, 0.2, 0.29, 1)
+
+[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R1"]
+z_index = -1
+points = PackedVector2Array(132, 80, 132, 170)
+width = 24.0
+default_color = Color(0.29, 0.2, 0.29, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/R1"]
+position = Vector2(0, 12)
+shape = SubResource("RectangleShape2D_slab320")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat7"]
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/R1"]
+texture_repeat = 2
+position = Vector2(-160, 0)
 scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
+texture = ExtResource("28_floortile")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 80, 20)
 
-[node name="Plat8" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(4360, -170)
+[node name="R2" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
+position = Vector2(3140, 300)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat8"]
-shape = SubResource("RectangleShape2D_platform")
+[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R2"]
+z_index = -1
+points = PackedVector2Array(-132, 80, -132, 340)
+width = 24.0
+default_color = Color(0.29, 0.2, 0.29, 1)
+
+[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R2"]
+z_index = -1
+points = PackedVector2Array(132, 80, 132, 340)
+width = 24.0
+default_color = Color(0.29, 0.2, 0.29, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/R2"]
+position = Vector2(0, 12)
+shape = SubResource("RectangleShape2D_slab320")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat8"]
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/R2"]
+texture_repeat = 2
+position = Vector2(-160, 0)
 scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
+texture = ExtResource("28_floortile")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 80, 20)
 
-[node name="Plat9" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(4010, -330)
+[node name="R3" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
+position = Vector2(2820, 130)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat9"]
-shape = SubResource("RectangleShape2D_platform")
+[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R3"]
+z_index = -1
+points = PackedVector2Array(-112, 80, -112, 510)
+width = 24.0
+default_color = Color(0.29, 0.2, 0.29, 1)
+
+[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R3"]
+z_index = -1
+points = PackedVector2Array(112, 80, 112, 510)
+width = 24.0
+default_color = Color(0.29, 0.2, 0.29, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/R3"]
+position = Vector2(0, 12)
+shape = SubResource("RectangleShape2D_slab280")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat9"]
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/R3"]
+texture_repeat = 2
+position = Vector2(-140, 0)
 scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
+texture = ExtResource("28_floortile")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 70, 20)
 
-[node name="Plat10" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(4360, -490)
+[node name="R4" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
+position = Vector2(3080, -40)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat10"]
-shape = SubResource("RectangleShape2D_platform")
+[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R4"]
+z_index = -1
+points = PackedVector2Array(-112, 0, -112, -1400)
+width = 8.0
+default_color = Color(0.18, 0.15, 0.2, 1)
+
+[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R4"]
+z_index = -1
+points = PackedVector2Array(112, 0, 112, -1400)
+width = 8.0
+default_color = Color(0.18, 0.15, 0.2, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/R4"]
+position = Vector2(0, 12)
+shape = SubResource("RectangleShape2D_slab280")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat10"]
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/R4"]
+texture_repeat = 2
+position = Vector2(-140, 0)
 scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
+texture = ExtResource("28_floortile")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 70, 20)
 
-[node name="Plat11" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(4760, -650)
+[node name="R5" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
+position = Vector2(3320, -210)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat11"]
-shape = SubResource("RectangleShape2D_platform")
+[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R5"]
+z_index = -1
+points = PackedVector2Array(-272, 0, -272, -1230)
+width = 8.0
+default_color = Color(0.18, 0.15, 0.2, 1)
+
+[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R5"]
+z_index = -1
+points = PackedVector2Array(272, 0, 272, -1230)
+width = 8.0
+default_color = Color(0.18, 0.15, 0.2, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/R5"]
+position = Vector2(0, 12)
+shape = SubResource("RectangleShape2D_slab600")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat11"]
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/R5"]
+texture_repeat = 2
+position = Vector2(-300, 0)
 scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
+texture = ExtResource("28_floortile")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 150, 20)
 
-[node name="Plat12" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(700, 170)
+[node name="R6" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
+position = Vector2(2780, -380)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat12"]
-shape = SubResource("RectangleShape2D_platform")
+[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R6"]
+z_index = -1
+points = PackedVector2Array(-92, 0, -92, -1060)
+width = 8.0
+default_color = Color(0.18, 0.15, 0.2, 1)
+
+[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R6"]
+z_index = -1
+points = PackedVector2Array(92, 0, 92, -1060)
+width = 8.0
+default_color = Color(0.18, 0.15, 0.2, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/R6"]
+position = Vector2(0, 12)
+shape = SubResource("RectangleShape2D_slab240")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat12"]
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/R6"]
+texture_repeat = 2
+position = Vector2(-120, 0)
 scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
+texture = ExtResource("28_floortile")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 60, 20)
 
-[node name="Plat13" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(1250, 20)
+[node name="Stones" type="Node2D" parent="Arena/DoomArena/Set"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat13"]
-shape = SubResource("RectangleShape2D_platform")
-one_way_collision = true
+[node name="Stone1" parent="Arena/DoomArena/Set/Stones" instance=ExtResource("27_coreplat")]
+position = Vector2(1440, 470)
 
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat13"]
-scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
+[node name="Stone2" parent="Arena/DoomArena/Set/Stones" instance=ExtResource("27_coreplat")]
+position = Vector2(1920, 470)
 
-[node name="Plat14" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(1800, -130)
+[node name="Stone3" parent="Arena/DoomArena/Set/Stones" instance=ExtResource("27_coreplat")]
+position = Vector2(2400, 470)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat14"]
-shape = SubResource("RectangleShape2D_platform")
-one_way_collision = true
-
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat14"]
-scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
-
-[node name="Plat15" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(2350, -280)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat15"]
-shape = SubResource("RectangleShape2D_platform")
-one_way_collision = true
-
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat15"]
-scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
-
-[node name="Plat16" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(2900, -430)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat16"]
-shape = SubResource("RectangleShape2D_platform")
-one_way_collision = true
-
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat16"]
-scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
-
-[node name="Plat17" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(6200, 350)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat17"]
-shape = SubResource("RectangleShape2D_platform")
-one_way_collision = true
-
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat17"]
-scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
-
-[node name="Plat18" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(6550, 180)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat18"]
-shape = SubResource("RectangleShape2D_platform")
-one_way_collision = true
-
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat18"]
-scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
-
-[node name="Plat19" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(6850, 0)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat19"]
-shape = SubResource("RectangleShape2D_platform")
-one_way_collision = true
-
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat19"]
-scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
-
-[node name="Plat20" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(6550, -180)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat20"]
-shape = SubResource("RectangleShape2D_platform")
-one_way_collision = true
-
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat20"]
-scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
-
-[node name="Plat21" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(6200, -360)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat21"]
-shape = SubResource("RectangleShape2D_platform")
-one_way_collision = true
-
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat21"]
-scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
-
-[node name="Plat22" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(5850, -540)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat22"]
-shape = SubResource("RectangleShape2D_platform")
-one_way_collision = true
-
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat22"]
-scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
-
-[node name="Plat23" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(7300, 300)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat23"]
-shape = SubResource("RectangleShape2D_platform")
-one_way_collision = true
-
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat23"]
-scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
-
-[node name="Plat24" type="StaticBody2D" parent="Arena/DoomArena/Set/Platforms"]
-position = Vector2(7450, -250)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Platforms/Plat24"]
-shape = SubResource("RectangleShape2D_platform")
-one_way_collision = true
-
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Platforms/Plat24"]
-scale = Vector2(4, 4)
-texture = ExtResource("10_platform")
-
-[node name="Lift" parent="Arena/DoomArena/Set" instance=ExtResource("9_lift")]
-position = Vector2(5800, 600)
+[node name="LiftL" parent="Arena/DoomArena/Set" instance=ExtResource("9_lift")]
+position = Vector2(110, 600)
 curve = SubResource("Curve2D_tall")
 
-[node name="Floor" type="StaticBody2D" parent="Arena/DoomArena"]
-collision_layer = 0
-
-[node name="Run1" type="CollisionShape2D" parent="Arena/DoomArena/Floor"]
-position = Vector2(4200, 680)
-shape = SubResource("RectangleShape2D_doomshort")
-
-[node name="Run2" type="CollisionShape2D" parent="Arena/DoomArena/Floor"]
-position = Vector2(6600, 680)
-shape = SubResource("RectangleShape2D_doomlong")
-
-[node name="Tiles" type="Node2D" parent="Arena/DoomArena/Floor"]
-position = Vector2(0, 120)
-
-[node name="Art1" type="Sprite2D" parent="Arena/DoomArena/Floor/Tiles"]
-texture_repeat = 2
-position = Vector2(3360, 640)
-scale = Vector2(4, 4)
-texture = ExtResource("28_floortile")
-centered = false
-region_enabled = true
-region_rect = Rect2(0, 0, 420, 20)
-
-[node name="Art2" type="Sprite2D" parent="Arena/DoomArena/Floor/Tiles"]
-texture_repeat = 2
-position = Vector2(5520, 640)
-scale = Vector2(4, 4)
-texture = ExtResource("28_floortile")
-centered = false
-region_enabled = true
-region_rect = Rect2(0, 0, 540, 20)
+[node name="LiftR" parent="Arena/DoomArena/Set" instance=ExtResource("9_lift")]
+position = Vector2(3730, 600)
+curve = SubResource("Curve2D_tall")
 
 [node name="FarWall" type="StaticBody2D" parent="Arena/DoomArena"]
-position = Vector2(7700, -360)
+position = Vector2(3860, -360)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/FarWall"]
 shape = SubResource("RectangleShape2D_doomwall")
 
 [node name="Embers" type="CPUParticles2D" parent="Arena/DoomArena"]
-position = Vector2(3840, 700)
+position = Vector2(1920, 700)
 emitting = false
 amount = 90
 lifetime = 5.0
 preprocess = 3.0
 emission_shape = 3
-emission_rect_extents = Vector2(4200, 20)
+emission_rect_extents = Vector2(2000, 20)
 direction = Vector2(0, -1)
 spread = 25.0
 gravity = Vector2(0, -20)

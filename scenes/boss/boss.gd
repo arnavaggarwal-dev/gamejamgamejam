@@ -35,8 +35,8 @@ const PHASES := [
 const FINAL := 3  # the rebuilt giant's phase: no weak spot of his own, Lil' Watt powers him
 const GROWN_SCALE := 1.58  # the giant's crown reaches the top of the 3x zoomed-out view
 const GROWN_POS := Vector2(-661, -371)  # Rig offset once he has grown, scaled about his feet (1140, 640)
-const FINAL_X := 1950.0  # where the giant rises: torso near x 3000, standing in the first lava pool
-const GIANT_STEP := 900.0  # px the giant's whole body moves per step toward the player
+const FINAL_X := 780.0  # where the giant rises: torso at x 1920, mid screen, in the lava moat
+const GIANT_ROAM := 420.0  # px the giant may step either side of his spot (he stays in his moat)
 const GIANT_BIG_BOMB := 2.5  # phase 4's rain bombs, scaled up for the zoomed-out view
 
 @export var projectiles: Node2D
@@ -54,7 +54,7 @@ const STRIDE := 36.0  # px a leg lifts per step while he walks
 const DASH_OVERSHOOT := 300.0  # px the head dashes past where it aimed
 const TORSO_X := 1080.0
 const ARENA_W := 2560.0
-const DOOM_W := 7680.0  # phase 4's arena of doom
+const DOOM_W := 3840.0  # phase 4's arena of doom (one zoomed-out screen)
 
 var state := State.INTRO
 var phase := 0
@@ -248,17 +248,21 @@ func stomp_return() -> void:
 	_chase().tween_property(stomp_anchor, "position:x", _rest_pose[stomp_anchor].x, 0.4 / anim.speed_scale).set_trans(Tween.TRANS_SINE)
 
 
-## Stage 4: with his front leg raised, the giant steps his whole body (up to GIANT_STEP) toward
-## the player, so the foot comes down by him while staying under the torso. The red ring is held
-## on its floor spot while the rig carries it along.
+## Stage 4: with his front leg raised, the giant steps his whole body toward the player (staying
+## within GIANT_ROAM of his spot in the moat), so the foot comes down as near him as it can while
+## staying under the torso. The red ring is held on its floor spot while the rig carries it.
 func step_aim() -> void:
-	var step := clampf(_player_x() - stomp_anchor.global_position.x, -GIANT_STEP, GIANT_STEP)
-	var goal := clampf(position.x + step, 0.0, DOOM_W - 1800.0)  # torso (at x + 1140) stays in the arena
+	var goal := clampf(position.x + _player_x() - stomp_anchor.global_position.x, FINAL_X - GIANT_ROAM, FINAL_X + GIANT_ROAM)
 	var spot := stomp_anchor.global_position.x + goal - position.x
 	stomp_ring.global_position.x = spot
 	var walk := _chase().set_parallel()
 	walk.tween_property(self, "position:x", goal, 0.45 / anim.speed_scale).set_trans(Tween.TRANS_SINE)
 	walk.tween_property(stomp_ring, "global_position:x", spot, 0.45 / anim.speed_scale)
+
+
+## ...then steps back to his spot in the moat, under the moon.
+func step_home() -> void:
+	_chase().tween_property(self, "position:x", FINAL_X, 0.4 / anim.speed_scale).set_trans(Tween.TRANS_SINE)
 
 
 ## Stage 3 tell: aim the dash at the player (called repeatedly, then it locks) and lay the

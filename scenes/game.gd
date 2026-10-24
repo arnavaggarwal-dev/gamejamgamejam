@@ -4,7 +4,7 @@ extends Node2D
 const GOAL_HINT := "GRAB BOMBS [Z] AND THROW THEM AT THE CORE!"
 const HELPER := preload("res://scenes/boss/training_bot.tscn")
 const DOOM_ZOOM := Vector2.ONE / 3.0  # phase 4 pulls the camera back threefold
-const WATT_SPOT := Vector2(3650.0, -350.0)  # phase 4: Lil' Watt beams into the rising king from here
+const WATT_SPOT := Vector2(2450.0, -560.0)  # phase 4: Lil' Watt beams into the rising king from here
 const WATT_SIZE := Vector2(2.0, 2.0)  # phase 4's Lil' Watt is powered up (and readable zoomed out)
 const CINEMA_DROP := 240  # world px the view drops during the letterbox, so the floor clears the bottom bar
 
@@ -126,6 +126,7 @@ func _final_phase() -> void:
 	boss.revive()
 	await boss.revived
 	hud.coach("")
+	hud.boss_bar_aside()
 	hud.cinema(false)
 	create_tween().tween_property(camera, "limit_bottom", 720, 0.5).set_trans(Tween.TRANS_SINE)
 	camera.target = player

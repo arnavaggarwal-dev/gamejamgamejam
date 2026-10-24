@@ -334,9 +334,9 @@ func _test_giant_stages() -> void:
 	boss.rest_timer.stop()
 	var anchor_rest := boss.stomp_anchor.position
 	var from_x := boss.position.x
-	boss.step_aim()  # no player in this scene: he steps toward x 400, at most GIANT_STEP
+	boss.step_aim()  # no player in this scene: he steps toward x 400, as far as his moat allows
 	await create_timer(0.6).timeout
-	check(is_equal_approx(boss.position.x, from_x - Boss.GIANT_STEP) and boss.stomp_anchor.position == anchor_rest, "a step moves his whole body; the leg stays under him")
+	check(is_equal_approx(boss.position.x, from_x - Boss.GIANT_ROAM) and boss.stomp_anchor.position == anchor_rest, "a step moves his whole body (staying in his moat); the leg stays under him")
 	check(absf(boss.stomp_ring.global_position.x - boss.stomp_anchor.global_position.x) < 2.0, "the red ring marks where the foot comes down")
 	boss.rain_bomb()
 	var big: Bomb = root.get_children().filter(func(n: Node) -> bool: return n is Bomb).back()
@@ -472,22 +472,24 @@ func _test_final_phase() -> void:
 		boss.skip_phase()
 	await create_timer(3.0).timeout
 	var stage: Stage = game.get_node("Arena")
-	check(camera.zoom.is_equal_approx(Vector2.ONE / 3.0) and camera.limit_right == 7680 and camera.limit_top == -1440, "phase 4 pulls the camera back threefold")
+	check(camera.zoom.is_equal_approx(Vector2.ONE / 3.0) and camera.limit_right == 3840 and camera.limit_top == -1440, "phase 4 pulls the camera back threefold")
 	check(player.frozen and hud.bars[0].scale.y > 0.9 and not hud.boss_box.visible, "a cutscene starts: letterbox bars in, the player frozen")
-	var doom_floor: StaticBody2D = stage.get_node("DoomArena/Floor")
-	check(doom_floor.collision_layer == 1 and stage.doom.can_process() and stage.get_node("WallR/CollisionShape2D").disabled, "the arena of doom opens: the floor runs on past the old wall")
-	check(stage.get_node("DoomArena/Set/Platforms").get_child_count() >= 20 and stage.get_node("DoomArena/Set/Lava").get_child_count() > 0, "...broken by lava, with platforms climbing high")
-	var back := stage.safe_spot(3000.0).x
-	var back_far := stage.safe_spot(5300.0).x
-	var on_lava := func(x: float) -> bool: return (x > 2560.0 and x < 3360.0) or (x > 5040.0 and x < 5520.0)
-	check(not on_lava.call(back) and not on_lava.call(back_far), "falling in the lava puts you back on solid ground")
+	check(stage.doom.can_process() and stage.get_node("WallR/CollisionShape2D").disabled, "the arena of doom opens: the floor runs on past the old wall")
+	check(stage.panels.slice(7, 17).all(func(p: FloorPanel) -> bool: return p.collapsed) and not stage.panels[6].collapsed and not stage.panels[17].collapsed, "the middle of the floor drops into a lava moat; the banks stay")
+	check(stage.get_node("DoomArena/Set/Ramparts").get_child_count() == 12 and stage.stones.all(func(c: CorePlatform) -> bool: return c.armed), "mirrored ramparts climb each side; armed core stones cross the moat")
+	check(stage.panels[2].belt_speed > 0.0 and stage.panels[21].belt_speed < 0.0 and stage.panels[4].belt_speed == 0.0, "the banks' belts flow toward the king")
+	await create_timer(1.6).timeout
+	check(not stage.get_node("PlatM").visible and not stage.get_node("PlatM").can_process(), "the castle's own platforms sink away")
+	var back := stage.safe_spot(1900.0).x
+	check(back < 1120.0 or back > 2720.0, "falling in the lava puts you back on a bank")
 	var helper: TrainingBot = game.helper
 	check(is_instance_valid(helper) and camera.target == helper and not helper.link.visible, "Lil' Watt flies in, the camera following it")
-	await create_timer(4.2).timeout  # at the fallen crown: "...DAD?", then it turns on you
+	await create_timer(2.6).timeout  # at the fallen crown: "...DAD?", then it turns on you
 	check(helper.face == &"angry" and hud.coach_label.text == "YOU BROKE MY DAD!!", "Lil' Watt finds the wreck and gets angry")
 	await create_timer(9.8).timeout  # flies to the wreck, beams in, and the king rises
 	check(boss.rig.scale.is_equal_approx(Vector2.ONE * Boss.GROWN_SCALE) and boss.state != Boss.State.PHASE_SHIFT, "Lil' Watt's power revives the king, giant-sized")
 	check(not player.frozen and camera.target == player and hud.bars[0].scale.y < 0.05 and hud.boss_box.visible, "the cutscene ends: bars out, control back")
+	check(hud.boss_box.global_position.x > 700.0, "the boss bar moves to the top-right corner, clear of the giant's head")
 	check(helper.link.visible and helper.power_target == boss.weak_point() and helper.follow_y and not helper.shot_timer.is_stopped(), "Lil' Watt fights beside him: powering him, following you, shooting")
 	check(hud.boss_name.text == "LIL' WATT" and hud.boss_bar.value == TrainingBot.HITS, "the boss bar now shows Lil' Watt")
 	var shots := projectiles_of(game, "res://scenes/boss/zap_ball.tscn")
@@ -592,7 +594,7 @@ func _test_stage() -> void:
 	await process_frame
 	var stage: Stage = game.get_node("Arena")
 	var player: Player = game.get_node("Player")
-	check(stage.panels.size() == 16, "the floor is 16 panels across a 2560 px arena")
+	check(stage.panels.size() == 24 and Stage.ARENA_PANELS == 16, "the floor is 16 panels across the 2560 px castle, 24 once phase 4 opens it to 3840")
 	var piston: Node2D = stage.get_node("Piston")
 	check(stage.panels[4].belt_speed == 0.0 and not piston.get_node("AnimationPlayer").is_playing() and stage.zap_timer.is_stopped(), "phase 1 is plain, still stone")
 	stage.set_phase(1)

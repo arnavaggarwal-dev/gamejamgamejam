@@ -11,6 +11,7 @@ const HEART_EMPTY := preload("res://assets/art/ui/heart_empty.png")
 var _banner_id := 0
 var _hint_id := 0
 var _flash: Tween
+var _cinema := false  # letterbox in: hints wait
 
 @onready var hearts_row: Control = $Hearts
 @onready var hearts: Array = $Hearts.get_children()
@@ -67,7 +68,7 @@ func show_banner(text: String, seconds: float) -> void:
 func show_hint(text: String) -> void:
 	_hint_id += 1
 	hint.text = text
-	hint.visible = text != ""
+	hint.visible = text != "" and not _cinema
 
 
 ## A hint that clears itself after a few seconds (unless another hint replaced it).
@@ -102,6 +103,7 @@ func flash(strength := 0.7, hold := 0.0) -> void:
 ## Cutscene letterbox: black bars slide in top and bottom while the hearts and boss bar step
 ## aside (and the hint clears), or slide back out.
 func cinema(on: bool) -> void:
+	_cinema = on
 	hearts_row.visible = not on
 	boss_box.visible = not on
 	if on:
@@ -109,6 +111,15 @@ func cinema(on: bool) -> void:
 	var slide := create_tween().set_parallel()
 	for bar: Control in bars:
 		slide.tween_property(bar, "scale:y", 1.0 if on else 0.0, 0.5).set_trans(Tween.TRANS_SINE)
+
+
+## Phase 4: the boss bar moves to the top-right corner (open sky), so the screen-tall king's
+## head stays clear.
+func boss_bar_aside() -> void:
+	boss_box.anchor_left = 1.0
+	boss_box.anchor_right = 1.0
+	boss_box.offset_left = -472.0
+	boss_box.offset_right = -24.0
 
 
 func show_end(text: String) -> void:
