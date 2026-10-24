@@ -2,8 +2,9 @@ class_name Boss
 extends Node2D
 ## King Kilowatt, too big for the screen. Stage 1 only his legs fit in frame (weak spot: the
 ## front knee); break them and the torso crashes down, head on its shoulders (chest core);
-## break that and the head pops off and flies on jet boosters (the eye). Only thrown bombs
-## hurt him, and every hit cracks the part being fought a little more.
+## break that and the head pops off and flies on jet boosters (the eye). Break the head and he
+## rebuilds himself into a giant (phase 4) that Lil' Watt powers: hits on Lil' Watt reach him
+## through power_hit(). Only thrown bombs hurt, and each hit cracks the part being fought.
 ## Attacks live in the AnimationPlayer: value tracks move the rig and toggle hitboxes, method
 ## tracks call stomp_* / aim_* / swoop / rain_bomb / spawn_bomb / spit_bomb / boom / land / shake.
 ## Moves that chase the player (the stomp's walk, the head's dash) are tweens started there.
@@ -27,7 +28,11 @@ const PHASES := [
 	{attacks = [&"stomp", &"rain"], speed = 1.0, rest = 1.2},  # legs
 	{attacks = [&"swipe", &"bombs"], speed = 1.2, rest = 0.9},  # torso (moves by roaming, no charge)
 	{attacks = [&"swoop", &"spit", &"laser", &"spit"], speed = 1.3, rest = 0.7},  # head
+	{attacks = [&"stomp", &"rain", &"laser", &"rain"], speed = 1.0, rest = 1.1},  # rebuilt giant
 ]
+const FINAL := 3  # the rebuilt giant's phase: no weak spot of his own, Lil' Watt powers him
+const GROWN_POS := Vector2(-570, -320)  # Rig offset once he has grown 1.5x about his feet
+const FINAL_X := 1650.0  # where the giant rebuilds: torso near x 2700, mid arena of doom
 
 @export var projectiles: Node2D
 
@@ -44,6 +49,7 @@ const STRIDE := 36.0  # px a leg lifts per step while he walks
 const DASH_OVERSHOOT := 300.0  # px the head dashes past where it aimed
 const TORSO_X := 1080.0
 const ARENA_W := 2560.0
+const DOOM_W := 7680.0  # phase 4's arena of doom
 
 var state := State.INTRO
 var phase := 0
@@ -104,7 +110,7 @@ func _process(_delta: float) -> void:
 ## Rides the rail while resting, roaming either side of his spot near the player so attacks
 ## still land close; in the legs stage the legs step as he walks.
 func _physics_process(delta: float) -> void:
-	if state != State.IDLE:
+	if state != State.IDLE or phase == FINAL:  # the giant stands his ground
 		return
 	var player := get_tree().get_first_node_in_group("player") as Node2D
 	if player == null:
@@ -141,15 +147,30 @@ func _rail_goal(player: Node2D) -> float:
 
 ## Cracks spread over the part being fought as it takes hits: one, then all three.
 func _show_cracks() -> void:
+	if phase >= cracks.size():
+		return
 	var damage := HITS_PER_PHASE - hp
 	var shown := damage * (damage + 1) / 2
 	for i in cracks[phase].get_child_count():
 		cracks[phase].get_child(i).visible = i < shown
 
 
-## The core to hit right now: the front knee, then the chest, then the eye.
+## The core to hit right now: the front knee, then the chest, then the eye; the giant's chest is
+## where Lil' Watt's power goes in.
 func weak_point() -> Node2D:
-	return cores[phase]
+	return cores[1] if phase == FINAL else cores[phase]
+
+
+## Phase 4: each hit on Lil' Watt, his power source, costs the giant a hit.
+func power_hit() -> void:
+	if phase != FINAL or state == State.DEAD:
+		return
+	hp -= 1
+	health_changed.emit(hp, HITS_PER_PHASE)
+	get_tree().call_group("hud", "flash", 0.8)
+	get_tree().call_group("camera", "hitstop", 0.12)
+	if hp <= 0:
+		_advance_phase()
 
 
 func hits_total() -> int:
@@ -260,9 +281,18 @@ func spawn_bomb() -> void:
 	_drop_bomb(bomb_spawn.global_position, Vector2(randf_range(-650.0, -250.0), -350.0))
 
 
-## Stage 1: his hands are out of frame, so bombs fall from the sky near the player.
+## Stages 1 and 4: his hands are out of frame, so bombs fall from the sky near the player
+## (from above the zoomed-out view in phase 4).
 func rain_bomb() -> void:
-	_drop_bomb(Vector2(clampf(_player_x() + randf_range(-320.0, 320.0), 80.0, ARENA_W - 80.0), -60.0), Vector2.ZERO)
+	var x := clampf(_player_x() + randf_range(-320.0, 320.0), 80.0, (DOOM_W if phase == FINAL else ARENA_W) - 80.0)
+	_drop_bomb(Vector2(x, -1500.0 if phase == FINAL else -60.0), Vector2.ZERO)
+
+
+## The rebuild in phase 4 mends every crack.
+func heal_cracks() -> void:
+	for part: Node2D in cracks:
+		for crack: Node2D in part.get_children():
+			crack.hide()
 
 
 func spit_bomb() -> void:
@@ -329,7 +359,7 @@ func _player_pos() -> Vector2:
 
 func _player_x() -> float:
 	var player := get_tree().get_first_node_in_group("player") as Node2D
-	return clampf(player.global_position.x if player else 400.0, 80.0, ARENA_W - 80.0)
+	return clampf(player.global_position.x if player else 400.0, 80.0, (DOOM_W if phase == FINAL else ARENA_W) - 80.0)
 
 
 # --- internals ---
@@ -347,6 +377,8 @@ func _advance_phase() -> void:
 	hp = HITS_PER_PHASE
 	_attack_index = 0
 	state = State.PHASE_SHIFT
+	if phase == FINAL:
+		create_tween().tween_property(self, "position:x", FINAL_X, 3.0).set_trans(Tween.TRANS_SINE)  # pieces gather mid arena
 	phase_changed.emit(phase)
 	_play.call_deferred(StringName("phase_%d" % (phase + 1)), State.PHASE_SHIFT)
 
@@ -369,7 +401,7 @@ func _reset_rig() -> void:
 		_move.kill()
 	for n: Node2D in _rest_pose:
 		n.position = _rest_pose[n]
-	rig.position = Vector2.ZERO
+	rig.position = GROWN_POS if phase == FINAL else Vector2.ZERO
 	rig.modulate = Color.WHITE
 	eye.modulate = Color.WHITE
 	body.modulate = Color.WHITE

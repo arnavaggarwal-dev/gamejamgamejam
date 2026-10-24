@@ -2,7 +2,8 @@ class_name Stage
 extends Node2D
 ## The arena's own moves. Phase 1 is plain stone so the king's attacks read cleanly; phase 2
 ## switches on the conveyors, the lifts, zaps near the player and the core platforms that fall
-## apart underfoot; phase 3 flips the belts, zaps more often and collapses two panels into pits.
+## apart underfoot; phase 3 flips the belts, zaps more often and collapses two panels into pits;
+## phase 4 raises the arena of doom: the floor runs on to x 7680 under a red sky full of embers.
 
 signal zap_started
 signal collapsed
@@ -10,8 +11,9 @@ signal collapsed
 const PANEL_W := 160.0
 const BELTS := {4: 140.0, 5: 140.0, 11: -140.0, 12: -140.0}
 const PITS := [7, 14]
-const ZAP_EVERY := [0.0, 5.0, 4.0]  # seconds between zaps, per phase (none in phase 1)
-const ZAP_WIDTH := [2, 2, 3]  # panels per zap, per phase
+const ZAP_EVERY := [0.0, 5.0, 4.0, 4.0]  # seconds between zaps, per phase (none in phase 1)
+const ZAP_WIDTH := [2, 2, 3, 3]  # panels per zap, per phase
+const DOOM_W := 7680.0  # the arena of doom's width (phase 4)
 const ARENA_W := 2560.0
 
 var phase := 0
@@ -45,6 +47,8 @@ func set_phase(p: int) -> void:
 		for i in PITS:
 			panels[i].collapse()
 		collapsed.emit()
+	elif phase == 3:
+		$DoomArena/AnimationPlayer.play(&"reveal")
 	zap_timer.start(ZAP_EVERY[phase])
 
 

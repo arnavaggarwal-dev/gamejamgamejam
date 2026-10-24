@@ -27,6 +27,7 @@
 [ext_resource type="Shader" path="res://assets/shaders/spotlight.gdshader" id="25_spot"]
 [ext_resource type="PackedScene" path="res://scenes/boss/training_bot.tscn" id="26_bot"]
 [ext_resource type="PackedScene" path="res://scenes/stage/core_platform.tscn" id="27_coreplat"]
+[ext_resource type="Texture2D" path="res://assets/art/world/floor_tile.png" id="28_floortile"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_spot"]
 shader = ExtResource("25_spot")
@@ -43,6 +44,119 @@ _data = {
 "points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 480, 0)
 }
 point_count = 2
+
+[sub_resource type="Gradient" id="Gradient_doom"]
+offsets = PackedFloat32Array(0, 0.55, 0.85, 1)
+colors = PackedColorArray(0.176, 0.153, 0.188, 1, 0.451, 0.373, 0.694, 1, 0.565, 0.337, 0.467, 1, 0.859, 0.588, 0.573, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_doom"]
+gradient = SubResource("Gradient_doom")
+width = 16
+height = 256
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="Gradient_ember"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(0.859, 0.851, 0.569, 1, 0.859, 0.588, 0.573, 1, 0.565, 0.337, 0.467, 0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_doomfloor"]
+size = Vector2(5120, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_doomwall"]
+size = Vector2(40, 2400)
+
+[sub_resource type="Animation" id="Animation_reveal"]
+resource_name = "reveal"
+length = 2.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sky:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 2.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Floor/Art:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.6, 2),
+"transitions": PackedFloat32Array(1, 0.5, 1),
+"update": 0,
+"values": [Vector2(2560, 760), Vector2(2560, 760), Vector2(2560, 640)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Floor/CollisionShape2D:disabled")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("FarWall/CollisionShape2D:disabled")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("../WallR/CollisionShape2D:disabled")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Embers:emitting")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_doom"]
+_data = {
+&"reveal": SubResource("Animation_reveal")
+}
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_game")
@@ -352,6 +466,64 @@ position = Vector2(540, 330)
 
 [node name="CoreR" parent="Arena/CorePlatforms" instance=ExtResource("27_coreplat")]
 position = Vector2(1760, 320)
+
+[node name="DoomArena" type="Node2D" parent="Arena"]
+visible = false
+
+[node name="Sky" type="TextureRect" parent="Arena/DoomArena"]
+z_index = -20
+offset_left = -1400.0
+offset_top = -1900.0
+offset_right = 9100.0
+offset_bottom = 720.0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_doom")
+expand_mode = 1
+
+[node name="Floor" type="StaticBody2D" parent="Arena/DoomArena"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Floor"]
+position = Vector2(5120, 680)
+shape = SubResource("RectangleShape2D_doomfloor")
+disabled = true
+
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Floor"]
+texture_repeat = 2
+position = Vector2(2560, 760)
+scale = Vector2(4, 4)
+texture = ExtResource("28_floortile")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 1280, 20)
+
+[node name="FarWall" type="StaticBody2D" parent="Arena/DoomArena"]
+position = Vector2(7700, -360)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/FarWall"]
+shape = SubResource("RectangleShape2D_doomwall")
+disabled = true
+
+[node name="Embers" type="CPUParticles2D" parent="Arena/DoomArena"]
+position = Vector2(3840, 700)
+emitting = false
+amount = 90
+lifetime = 5.0
+preprocess = 3.0
+emission_shape = 3
+emission_rect_extents = Vector2(4200, 20)
+direction = Vector2(0, -1)
+spread = 25.0
+gravity = Vector2(0, -20)
+initial_velocity_min = 60.0
+initial_velocity_max = 160.0
+scale_amount_min = 4.0
+scale_amount_max = 8.0
+color_ramp = SubResource("Gradient_ember")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Arena/DoomArena"]
+libraries = {
+&"": SubResource("AnimationLibrary_doom")
+}
 
 [node name="ZapTimer" type="Timer" parent="Arena"]
 

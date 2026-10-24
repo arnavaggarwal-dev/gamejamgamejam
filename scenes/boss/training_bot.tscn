@@ -220,6 +220,17 @@ monitorable = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hover/Core/WeakPoint"]
 shape = SubResource("CircleShape2D_core")
 
+[node name="Link" type="Line2D" parent="."]
+visible = false
+show_behind_parent = true
+top_level = true
+width = 30.0
+default_color = Color(0.176, 0.153, 0.188, 1)
+
+[node name="Bolt" type="Line2D" parent="Link"]
+width = 14.0
+default_color = Color(0.859, 0.851, 0.569, 1)
+
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
 &"": SubResource("AnimationLibrary_main")

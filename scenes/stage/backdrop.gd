@@ -3,8 +3,8 @@ extends Node2D
 ## the scene), and the room darkens and the torches burn hotter each phase.
 
 # Dimmed from the start so the pale wall never glares; each phase goes a step darker.
-const MOODS := [Color(0.88, 0.86, 0.92), Color(0.8, 0.75, 0.9), Color(0.68, 0.6, 0.82)]
-const TORCH_TINTS := [Color(1, 1, 1), Color(1.15, 0.9, 0.9), Color(1.35, 0.75, 0.75)]
+const MOODS := [Color(0.88, 0.86, 0.92), Color(0.8, 0.75, 0.9), Color(0.68, 0.6, 0.82), Color(0.55, 0.42, 0.58, 0)]  # phase 4: the castle fades into the arena of doom
+const TORCH_TINTS := [Color(1, 1, 1), Color(1.15, 0.9, 0.9), Color(1.35, 0.75, 0.75), Color(1.5, 0.6, 0.6)]
 
 @onready var crowd: AnimatedSprite2D = $WallLayer/Crowd
 @onready var cheer_timer: Timer = $CheerTimer
@@ -20,7 +20,7 @@ func cheer(seconds := 1.5) -> void:
 
 
 func set_phase(p: int) -> void:
-	create_tween().tween_property(self, "modulate", MOODS[p], 0.6)
+	create_tween().tween_property(self, "modulate", MOODS[p], 2.5 if p == 3 else 0.6)
 	for torch in get_tree().get_nodes_in_group("torches"):
 		torch.speed_scale = 1.0 + p * 0.5
 		torch.modulate = TORCH_TINTS[p]

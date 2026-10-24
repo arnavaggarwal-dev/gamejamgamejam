@@ -2,6 +2,8 @@ extends Node2D
 ## Arena root: wires player, boss, stage, backdrop, tutorial and HUD together and handles restarts.
 
 const GOAL_HINT := "GRAB BOMBS [Z] AND THROW THEM AT THE CORE!"
+const HELPER := preload("res://scenes/boss/training_bot.tscn")
+const DOOM_ZOOM := Vector2.ONE / 3.0  # phase 4 pulls the camera back threefold
 
 @onready var player: Player = $Player
 @onready var boss: Boss = $Boss
@@ -11,6 +13,9 @@ const GOAL_HINT := "GRAB BOMBS [Z] AND THROW THEM AT THE CORE!"
 @onready var tutorial: Tutorial = $Tutorial
 @onready var projectiles: Node2D = $Projectiles
 @onready var respawn: Marker2D = $RespawnPoint
+@onready var camera: Camera2D = $Camera2D
+
+var helper: TrainingBot  # Lil' Watt powering the giant in phase 4
 
 
 func _ready() -> void:
@@ -53,6 +58,8 @@ func _on_player_died() -> void:
 		child.queue_free()
 	player.reset(respawn.global_position)
 	boss.restart_phase()
+	if boss.phase == Boss.FINAL:
+		_spawn_helper()  # a fresh Lil' Watt for the retry
 	hud.show_banner("AGAIN!", 1.0)
 
 
@@ -74,11 +81,39 @@ func _on_boss_phase_changed(phase: int) -> void:
 	backdrop.set_phase(phase)
 	if phase == 2:
 		get_tree().call_group("camera", "shake", 14.0)
+	if phase == Boss.FINAL:
+		_final_phase()
+
+
+## Phase 4: the camera pulls back threefold over the arena of doom while the king rebuilds
+## himself, and Lil' Watt flies in to power him. Breaking Lil' Watt finishes him.
+func _final_phase() -> void:
+	camera.limit_top = -1440  # 720 x 3 tall, floor still at the bottom of the view
+	camera.limit_right = int(Stage.DOOM_W)
+	create_tween().tween_property(camera, "zoom", DOOM_ZOOM, 2.5).set_trans(Tween.TRANS_SINE)
+	await get_tree().create_timer(1.2, false).timeout
+	_spawn_helper()
+	hud.show_tip("LIL' WATT IS POWERING THE KING!  BREAK LIL' WATT!", 5.0)
+
+
+func _spawn_helper() -> void:
+	if is_instance_valid(helper):
+		helper.queue_free()
+	helper = HELPER.instantiate()
+	add_child(helper)
+	helper.global_position = Vector2(boss.weak_point().global_position.x, 420.0)
+	helper.power_target = boss.weak_point()
+	helper.roam_max = Stage.DOOM_W - 120.0
+	helper.hit.connect(func(_left: int) -> void: boss.power_hit())
+	hud.set_boss_name("LIL' WATT")
+	hud.set_boss_health(helper.hp, TrainingBot.HITS)
 
 
 func _on_boss_defeated() -> void:
 	player.hurtbox.set_deferred("monitoring", false)  # deferred: defeated fires inside the WeakPoint physics callback
 	stage.stop()
+	if is_instance_valid(helper) and helper.hp > 0:
+		helper.break_down()  # (debug skip) the power source goes with him
 	backdrop.cheer(6.0)
 	hud.flash()
 	hud.show_hint("")

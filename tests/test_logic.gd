@@ -20,7 +20,7 @@ var _errors := ErrorCounter.new()
 func _initialize() -> void:
 	OS.add_logger(_errors)
 	# A runtime error inside a test stops _run before quit(); the watchdog ends the process instead of hanging.
-	create_timer(120.0, true, false, true).timeout.connect(_on_timeout)
+	create_timer(180.0, true, false, true).timeout.connect(_on_timeout)
 	_run.call_deferred()
 
 
@@ -39,6 +39,7 @@ func _run() -> void:
 	await _test_game_wiring()
 	await _test_phase_extras()
 	await _test_skip_phase()
+	await _test_final_phase()
 	await _test_pause()
 	await _test_stage()
 	await _test_core_platform()
@@ -232,11 +233,14 @@ func _test_boss() -> void:
 	var won := [false]
 	boss.phase_changed.connect(func(p: int) -> void: phases.append(p))
 	boss.defeated.connect(func() -> void: won[0] = true)
-	for i in boss.hits_total():
+	for i in Boss.HITS_PER_PHASE * 3:
 		boss.state = Boss.State.IDLE
 		boss.take_hit()
-	check(phases == [1, 2], "phase advances every 3 hits")
-	check(won[0] and boss.state == Boss.State.DEAD, "9 hits defeat the boss")
+	check(phases == [1, 2, Boss.FINAL], "phase advances every 3 hits, then he rebuilds into the giant")
+	check(not won[0] and boss.phase == Boss.FINAL, "breaking his head is not the end")
+	for i in Boss.HITS_PER_PHASE:
+		boss.power_hit()
+	check(won[0] and boss.state == Boss.State.DEAD, "three hits on Lil' Watt (his power) finish the giant")
 	boss.queue_free()
 
 	var boss2: Boss = load("res://scenes/boss/boss.tscn").instantiate()
@@ -287,6 +291,14 @@ func _test_giant_stages() -> void:
 	check(not boss.body.visible and boss.head.global_position.y > 300.0 and boss.head.global_position.y < 450.0 and boss.head.get_node("Jets").visible and armed.call(2) and not armed.call(1), "breaking the torso brings the head in, hovering on jets, and arms the eye")
 	check(boss.state == Boss.State.IDLE and boss.anim.current_animation == &"idle_3", "the head fights on")
 	check([boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"swoop", &"spit", &"laser"], "stage 3 swoops, spits bombs and fires the laser")
+	for i in Boss.HITS_PER_PHASE:
+		boss.state = Boss.State.IDLE
+		boss.take_hit()
+	await create_timer(7.4).timeout  # the whole rebuild
+	check(boss.phase == Boss.FINAL and boss.legs.visible and boss.body.visible and boss.head.position == Vector2(1090, 170), "breaking the head rebuilds him: legs, torso, head back together")
+	check(boss.rig.scale.is_equal_approx(Vector2(1.5, 1.5)) and boss.rig.position.is_equal_approx(Boss.GROWN_POS), "...and he grows 1.5x, feet still on the floor")
+	check(not armed.call(0) and not armed.call(1) and not armed.call(2), "the giant has no weak spot of his own")
+	check(boss.state == Boss.State.IDLE and boss.anim.current_animation == &"idle_4", "the giant fights on")
 	boss.queue_free()
 	await process_frame
 
@@ -399,6 +411,41 @@ func _test_roam() -> void:
 	await process_frame
 
 
+## Phase 4 in the arena: the camera pulls back 3x over the arena of doom, Lil' Watt flies in
+## linked to the giant, and breaking Lil' Watt knocks the king out.
+func _test_final_phase() -> void:
+	var game: Node2D = load("res://scenes/game.tscn").instantiate()
+	root.add_child(game)
+	var boss: Boss = game.get_node("Boss")
+	var player: Player = game.get_node("Player")
+	var camera: Camera2D = game.get_node("Camera2D")
+	var hud: HUD = game.get_node("HUD")
+	player.hurtbox.monitoring = false
+	while boss.state != Boss.State.IDLE:
+		await physics_frame
+	for i in 3:
+		boss.skip_phase()
+	await create_timer(3.0).timeout
+	var stage: Stage = game.get_node("Arena")
+	check(camera.zoom.is_equal_approx(Vector2.ONE / 3.0) and camera.limit_right == 7680 and camera.limit_top == -1440, "phase 4 pulls the camera back threefold")
+	check(not stage.get_node("DoomArena/Floor/CollisionShape2D").disabled and stage.get_node("WallR/CollisionShape2D").disabled, "the arena of doom opens: the floor runs on past the old wall")
+	var helper: TrainingBot = game.helper
+	check(is_instance_valid(helper) and helper.link.visible and helper.power_target == boss.weak_point(), "Lil' Watt flies in and powers the giant")
+	check(hud.boss_name.text == "LIL' WATT" and hud.boss_bar.value == TrainingBot.HITS, "the boss bar now shows Lil' Watt")
+	var won := [false]
+	boss.defeated.connect(func() -> void: won[0] = true)
+	for i in TrainingBot.HITS:
+		var bomb: Bomb = load("res://scenes/boss/bomb.tscn").instantiate()
+		game.get_node("Projectiles").add_child(bomb)
+		bomb.throw(Vector2.ZERO)
+		bomb.global_position = helper.core.global_position
+		await create_timer(0.4).timeout
+	check(won[0] and boss.state == Boss.State.DEAD, "breaking Lil' Watt knocks the giant out")
+	game.queue_free()
+	await process_frame
+	Engine.time_scale = 1.0
+
+
 func _test_game_wiring() -> void:
 	var game: Node2D = load("res://scenes/game.tscn").instantiate()
 	root.add_child(game)
@@ -444,6 +491,8 @@ func _test_skip_phase() -> void:
 	hud.skip_button.pressed.emit()
 	check(boss.phase == 1 and boss.hp == Boss.HITS_PER_PHASE, "skip phase jumps to phase 2 with full hits")
 	boss.skip_phase()
+	boss.skip_phase()
+	check(boss.phase == Boss.FINAL and boss.state != Boss.State.DEAD, "skipping on reaches phase 4, the giant")
 	boss.skip_phase()
 	check(boss.state == Boss.State.DEAD, "skipping from the last phase knocks the king out")
 	game.queue_free()
