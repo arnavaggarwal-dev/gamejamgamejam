@@ -73,6 +73,7 @@ func _fx() -> void:
 	_save_sheet("fx/explosion.png", Fx.explosion_frames())
 	_save_sheet("fx/spark.png", Fx.spark_frames())
 	_save_sheet("fx/dust.png", Fx.dust_frames())
+	_save_sheet("fx/slime.png", Fx.slime_frames())
 	_save_sheet("fx/poof.png", Fx.poof_frames())
 	_save_sheet("fx/shockwave.png", Fx.shockwave_frames())
 	_save_sheet("fx/laser_warn.png", Fx.laser_warn_frames())

@@ -62,7 +62,7 @@ func run() -> void:
 	_start_x = player.global_position.x
 	_focus([player])
 	await _step("WALK WITH THE  ARROW KEYS", _walked)
-	await _step("JUMP WITH  X", _jumped)
+	await _step("JUMP WITH  X\nAND AGAIN IN THE AIR!", _jumped)
 	await _step("DASH WITH  C\nHOLD ARROWS TO AIM IT", _dashed)
 	if not _skip:
 		_spawn_practice_bomb()

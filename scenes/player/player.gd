@@ -15,6 +15,7 @@ const AIM_DOTS := 14
 const AIM_STEP := 0.06
 const DUST := preload("res://scenes/fx/dust.tscn")
 const POOF := preload("res://scenes/fx/poof.tscn")
+const SLIME := preload("res://scenes/fx/slime.tscn")
 
 @export var speed := 330.0
 @export var accel := 2600.0
@@ -35,6 +36,7 @@ var _jump_buffer := 0.0
 var _was_on_floor := true
 var _dead := false
 var _air_dash_ready := true  # one dash per jump
+var _air_jump_ready := true  # one jump in mid-air (after a dash, off a ledge, or a double jump)
 var _dash_dir := Vector2.RIGHT
 var _dash_grounded := false  # started on the floor (and not upward): you can still jump out of it
 
@@ -74,6 +76,7 @@ func _physics_process(delta: float) -> void:
 	if is_on_floor() or (dashing and _dash_grounded):
 		_coyote = COYOTE_TIME  # a ground dash off a ledge can still jump at the end
 		_air_dash_ready = _air_dash_ready or is_on_floor()
+		_air_jump_ready = _air_jump_ready or is_on_floor()
 	else:
 		_coyote -= delta
 	if Input.is_action_just_pressed("dash") and dash_cooldown.is_stopped() and _air_dash_ready:
@@ -86,14 +89,17 @@ func _physics_process(delta: float) -> void:
 			velocity.y += gravity * delta
 
 	_jump_buffer = JUMP_BUFFER if Input.is_action_just_pressed("jump") else _jump_buffer - delta
-	if _jump_buffer > 0.0 and _coyote > 0.0:
+	if _jump_buffer > 0.0 and (_coyote > 0.0 or _air_jump_ready):
+		var midair := _coyote <= 0.0
+		if midair:
+			_air_jump_ready = false
 		if dashing:
 			_cancel_dash()
 		velocity.y = jump_velocity
 		_jump_buffer = 0.0
 		_coyote = 0.0
 		juice.play(&"jump")  # squash, then a big stretch off the ground
-		_puff(DUST, _feet())
+		_puff(SLIME if midair else DUST, _feet())  # a slimy splat when he kicks off thin air
 	if Input.is_action_just_released("jump") and velocity.y < 0.0:
 		velocity.y *= 0.5
 
@@ -151,7 +157,7 @@ func _start_dash() -> void:
 	trail.angle_max = trail.angle_min
 	trail.emitting = true
 	juice.play(&"dash_v" if absf(_dash_dir.y) > absf(_dash_dir.x) else &"dash")
-	_puff(DUST, _feet())
+	_puff(DUST if is_on_floor() else SLIME, _feet())
 
 
 ## Jump pressed mid-dash: the dash ends early and the jump keeps most of its sideways speed.

@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/fx/one_shot.gd" id="1_fx"]
+[ext_resource type="SpriteFrames" path="res://assets/art/fx/slime_frames.tres" id="2_frames"]
+
+[node name="Slime" type="AnimatedSprite2D"]
+z_index = 5
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("2_frames")
+animation = &"play"
+script = ExtResource("1_fx")

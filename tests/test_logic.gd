@@ -134,6 +134,23 @@ func _test_arena() -> void:
 	await physics_frame
 	Input.action_release("jump")
 	check(not player.dashing and player.velocity.y < 0.0 and absf(player.velocity.x) > player.speed, "jumping mid-dash cuts the dash into a jump that keeps its speed")
+	await _land(player)
+	await _aimed_dash(player, ["aim_up"])
+	await create_timer(0.25).timeout  # the up-dash is over; he is in mid-air, no coyote left
+	var splats_before := _count_scenes(game, "slime.tscn")
+	Input.action_press("jump")
+	await physics_frame
+	await physics_frame
+	Input.action_release("jump")
+	check(player.velocity.y < player.jump_velocity * 0.9, "after an up-dash he can still jump once in mid-air")
+	check(_count_scenes(game, "slime.tscn") > splats_before, "a mid-air jump bursts a slimy splat")
+	await create_timer(0.1).timeout
+	var vy := player.velocity.y
+	Input.action_press("jump")
+	await physics_frame
+	await physics_frame
+	Input.action_release("jump")
+	check(player.velocity.y > vy, "only one mid-air jump until he lands")
 	game.queue_free()
 	await process_frame
 
@@ -150,6 +167,10 @@ func _aimed_dash(player: Player, arrows: Array) -> Vector2:
 	for a: String in arrows:
 		Input.action_release(a)
 	return v
+
+
+func _count_scenes(parent: Node, file: String) -> int:
+	return parent.get_children().filter(func(n: Node) -> bool: return n.scene_file_path.ends_with(file)).size()
 
 
 func _land(player: Player) -> void:

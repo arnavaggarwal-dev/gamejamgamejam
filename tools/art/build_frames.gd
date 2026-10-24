@@ -24,6 +24,7 @@ const SHEETS := {
 	"fx/explosion_frames.tres": [Vector2i(48, 48), {"play": ["fx/explosion.png", 8, 18.0, false]}],
 	"fx/spark_frames.tres": [Vector2i(24, 24), {"play": ["fx/spark.png", 4, 20.0, false]}],
 	"fx/dust_frames.tres": [Vector2i(16, 8), {"play": ["fx/dust.png", 5, 16.0, false]}],
+	"fx/slime_frames.tres": [Vector2i(28, 16), {"play": ["fx/slime.png", 6, 18.0, false]}],
 	"fx/poof_frames.tres": [Vector2i(28, 28), {"play": ["fx/poof.png", 6, 14.0, false]}],
 	"fx/shockwave_frames.tres": [Vector2i(20, 14), {"roll": ["fx/shockwave.png", 3, 12.0, true]}],
 	"fx/laser_warn_frames.tres": [Vector2i(640, 3), {"march": ["fx/laser_warn.png", 2, 12.0, true]}],

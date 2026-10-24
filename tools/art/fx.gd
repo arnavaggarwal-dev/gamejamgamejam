@@ -135,6 +135,23 @@ static func dust_frames() -> Array:
 	return frames
 
 
+## Slimy splat when the little guy jumps or dashes in mid-air: a squashed teal blob bursts into
+## droplets that fly out and drip down (6 frames).
+static func slime_frames() -> Array:
+	var frames := []
+	for f in 6:
+		var c = Canvas.new(28, 16)
+		if f < 2:
+			c.shade_ellipse(14, 8, 5.0 - f * 2.0, 2.6 - f, P.HERO)
+		var d := 3.0 + f * 2.2
+		var r := maxf(0.8, 2.4 - f * 0.3)
+		for k in 6:
+			var a := TAU * k / 6.0 + 0.3
+			c.shade_ellipse(14 + cos(a) * d, 8 + sin(a) * d * 0.55 + f * 0.6, r, r, P.HERO)
+		frames.append(c)
+	return frames
+
+
 ## Bigger puff ring for the player's knock-out (6 frames).
 static func poof_frames() -> Array:
 	var frames := []
