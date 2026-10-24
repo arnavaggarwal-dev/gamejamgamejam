@@ -98,6 +98,7 @@ func _test_player() -> void:
 	player.invuln.stop()
 	Input.action_press("detonate")
 	await physics_frame
+	await physics_frame
 	Input.action_release("detonate")
 	check(bomb.exploded and player.hp == Player.MAX_HP and player.velocity.y < -1000.0, "[A] blows up the bomb in his hands: he rockets up, unhurt")
 	player.velocity = Vector2.ZERO
