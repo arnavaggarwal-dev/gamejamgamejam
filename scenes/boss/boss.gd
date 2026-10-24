@@ -1,8 +1,9 @@
 class_name Boss
 extends Node2D
 ## King Kilowatt, too big for the screen. Stage 1 only his legs fit in frame (weak spot: the
-## front knee); break them and the torso crashes down (chest core); break that and the head
-## flies in on jet boosters (the eye). Only thrown bombs hurt him.
+## front knee); break them and the torso crashes down, head on its shoulders (chest core);
+## break that and the head pops off and flies on jet boosters (the eye). Only thrown bombs
+## hurt him, and every hit cracks the part being fought a little more.
 ## Attacks live in the AnimationPlayer: value tracks move the rig and toggle hitboxes, method
 ## tracks call stomp_* / aim_* / swoop / rain_bomb / spawn_bomb / spit_bomb / boom / land / shake.
 ## Moves that chase the player (the stomp's walk, the head's dash) are tweens started there.
@@ -71,6 +72,7 @@ var _dash_target := Vector2.ZERO
 @onready var fist_l: Node2D = $Rig/Upper/Body/FistL
 @onready var bomb_spawn: Marker2D = $Rig/Upper/Body/FistL/BombSpawn
 @onready var cores: Array = [$Rig/Legs/StompAnchor/LegF/KneeCore, $Rig/Upper/Body/Core, $Rig/Upper/Head/EyeCore]
+@onready var cracks: Array = [$Rig/Legs/StompAnchor/LegF/Cracks, $Rig/Upper/Body/Cracks, $Rig/Upper/Head/Cracks]
 @onready var anim: AnimationPlayer = $AnimationPlayer
 @onready var rest_timer: Timer = $RestTimer
 
@@ -137,6 +139,14 @@ func _rail_goal(player: Node2D) -> float:
 	return clampf(player.global_position.x + RAIL_LEAD - TORSO_X, RAIL_MIN, RAIL_MAX)
 
 
+## Cracks spread over the part being fought as it takes hits: one, then all three.
+func _show_cracks() -> void:
+	var damage := HITS_PER_PHASE - hp
+	var shown := damage * (damage + 1) / 2
+	for i in cracks[phase].get_child_count():
+		cracks[phase].get_child(i).visible = i < shown
+
+
 ## The core to hit right now: the front knee, then the chest, then the eye.
 func weak_point() -> Node2D:
 	return cores[phase]
@@ -162,6 +172,7 @@ func take_hit() -> bool:
 	if state != State.IDLE and state != State.ATTACK:
 		return false
 	hp -= 1
+	_show_cracks()
 	health_changed.emit(hits_left(), hits_total())
 	get_tree().call_group("hud", "flash", 0.8)
 	get_tree().call_group("camera", "hitstop", 0.12)
@@ -178,6 +189,7 @@ func restart_phase() -> void:
 		return
 	hp = HITS_PER_PHASE
 	_attack_index = 0
+	_show_cracks()
 	health_changed.emit(hits_left(), hits_total())
 	_rest()
 

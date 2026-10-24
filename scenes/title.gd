@@ -4,13 +4,11 @@ extends Control
 
 func _ready() -> void:
 	# Poster pose: the giant fight starts with only his legs in frame, so the title shows him
-	# squashed into one screen instead (torso down, head on his shoulders, no legs or neck).
+	# squashed into one screen instead (torso down, head on his shoulders, no legs).
 	var boss: Boss = $Boss
 	boss.rig.position = Vector2.ZERO
 	boss.legs.hide()
 	boss.upper.position = Vector2.ZERO
-	boss.head.position = Vector2(1090, 170)
-	boss.get_node("Rig/Upper/Body/Neck").hide()
 	boss.fist_l.hide()
 	boss.get_node("Rig/Upper/Body/Core/Target").hide()
 	boss.anim.play(&"idle_2")

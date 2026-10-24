@@ -1,8 +1,9 @@
 class_name TrainingBot
 extends Node2D
 ## Lil' Watt, the tutorial's punching bag. It hovers at the king's lead and core height, so the
-## throw that breaks it is the same throw that hurts him. Bombs thrown into its core cost a hit;
-## the "die" animation blows it up, drops the wreck, emits `broken` and frees it.
+## throw that breaks it is the same throw that hurts him. Bombs thrown into its core cost a hit
+## and crack it a little more; the "die" animation blows it up, drops the wreck, emits `broken`
+## and frees it.
 
 signal hit(hits_left: int)
 signal broken
@@ -17,6 +18,7 @@ var hp := HITS
 @onready var anim: AnimationPlayer = $AnimationPlayer
 @onready var juice: AnimationPlayer = $Juice
 @onready var core: Node2D = $Hover/Core
+@onready var cracks: Node2D = $Hover/Cracks
 
 
 func _physics_process(delta: float) -> void:
@@ -33,6 +35,8 @@ func _on_weak_point_body_entered(body: Node2D) -> void:
 	bomb.explode()
 	hp -= 1
 	hit.emit(hp)
+	for i in cracks.get_child_count():
+		cracks.get_child(i).visible = i < HITS - hp
 	if hp > 0:
 		juice.play(&"hit")
 	else:

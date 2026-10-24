@@ -4,6 +4,8 @@
 [ext_resource type="SpriteFrames" path="res://assets/art/boss/bot_frames.tres" id="2_bot"]
 [ext_resource type="SpriteFrames" path="res://assets/art/boss/core_frames.tres" id="3_core"]
 [ext_resource type="PackedScene" path="res://scenes/fx/target.tscn" id="4_target"]
+[ext_resource type="Texture2D" path="res://assets/art/boss/crack_0.png" id="5_crack0"]
+[ext_resource type="Texture2D" path="res://assets/art/boss/crack_2.png" id="6_crack2"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_core"]
 radius = 48.0
@@ -184,6 +186,20 @@ scale = Vector2(4, 4)
 sprite_frames = ExtResource("2_bot")
 animation = &"hover"
 autoplay = "hover"
+
+[node name="Cracks" type="Node2D" parent="Hover"]
+
+[node name="Crack1" type="Sprite2D" parent="Hover/Cracks"]
+visible = false
+position = Vector2(-30, -30)
+scale = Vector2(4, 4)
+texture = ExtResource("5_crack0")
+
+[node name="Crack2" type="Sprite2D" parent="Hover/Cracks"]
+visible = false
+position = Vector2(28, 22)
+scale = Vector2(4, 4)
+texture = ExtResource("6_crack2")
 
 [node name="Core" type="Node2D" parent="Hover"]
 

@@ -69,7 +69,7 @@ func run() -> void:
 	await _step("A BOMB!  WALK OVER TO IT", _next_to_bomb)
 	await _step("PRESS  Z  TO PICK IT UP", _holding_bomb)
 	core_arrow.show()
-	_focus([player, _practice, bot.core, core_arrow])
+	_focus([player, _practice, bot, core_arrow])  # the whole bot, so its cracks show
 	await _step("THROW IT AT THE GLOWING CORE!\nFACE THE ROBOT AND PRESS  Z", _bot_hit)
 	await _step("AGAIN!  BREAK LIL' WATT!", _bot_broken)
 	core_arrow.hide()

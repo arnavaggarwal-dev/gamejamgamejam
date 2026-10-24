@@ -267,12 +267,19 @@ func _test_giant_stages() -> void:
 	var armed := func(i: int) -> bool: return boss.cores[i].get_node("WeakPoint").monitoring
 	check(boss.weak_point() == boss.cores[0] and armed.call(0) and not armed.call(1) and not armed.call(2), "stage 1: only the knee core can be hit")
 	check(boss.legs.visible and boss.upper.position.y < -600.0, "stage 1: his legs fill the screen, the torso is out of frame above")
-	for i in Boss.HITS_PER_PHASE:
-		boss.state = Boss.State.IDLE
-		boss.take_hit()
+	var cracked := func(i: int) -> int: return boss.cracks[i].get_children().filter(func(n: Node) -> bool: return n.visible).size()
+	check(cracked.call(0) == 0, "an unhurt leg has no cracks")
+	boss.state = Boss.State.IDLE
+	boss.take_hit()
+	check(cracked.call(0) == 1, "the first hit cracks his leg")
+	boss.state = Boss.State.IDLE
+	boss.take_hit()
+	check(cracked.call(0) == 3, "the second hit cracks it all over")
+	boss.state = Boss.State.IDLE
+	boss.take_hit()
 	await create_timer(2.6).timeout
 	check(not boss.legs.visible and is_zero_approx(boss.upper.position.y) and armed.call(1) and not armed.call(0), "breaking the legs drops the torso into view and arms the chest core")
-	check(boss.head.global_position.y < 0.0, "stage 2: his head is still out of frame")
+	check(boss.head.position == Vector2(1090, 170) and boss.head.global_position.y > 0.0 and cracked.call(1) == 0, "stage 2: his head sits on the torso's shoulders (no stretched neck), torso uncracked")
 	for i in Boss.HITS_PER_PHASE:
 		boss.state = Boss.State.IDLE
 		boss.take_hit()
@@ -304,6 +311,7 @@ func _test_boss_moves() -> void:
 	check(not boss.body.get_node("ChargeHitbox/CollisionShape2D").disabled, "the torso charge is dangerous while it lunges")
 	await create_timer(0.25).timeout
 	check(boss.body.position.x < -400.0, "the torso lunges ~420 px toward the player")
+	check(is_equal_approx(boss.head.position.x - boss.body.position.x, 1090.0), "his head stays on the torso through the lunge")
 	boss.phase = 2
 	var hover := Vector2(1030, 380)  # the stage-3 hover spot the tell quivers around
 	boss._play(&"swoop", Boss.State.ATTACK)
@@ -617,6 +625,7 @@ func _test_tutorial_rush() -> void:
 	var hud: HUD = game.get_node("HUD")
 	check(tutorial.bot.hp == TrainingBot.HITS - 1 and hud.coach_label.text.begins_with("AGAIN"), "hitting the core early moves the lesson on")
 	check(player.hp == Player.MAX_HP, "a hit on Lil' Watt never hurts the thrower")
+	check(tutorial.bot.cracks.get_child(0).visible and not tutorial.bot.cracks.get_child(1).visible, "each hit cracks Lil' Watt a little more")
 	for i in TrainingBot.HITS - 1:
 		while not is_instance_valid(tutorial._practice) or tutorial._practice.exploded:
 			await physics_frame

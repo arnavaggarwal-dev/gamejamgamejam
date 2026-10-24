@@ -339,20 +339,6 @@ static func foot():
 	return c
 
 
-## The long neck that holds his head out of frame until the torso is destroyed.
-static func neck():
-	var c = Canvas.new(22, 140)
-	for y in 140:
-		_metal_span(c, 3, 18, y, -10)
-		if y % 14 == 0:
-			c.hline(3, 18, y, P.INK)
-			c.hline(3, 18, y + 1, P.SLATE)
-			c.px(5, y + 4, P.BUTTER)
-			c.px(16, y + 4, P.BUTTER)
-	c.outline()
-	return c
-
-
 ## The head's jet booster: a metal nozzle and a flickering flame (2 frames).
 static func jet_frames() -> Array:
 	var frames := []
@@ -368,3 +354,27 @@ static func jet_frames() -> Array:
 		c.outline()
 		frames.append(c)
 	return frames
+
+
+## Damage crack decal: jagged ink splits branching from a broken centre, a few lit edges.
+## Three variants (seeds) so neighbouring cracks don't match.
+static func crack(seed: int):
+	var c = Canvas.new(18, 18)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed
+	var start := rng.randf() * TAU
+	for k in 4:
+		var a := start + k * TAU / 4.0 + rng.randf_range(-0.5, 0.5)
+		var p := Vector2(9, 9)
+		for step in rng.randi_range(5, 8):
+			a += rng.randf_range(-0.6, 0.6)
+			p += Vector2(cos(a), sin(a))
+			var q := Vector2i(roundi(p.x), roundi(p.y))
+			if q.x < 1 or q.y < 1 or q.x > 16 or q.y > 16:
+				break
+			c.px(q.x, q.y, P.INK)
+			if step % 3 == 1 and not c.solid(q.x, q.y - 1):
+				c.px(q.x, q.y - 1, P.PEACH)  # the top-left light catches a broken edge here and there
+	for d in [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1)]:
+		c.px(8 + d.x, 8 + d.y, P.INK)  # the impact point
+	return c

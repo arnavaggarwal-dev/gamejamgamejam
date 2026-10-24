@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dhx666pshnvp5"
-path="res://.godot/imported/neck.png-0cb61fc6479021399acf2d7a50c8b1d4.ctex"
+uid="uid://b0a20lajmshnn"
+path="res://.godot/imported/crack_2.png-3dfcf9ef4c10a27d3dbc9518738fff96.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/art/boss/neck.png"
-dest_files=["res://.godot/imported/neck.png-0cb61fc6479021399acf2d7a50c8b1d4.ctex"]
+source_file="res://assets/art/boss/crack_2.png"
+dest_files=["res://.godot/imported/crack_2.png-3dfcf9ef4c10a27d3dbc9518738fff96.ctex"]
 
 [params]
 

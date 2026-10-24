@@ -155,8 +155,9 @@ func _boss() -> void:
 	_save_sheet("boss/reticle.png", [Boss.reticle()])
 	_save_sheet("boss/leg.png", [Boss.leg()])
 	_save_sheet("boss/foot.png", [Boss.foot()])
-	_save_sheet("boss/neck.png", [Boss.neck()])
 	_save_sheet("boss/jet.png", Boss.jet_frames())
+	for i in 3:
+		_save_sheet("boss/crack_%d.png" % i, [Boss.crack(31 + i * 17)])
 	_save_sheet("boss/bot.png", Boss.bot_frames())
 
 
