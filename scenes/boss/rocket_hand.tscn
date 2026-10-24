@@ -1,0 +1,55 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/boss/rocket_hand.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/art/boss/fist_open.png" id="2_hand"]
+[ext_resource type="SpriteFrames" path="res://assets/art/boss/jet_frames.tres" id="3_jet"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hand"]
+size = Vector2(150, 120)
+
+[sub_resource type="Gradient" id="Gradient_smoke"]
+colors = PackedColorArray(0.851, 0.831, 0.847, 0.8, 0.318, 0.302, 0.29, 0)
+
+[node name="RocketHand" type="Area2D"]
+collision_layer = 8
+collision_mask = 0
+monitoring = false
+script = ExtResource("1_script")
+
+[node name="Look" type="Node2D" parent="."]
+
+[node name="Smoke" type="CPUParticles2D" parent="Look"]
+position = Vector2(-110, 0)
+amount = 24
+lifetime = 0.6
+direction = Vector2(-1, 0)
+spread = 25.0
+gravity = Vector2(0, -60)
+initial_velocity_min = 40.0
+initial_velocity_max = 120.0
+scale_amount_min = 10.0
+scale_amount_max = 22.0
+color_ramp = SubResource("Gradient_smoke")
+
+[node name="Jet" type="AnimatedSprite2D" parent="Look"]
+position = Vector2(-96, 0)
+rotation = 1.5708
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("3_jet")
+animation = &"burn"
+autoplay = "burn"
+
+[node name="Art" type="Sprite2D" parent="Look"]
+rotation = 1.5708
+scale = Vector2(4, 4)
+texture = ExtResource("2_hand")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_hand")
+
+[node name="Life" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+autostart = true
+
+[connection signal="timeout" from="Life" to="." method="queue_free"]

@@ -8,6 +8,8 @@ extends Node2D
 ## power_hit(). Only thrown bombs hurt, and each hit cracks the part being fought.
 ## Attacks live in the AnimationPlayer: value tracks move the rig and toggle hitboxes, method
 ## tracks call stomp_* / aim_* / swoop / rain_bomb / spawn_bomb / spit_bomb / boom / land / shake.
+## His arms are articulated (shoulder, elbow, wrist): clips move the FistL / FistR wrist targets
+## and two-bone IK (_reach) bends the arms to them every frame.
 ## Moves that chase the player (the stomp's walk, the head's dash) are tweens started there.
 ## Between attacks he roams: he drifts either side of his spot near the player, legs stepping.
 
@@ -26,9 +28,13 @@ const SHOCKWAVE_SCENE := preload("res://scenes/boss/shockwave.tscn")
 const SPARK_SCENE := preload("res://scenes/fx/spark.tscn")
 const EXPLOSION_SCENE := preload("res://scenes/fx/explosion.tscn")
 const DUST_SCENE := preload("res://scenes/fx/dust.tscn")
+const ROCKET_SCENE := preload("res://scenes/boss/rocket_hand.tscn")
+const ROCKET_SPEED := 1100.0
+const ARM_BONE := 144.0  # upper arm and forearm length (36 art px at 4x)
+const ARM_REACH := 270.0  # how far the aiming wrist sits from the shoulder (arm nearly straight)
 const PHASES := [
 	{attacks = [&"stomp", &"rain"], speed = 1.0, rest = 1.2},  # legs
-	{attacks = [&"swipe", &"bombs"], speed = 1.2, rest = 0.9},  # torso (moves by roaming, no charge)
+	{attacks = [&"rocket", &"bombs"], speed = 1.2, rest = 0.9},  # torso (moves by roaming, no charge)
 	{attacks = [&"swoop", &"spit", &"laser", &"spit"], speed = 1.3, rest = 0.7},  # head
 	{attacks = [&"step", &"rain", &"laser", &"rain"], speed = 1.0, rest = 1.1},  # rebuilt giant
 ]
@@ -66,6 +72,7 @@ var _move: Tween  # the running chase tween (stomp walk / head dash), killed on 
 var _wander := 0.0
 var _stride := 0.0
 var _dash_target := Vector2.ZERO
+var _hand_dir := Vector2.LEFT  # where the rocket hand will fly (set by aim_hand)
 
 @onready var rig: Node2D = $Rig
 @onready var legs: Node2D = $Rig/Legs
@@ -83,6 +90,12 @@ var _dash_target := Vector2.ZERO
 @onready var body: Node2D = $Rig/Upper/Body
 @onready var fist_l: Node2D = $Rig/Upper/Body/FistL
 @onready var bomb_spawn: Marker2D = $Rig/Upper/Body/FistL/BombSpawn
+@onready var fist_r: Node2D = $Rig/Upper/Body/FistR
+@onready var arm_l: Node2D = $Rig/Upper/Body/ArmL
+@onready var arm_r: Node2D = $Rig/Upper/Body/ArmR
+@onready var wrist_l: Node2D = $Rig/Upper/Body/ArmL/Elbow/Wrist
+@onready var hand_l: Sprite2D = $Rig/Upper/Body/ArmL/Elbow/Wrist/Hand
+@onready var sputter: CPUParticles2D = $Rig/Upper/Body/ArmL/Elbow/Sputter
 @onready var cores: Array = [$Rig/Legs/StompAnchor/LegF/KneeCore, $Rig/Upper/Body/Core, $Rig/Upper/Head/EyeCore]
 @onready var cracks: Array = [$Rig/Legs/StompAnchor/LegF/Cracks, $Rig/Upper/Body/Cracks, $Rig/Upper/Head/Cracks]
 @onready var anim: AnimationPlayer = $AnimationPlayer
@@ -106,11 +119,24 @@ func start_fight() -> void:
 	_play(&"intro", State.INTRO)
 
 
-## His eye always looks at the player (the art's pupil looks left, hence the half turn).
+## His eye always looks at the player (the art's pupil looks left, hence the half turn), and his
+## arms bend to their wrist targets.
 func _process(_delta: float) -> void:
 	var player := get_tree().get_first_node_in_group("player") as Node2D
 	if player:
 		eye.global_rotation = (player.global_position - eye.global_position).angle() - PI
+	_reach(arm_l, fist_l.position, 1.0)
+	_reach(arm_r, fist_r.position, -1.0)
+
+
+## Two-bone IK: turns the shoulder and elbow so the wrist lands on `target` (body space), the
+## elbow bending out to the side `out` (+1 left, -1 right). Bones hang down (+y) at rotation 0.
+func _reach(shoulder: Node2D, target: Vector2, out: float) -> void:
+	var to := target - shoulder.position
+	var d := clampf(to.length(), 1.0, ARM_BONE * 2.0 - 0.5)
+	var open := acos(d / (2.0 * ARM_BONE))  # equal bones: the upper arm's swing off the straight line
+	shoulder.rotation = to.angle() - PI / 2.0 + out * open
+	shoulder.get_node("Elbow").rotation = -out * 2.0 * open
 
 
 ## Rides the rail while resting, roaming either side of his spot near the player so attacks
@@ -263,6 +289,68 @@ func step_aim() -> void:
 ## ...then steps back to his spot in the moat, under the moon.
 func step_home() -> void:
 	_chase().tween_property(self, "position:x", FINAL_X, 0.4 / anim.speed_scale).set_trans(Tween.TRANS_SINE)
+
+
+## Stage 2 rocket-hand tell: his arm lowers and points straight at the player (called repeatedly,
+## then it locks).
+func aim_hand() -> void:
+	_hand_dir = (_player_pos() - arm_l.global_position).normalized()
+	var goal := arm_l.position + _hand_dir * ARM_REACH
+	_chase().tween_property(fist_l, "position", goal, 0.12).set_trans(Tween.TRANS_SINE)
+
+
+## The hand blasts off his wrist along the arm: a muzzle blast and sparks at the wrist, a freeze,
+## a flash and a heavy shake; the arm kicks back hard and springs out again; the bare wrist
+## sputters smoke until the new hand screws on. The rocket skids along the floor.
+func fire_hand() -> void:
+	var at := wrist_l.global_position
+	var rocket: Node2D = ROCKET_SCENE.instantiate()
+	_spawn_parent().add_child(rocket)
+	rocket.global_position = hand_l.global_position
+	rocket.launch(_hand_dir * ROCKET_SPEED)
+	wrist_l.hide()
+	sputter.emitting = true
+	var blast: Node2D = EXPLOSION_SCENE.instantiate()
+	_spawn_parent().add_child(blast)
+	blast.global_position = at + _hand_dir * 40.0
+	blast.scale = Vector2(2.4, 2.4)
+	_fx(SPARK_SCENE, at)
+	_fx(DUST_SCENE, at)
+	shake(16.0)
+	get_tree().call_group("hud", "flash", 0.3)
+	get_tree().call_group("camera", "hitstop", 0.07)
+	var aimed := fist_l.position
+	var kick := _chase()
+	kick.tween_property(fist_l, "position", aimed - _hand_dir * 130.0, 0.07).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	kick.tween_property(fist_l, "position", aimed, 0.45).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+
+
+## A new hand screws onto his wrist: it grows in, flipping like a turning bolt, then clicks home.
+func regrow_hand() -> void:
+	sputter.emitting = false
+	wrist_l.show()
+	var screw := create_tween()
+	screw.tween_method(_twist_hand, 0.0, 1.0, 0.45)
+	screw.tween_callback(_click_hand)
+
+
+func _twist_hand(t: float) -> void:
+	var size := lerpf(0.15, 1.0, t)
+	wrist_l.scale = Vector2(cos(t * 3.0 * TAU) * size, size)
+
+
+## The click: a snap past full size, a spark at the wrist, a jolt.
+func _click_hand() -> void:
+	wrist_l.scale = Vector2(1.3, 0.8)
+	create_tween().tween_property(wrist_l, "scale", Vector2.ONE, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_fx(SPARK_SCENE, wrist_l.global_position)
+	shake(6.0)
+	get_tree().call_group("camera", "hitstop", 0.05)
+
+
+## The arm swings back down to his side.
+func rest_hand() -> void:
+	_chase().tween_property(fist_l, "position", _rest_pose[fist_l], 0.4).set_trans(Tween.TRANS_SINE)
 
 
 ## Stage 3 tell: aim the dash at the player (called repeatedly, then it locks) and lay the
@@ -446,7 +534,11 @@ func _reset_rig() -> void:
 	rig.modulate = Color.WHITE
 	eye.modulate = Color.WHITE
 	body.modulate = Color.WHITE
-	fist_l.modulate = Color.WHITE
+	hand_l.modulate = Color.WHITE
+	hand_l.position = Vector2(-8, 72)
+	sputter.emitting = false
+	wrist_l.show()
+	wrist_l.scale = Vector2.ONE
 	stomp_ring.hide()
 	for box in [leg_f.get_node("Hitbox"), fist_l.get_node("Hitbox"), head.get_node("RamHitbox")]:
 		box.get_node("CollisionShape2D").set_deferred("disabled", true)

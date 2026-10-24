@@ -409,3 +409,31 @@ static func zap_ball_frames() -> Array:
 		c.outline()
 		frames.append(c)
 	return frames
+
+
+## One bone of his articulated arms (upper arm and forearm share it; the forearm is flipped):
+## a left-lit metal tube with a gold collar at the joint end, a seam and rivets.
+static func arm_bone():
+	var c = Canvas.new(14, 38)
+	for y in 38:
+		_metal_span(c, 1, 12, y, 0)
+	_gold_band(c, 1, 2, 12, 5)
+	for x in range(1, 13):
+		c.px(x, 22, P.INK)
+	_rivet(c, 3, 12)
+	_rivet(c, 9, 12)
+	_rivet(c, 3, 29)
+	_rivet(c, 9, 29)
+	c.outline()
+	return c
+
+
+## His elbow: a round bolt with a gold pin.
+static func arm_joint():
+	var c = Canvas.new(16, 16)
+	c.shade_ellipse(7.5, 7.5, 7, 7, P.METAL, [-0.3, 0.3, 0.8])
+	c.ring(7.5, 7.5, 6.5, 1.5, P.INK)
+	c.ellipse(7.5, 7.5, 2, 2, P.BUTTER)
+	c.px(7, 7, P.CREAM)
+	c.outline()
+	return c

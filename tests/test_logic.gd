@@ -33,6 +33,8 @@ func _run() -> void:
 	await _test_boss()
 	await _test_giant_stages()
 	await _test_boss_moves()
+	await _test_arms()
+	await _test_aimed_throw()
 	await _test_target_spin()
 	await _test_eye()
 	await _test_roam()
@@ -386,6 +388,55 @@ func _test_boss_moves() -> void:
 	await process_frame
 
 
+## His arms are articulated: two-bone IK lands each wrist on its target. The rocket hand flies
+## off his wrist toward the player, and a new hand screws back on.
+func _test_arms() -> void:
+	var boss: Boss = load("res://scenes/boss/boss.tscn").instantiate()
+	root.add_child(boss)
+	boss.phase = 1
+	boss.upper.position = Vector2.ZERO
+	await process_frame
+	check(boss.wrist_l.global_position.distance_to(boss.fist_l.global_position) < 2.0 and absf(boss.arm_l.get_node("Elbow").rotation) > 0.2, "his arm bends at the elbow to put the wrist on its target")
+	boss._play(&"rocket", Boss.State.ATTACK)
+	await create_timer(0.8).timeout
+	var rockets := root.get_children().filter(func(n: Node) -> bool: return n.scene_file_path == "res://scenes/boss/rocket_hand.tscn")
+	check(rockets.size() == 1 and not boss.wrist_l.visible, "the rocket hand fires off his wrist")
+	var rocket: Node2D = rockets[0]
+	check(rocket.velocity.x < 0.0 and rocket.velocity.y > 0.0 and boss.sputter.emitting, "...down along his lowered arm toward the player (x 400, on the floor), the bare wrist smoking")
+	await create_timer(1.4).timeout
+	check(boss.wrist_l.visible and boss.wrist_l.scale.is_equal_approx(Vector2.ONE), "a new hand twists back onto his wrist")
+	rocket.queue_free()
+	boss.queue_free()
+	await process_frame
+
+
+## A plain throw from across the arena reaches the king's core: it aims itself.
+func _test_aimed_throw() -> void:
+	var game: Node2D = load("res://scenes/game.tscn").instantiate()
+	root.add_child(game)
+	var boss: Boss = game.get_node("Boss")
+	var player: Player = game.get_node("Player")
+	player.hurtbox.monitoring = false
+	while boss.state != Boss.State.IDLE:
+		await physics_frame
+	boss.rest_timer.paused = true
+	var core: Node2D = boss.weak_point()
+	player.facing = 1
+	var bomb: Bomb = load("res://scenes/boss/bomb.tscn").instantiate()
+	game.get_node("Projectiles").add_child(bomb)
+	bomb.global_position = player.hold_point.global_position
+	bomb.pick_up()
+	player.held_bomb = bomb
+	await physics_frame
+	var far := core.global_position.x - player.global_position.x
+	player._throw()
+	await create_timer(2.0).timeout
+	check(boss.hp == Boss.HITS_PER_PHASE - 1, "a plain throw reaches his core %d px away" % far)
+	game.queue_free()
+	await process_frame
+	Engine.time_scale = 1.0
+
+
 func _test_target_spin() -> void:
 	var target: Node2D = load("res://scenes/fx/target.tscn").instantiate()
 	root.add_child(target)
@@ -541,7 +592,7 @@ func _test_phase_extras() -> void:
 	await process_frame
 	var boss: Boss = game.get_node("Boss")
 	boss.phase = 1
-	check([boss.next_attack(), boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"swipe", &"bombs", &"swipe", &"bombs"], "stage 2 (torso) swipes and throws bombs, no charge")
+	check([boss.next_attack(), boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"rocket", &"bombs", &"rocket", &"bombs"], "stage 2 (torso) fires his rocket hand and throws bombs, no charge")
 	check(boss.anim.has_animation(&"laser"), "laser animation exists")
 	boss.phase_changed.emit(2)
 	var stage: Stage = game.get_node("Arena")

@@ -9,7 +9,6 @@ func _ready() -> void:
 	boss.rig.position = Vector2.ZERO
 	boss.legs.hide()
 	boss.upper.position = Vector2.ZERO
-	boss.fist_l.hide()
 	boss.get_node("Rig/Upper/Body/Core/Target").hide()
 	boss.anim.play(&"idle_2")
 	var start: Button = $Card/VBox/Start

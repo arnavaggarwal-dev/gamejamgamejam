@@ -157,6 +157,8 @@ func _boss() -> void:
 	_save_sheet("boss/foot.png", [Boss.foot()])
 	_save_sheet("boss/jet.png", Boss.jet_frames())
 	_save_sheet("boss/shard.png", [Boss.shard()])
+	_save_sheet("boss/arm_bone.png", [Boss.arm_bone()])
+	_save_sheet("boss/arm_joint.png", [Boss.arm_joint()])
 	_save_sheet("boss/zap_ball.png", Boss.zap_ball_frames())
 	_save_sheet("world/lava.png", World.lava_frames())
 	_save_sheet("world/moon.png", [World.moon()])

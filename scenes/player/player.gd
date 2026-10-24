@@ -19,6 +19,8 @@ const SLIME := preload("res://scenes/fx/slime.tscn")
 const GHOST := preload("res://scenes/fx/afterimage.tscn")
 const HARD_LANDING := 1500.0  # px/s fall speed for the biggest landing squash
 const BOMB_BOUNCE := Vector2(650.0, -1150.0)  # off a blast: sideways away from it (at most), always this fast up
+const AIM_AHEAD := Vector2(100.0, 2400.0)  # a throw aims at a core this far ahead of him (min, max px)
+const MAX_FLIGHT := 1.5  # s: a far core gets a faster throw instead of a sky-high one
 
 @export var speed := 330.0
 @export var accel := 2600.0
@@ -249,12 +251,37 @@ func _grab() -> void:
 		juice.play(&"grab")
 
 
+## A plain throw at an armed core ahead of him is aimed: the usual sideways speed (faster for a far
+## core), with the lift solved so the arc passes through the core (the aim dots show it). Lobs
+## (aim_up) stay manual.
 func _throw_velocity() -> Vector2:
-	var v := lob_velocity if Input.is_action_pressed("aim_up") else throw_velocity
-	return Vector2(v.x * facing, v.y)
+	if Input.is_action_pressed("aim_up"):
+		return Vector2(lob_velocity.x * facing, lob_velocity.y)
+	var target := _bomb_target()
+	if target == null:
+		return Vector2(throw_velocity.x * facing, throw_velocity.y)
+	var start := held_bomb.global_position
+	var g: float = ProjectSettings.get_setting("physics/2d/default_gravity") * held_bomb.gravity_scale
+	var reach := absf(target.global_position.x - start.x)
+	var t := minf(reach / throw_velocity.x, MAX_FLIGHT)
+	var lift := (target.global_position.y - start.y - 0.5 * g * t * t) / t
+	return Vector2(reach / t * facing, clampf(lift, -1500.0, 200.0))
+
+
+## The nearest armed bomb target (a core's WeakPoint, group "bomb_target") ahead of him.
+func _bomb_target() -> Area2D:
+	var best: Area2D = null
+	for spot: Area2D in get_tree().get_nodes_in_group(&"bomb_target"):
+		var ahead := (spot.global_position.x - global_position.x) * facing
+		if not spot.monitoring or not spot.is_visible_in_tree() or ahead < AIM_AHEAD.x or ahead > AIM_AHEAD.y:
+			continue
+		if best == null or spot.global_position.distance_to(global_position) < best.global_position.distance_to(global_position):
+			best = spot
+	return best
 
 
 func _throw() -> void:
+	held_bomb.target = _bomb_target()
 	held_bomb.throw(_throw_velocity())
 	_thrown = held_bomb
 	held_bomb = null

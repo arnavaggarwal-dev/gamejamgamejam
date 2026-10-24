@@ -10,10 +10,13 @@ const PIT_Y := 900.0
 const GROUND_DRAG := 350.0  # px/s² while touching a surface; rolling has no friction of its own
 const SPIN := 12.0  # rad/s while airborne
 const BLAST_REACH := 150.0  # px from the blast that bounces the player (times size)
+const HOMING_RANGE := 240.0  # a thrown bomb this close to its target bends in on it
+const HOMING := 8.0  # how hard it bends (per second)
 
 var thrown := false
 var exploded := false
 var size := 1.0  # set before it enters the tree: phase 4's bombs come bigger, blast and all
+var target: Node2D  # the core it was thrown at, if any (it homes in over the last stretch)
 
 @onready var art: Node2D = $Art
 @onready var arrow: Node2D = $Arrow
@@ -32,6 +35,11 @@ func _ready() -> void:
 ## Rolling bombs coast to the speed of whatever they sit on (0 for stone, the belt speed on a
 ## conveyor); flight, and so the player's aim arc, is untouched.
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
+	if thrown and is_instance_valid(target):
+		var to := target.global_position - state.transform.origin
+		if to.length() < HOMING_RANGE:
+			var aim := to.normalized() * maxf(state.linear_velocity.length(), 600.0)
+			state.linear_velocity = state.linear_velocity.lerp(aim, minf(1.0, HOMING * state.step))
 	if state.get_contact_count() > 0:
 		var belt := state.get_contact_collider_velocity_at_position(0).x
 		state.linear_velocity.x = move_toward(state.linear_velocity.x, belt, GROUND_DRAG * state.step)

@@ -421,7 +421,7 @@ autoplay = "pulse"
 [node name="Target" parent="Hover/Core" instance=ExtResource("4_target")]
 scale = Vector2(2, 2)
 
-[node name="WeakPoint" type="Area2D" parent="Hover/Core"]
+[node name="WeakPoint" type="Area2D" parent="Hover/Core" groups=["bomb_target"]]
 collision_layer = 16
 collision_mask = 4
 monitorable = false
