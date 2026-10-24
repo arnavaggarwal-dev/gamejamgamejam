@@ -4,8 +4,9 @@ extends Node2D
 ## throw that breaks it is the same throw that hurts him. Bombs thrown into its core cost a hit
 ## and crack it a little more; the "die" animation blows it up, drops the wreck, emits `broken`
 ## and frees it. In phase 4 it revives the king, then fights beside him (fight()): it follows
-## the player up and down too, shoots zap balls, and powers him through a sagging power cable
-## plugged into `power_target`.
+## the player up and down too (weaving about its spot), shoots zap balls, and powers him through
+## a sagging power cable plugged into `power_target`. While it fights its core is shielded,
+## popping open only for GUARD_OPEN s right after each shot (or until a hit lands).
 
 signal hit(hits_left: int)
 signal broken
@@ -21,6 +22,8 @@ const SAG := 0.3  # how far the cable droops, per px of span
 const PULSE_SPEED := 0.7  # energy pulses per second along the cable
 const CABLE_STEPS := 24
 const ARC_TIME := 0.07  # s a spark arcing off the cable stays lit
+const WEAVE := Vector2(170.0, 90.0)  # px it sways about its spot while it fights
+const WEAVE_RATE := Vector2(1.3, 2.1)  # rad/s of that sway, per axis
 
 var hp := HITS
 var roam_max := 2440.0  # rightmost x it follows the player to (the doom arena is wider)
@@ -39,6 +42,8 @@ var _reach := 1.0  # how far the cable has shot out toward its target (0..1)
 var _flow := 0.0
 var _arc_wait := 0.0
 var _arc_left := 0.0
+var _sway := 0.0
+var guarded := false  # phase 4: its core is shielded except right after a shot
 
 @onready var anim: AnimationPlayer = $AnimationPlayer
 @onready var juice: AnimationPlayer = $Juice
@@ -49,6 +54,8 @@ var _arc_left := 0.0
 @onready var pulses: Array = $Link/Pulses.get_children()
 @onready var arc: Line2D = $Link/Arc
 @onready var plug: Node2D = $Link/PlugKing
+@onready var shield: Sprite2D = $Hover/Core/Shield
+@onready var guard_timer: Timer = $GuardTimer
 @onready var art: AnimatedSprite2D = $Hover/Art
 @onready var shot_timer: Timer = $ShotTimer
 
@@ -57,9 +64,13 @@ func _physics_process(delta: float) -> void:
 	var player := get_tree().get_first_node_in_group("player") as Node2D
 	if player == null or hp <= 0 or not roaming:
 		return
-	position.x = move_toward(position.x, clampf(player.global_position.x + LEAD, 120.0, roam_max), SPEED * delta)
+	var sway := Vector2.ZERO
+	if follow_y:  # phase 4: a moving target, weaving about its spot
+		_sway += delta
+		sway = Vector2(sin(_sway * WEAVE_RATE.x) * WEAVE.x, sin(_sway * WEAVE_RATE.y) * WEAVE.y)
+	position.x = move_toward(position.x, clampf(player.global_position.x + LEAD + sway.x, 120.0, roam_max), SPEED * delta)
 	if follow_y:
-		position.y = move_toward(position.y, clampf(player.global_position.y - ABOVE, -1000.0, 420.0), SPEED * delta)
+		position.y = move_toward(position.y, clampf(player.global_position.y - ABOVE + sway.y, -1000.0, 420.0), SPEED * delta)
 
 
 ## The power cable: it hangs in a sagging curve from its core to the power target, plugged into
@@ -112,6 +123,8 @@ func _on_weak_point_body_entered(body: Node2D) -> void:
 		return
 	bomb.explode()
 	hp -= 1
+	if guard_timer.time_left > 0.0:
+		_guard.call_deferred(true)  # one hit per opening
 	hit.emit(hp)
 	for i in cracks.get_child_count():
 		cracks.get_child(i).visible = i < HITS - hp
@@ -139,6 +152,8 @@ func fight() -> void:
 	follow_y = true
 	anim.play(&"hover")
 	shot_timer.start()
+	guarded = true
+	_guard(true)
 
 
 ## ShotTimer.timeout (connected in the scene): the "charge" tell, which calls shoot().
@@ -156,6 +171,19 @@ func shoot() -> void:
 	(projectiles if projectiles else get_parent()).add_child(ball)
 	ball.global_position = core.global_position
 	ball.velocity = (player.global_position - core.global_position).normalized() * ZAP_SPEED
+	if guarded:  # the shot leaves its core open for a moment
+		_guard(false)
+		guard_timer.start()
+
+
+## The shield over its core: closed means no target, no hits, nothing for a throw to aim at.
+func _guard(closed: bool) -> void:
+	if not closed and hp <= 0:
+		return
+	guard_timer.stop()
+	shield.visible = closed
+	core.get_node("Target").visible = not closed
+	core.get_node("WeakPoint").set_deferred(&"monitoring", not closed)
 
 
 ## Called from "hit": back to its own face after the hurt frame.

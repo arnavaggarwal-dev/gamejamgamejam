@@ -562,16 +562,24 @@ func _test_final_phase() -> void:
 	var shots := projectiles_of(game, "res://scenes/boss/zap_ball.tscn")
 	helper.shoot()
 	check(projectiles_of(game, "res://scenes/boss/zap_ball.tscn") == shots + 1, "Lil' Watt shoots zap balls")
+	check(not helper.shield.visible and helper.core.get_node("Target").visible, "a shot pops its shield open")
+	await create_timer(1.5).timeout
+	check(helper.shield.visible, "...and it shuts again after a moment")
 	stage.strike_near_player()
 	check(stage.get_children().any(func(n: Node) -> bool: return n.scene_file_path == "res://scenes/stage/sky_strike.tscn"), "lightning strikes out of the red sky")
 	var won := [false]
 	boss.defeated.connect(func() -> void: won[0] = true)
+	check(helper.shield.visible and not helper.core.get_node("WeakPoint").monitoring and not helper.core.get_node("Target").visible, "Lil' Watt's core is shielded while it fights")
 	for i in TrainingBot.HITS:
+		helper.shoot()  # each shot opens the shield for a moment
+		await physics_frame
 		var bomb: Bomb = load("res://scenes/boss/bomb.tscn").instantiate()
 		game.get_node("Projectiles").add_child(bomb)
 		bomb.throw(Vector2.ZERO)
 		bomb.global_position = helper.core.global_position
 		await create_timer(0.4).timeout
+		if i == 0:
+			check(helper.shield.visible and not helper.core.get_node("WeakPoint").monitoring, "a hit shuts the opening at once (one hit per shot)")
 	check(won[0] and boss.state == Boss.State.DEAD, "breaking Lil' Watt knocks the giant out")
 	check(is_instance_valid(helper) and helper.out_cold and not helper.link.visible and player.frozen and hud.bars[0].scale.y > 0.0, "the last hit knocks Lil' Watt out (no explosion), snaps the power link and starts the ending")
 	await create_timer(7.0).timeout

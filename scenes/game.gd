@@ -142,7 +142,7 @@ func _final_phase() -> void:
 	helper.fight()
 	stage.start_strikes()
 	hud.show_banner("FINAL PHASE", 1.4)
-	hud.show_tip("LIL' WATT IS POWERING THE KING!  BREAK LIL' WATT!", 5.0)
+	hud.show_tip("LIL' WATT POWERS THE KING!  HIT ITS CORE RIGHT AFTER IT SHOOTS.", 5.0)
 
 
 func _wait(seconds: float) -> void:
@@ -164,6 +164,7 @@ func _spawn_helper(at: Vector2) -> void:
 	add_child(helper)
 	helper.global_position = at
 	helper.scale = WATT_SIZE
+	helper.z_index = 2  # its cable (z -1 relative) then runs over the king but under Lil' Watt
 	helper.roaming = false
 	helper.roam_max = Stage.DOOM_W - 120.0
 	helper.projectiles = projectiles

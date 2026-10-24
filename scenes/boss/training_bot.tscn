@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" path="res://assets/art/boss/cable.png" id="7_cable"]
 [ext_resource type="SpriteFrames" path="res://assets/art/boss/zap_ball_frames.tres" id="8_zap"]
 [ext_resource type="Texture2D" path="res://assets/art/boss/arm_joint.png" id="9_plug"]
+[ext_resource type="Texture2D" path="res://assets/art/boss/core_shield.png" id="10_shield"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_core"]
 radius = 48.0
@@ -515,6 +516,61 @@ _data = {
 [node name="TrainingBot" type="Node2D"]
 script = ExtResource("1_script")
 
+[node name="Link" type="Node2D" parent="."]
+visible = false
+z_index = -1
+top_level = true
+
+[node name="Cable" type="Line2D" parent="Link"]
+texture_repeat = 2
+width = 48.0
+texture = ExtResource("7_cable")
+texture_mode = 1
+joint_mode = 2
+
+[node name="Pulses" type="Node2D" parent="Link"]
+
+[node name="Pulse1" type="AnimatedSprite2D" parent="Link/Pulses"]
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("8_zap")
+animation = &"spark"
+autoplay = "spark"
+frame_progress = 0
+
+[node name="Pulse2" type="AnimatedSprite2D" parent="Link/Pulses"]
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("8_zap")
+animation = &"spark"
+autoplay = "spark"
+frame_progress = 0.25
+
+[node name="Pulse3" type="AnimatedSprite2D" parent="Link/Pulses"]
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("8_zap")
+animation = &"spark"
+autoplay = "spark"
+frame_progress = 0.5
+
+[node name="Pulse4" type="AnimatedSprite2D" parent="Link/Pulses"]
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("8_zap")
+animation = &"spark"
+autoplay = "spark"
+frame_progress = 0.75
+
+[node name="Arc" type="Line2D" parent="Link"]
+visible = false
+width = 10.0
+default_color = Color(0.859, 0.851, 0.569, 1)
+
+[node name="Hot" type="Line2D" parent="Link/Arc"]
+width = 4.0
+default_color = Color(0.988, 0.984, 0.988, 1)
+
+[node name="PlugKing" type="Sprite2D" parent="Link"]
+scale = Vector2(4, 4)
+texture = ExtResource("9_plug")
+
 [node name="Hover" type="Node2D" parent="."]
 
 [node name="Art" type="AnimatedSprite2D" parent="Hover"]
@@ -571,60 +627,14 @@ monitorable = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hover/Core/WeakPoint"]
 shape = SubResource("CircleShape2D_core")
 
-[node name="Link" type="Node2D" parent="."]
+[node name="Shield" type="Sprite2D" parent="Hover/Core"]
 visible = false
-show_behind_parent = true
-top_level = true
+scale = Vector2(2, 2)
+texture = ExtResource("10_shield")
 
-[node name="Cable" type="Line2D" parent="Link"]
-texture_repeat = 2
-width = 48.0
-texture = ExtResource("7_cable")
-texture_mode = 1
-joint_mode = 2
-
-[node name="Pulses" type="Node2D" parent="Link"]
-
-[node name="Pulse1" type="AnimatedSprite2D" parent="Link/Pulses"]
-scale = Vector2(4, 4)
-sprite_frames = ExtResource("8_zap")
-animation = &"spark"
-autoplay = "spark"
-frame_progress = 0
-
-[node name="Pulse2" type="AnimatedSprite2D" parent="Link/Pulses"]
-scale = Vector2(4, 4)
-sprite_frames = ExtResource("8_zap")
-animation = &"spark"
-autoplay = "spark"
-frame_progress = 0.25
-
-[node name="Pulse3" type="AnimatedSprite2D" parent="Link/Pulses"]
-scale = Vector2(4, 4)
-sprite_frames = ExtResource("8_zap")
-animation = &"spark"
-autoplay = "spark"
-frame_progress = 0.5
-
-[node name="Pulse4" type="AnimatedSprite2D" parent="Link/Pulses"]
-scale = Vector2(4, 4)
-sprite_frames = ExtResource("8_zap")
-animation = &"spark"
-autoplay = "spark"
-frame_progress = 0.75
-
-[node name="Arc" type="Line2D" parent="Link"]
-visible = false
-width = 10.0
-default_color = Color(0.859, 0.851, 0.569, 1)
-
-[node name="Hot" type="Line2D" parent="Link/Arc"]
-width = 4.0
-default_color = Color(0.988, 0.984, 0.988, 1)
-
-[node name="PlugKing" type="Sprite2D" parent="Link"]
-scale = Vector2(4, 4)
-texture = ExtResource("9_plug")
+[node name="GuardTimer" type="Timer" parent="."]
+wait_time = 1.3
+one_shot = true
 
 [node name="ShotTimer" type="Timer" parent="."]
 wait_time = 2.6
@@ -642,3 +652,4 @@ libraries = {
 
 [connection signal="body_entered" from="Hover/Core/WeakPoint" to="." method="_on_weak_point_body_entered"]
 [connection signal="timeout" from="ShotTimer" to="." method="_on_shot_timer_timeout"]
+[connection signal="timeout" from="GuardTimer" to="." method="_guard" binds= [true]]
