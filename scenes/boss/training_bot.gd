@@ -4,8 +4,8 @@ extends Node2D
 ## throw that breaks it is the same throw that hurts him. Bombs thrown into its core cost a hit
 ## and crack it a little more; the "die" animation blows it up, drops the wreck, emits `broken`
 ## and frees it. In phase 4 it revives the king, then fights beside him (fight()): it follows
-## the player up and down too, shoots zap balls, and powers him through a lightning link to
-## `power_target`.
+## the player up and down too, shoots zap balls, and powers him through a sagging power cable
+## plugged into `power_target`.
 
 signal hit(hits_left: int)
 signal broken
@@ -17,21 +17,38 @@ const EXPLOSION := preload("res://scenes/fx/explosion.tscn")
 const ZAP_BALL := preload("res://scenes/boss/zap_ball.tscn")
 const ZAP_SPEED := 650.0
 const ABOVE := 220.0  # px it hovers above the player once it follows him up and down
+const SAG := 0.3  # how far the cable droops, per px of span
+const PULSE_SPEED := 0.7  # energy pulses per second along the cable
+const CABLE_STEPS := 24
+const ARC_TIME := 0.07  # s a spark arcing off the cable stays lit
 
 var hp := HITS
 var roam_max := 2440.0  # rightmost x it follows the player to (the doom arena is wider)
-var power_target: Node2D  # what the lightning link feeds (the giant king's chest), if anything
+var power_target: Node2D:  # what the power cable plugs into (the giant king's chest), if anything
+	set(value):
+		power_target = value
+		_reach = 0.0  # the cable shoots out to it
+		if value and is_inside_tree():
+			create_tween().tween_property(self, "_reach", 1.0, 0.45).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 var roaming := true  # follows the player (off while a cutscene flies it around)
 var follow_y := false  # phase 4: climbs with the player too
 var projectiles: Node  # where its shots go (the arena's Projectiles, cleared when the player dies)
 var face := &"hover"  # the Art animation it wears between hurt frames (angry once you broke its dad)
 var out_cold := false  # phase 4's last hit knocks it out instead of blowing it up
+var _reach := 1.0  # how far the cable has shot out toward its target (0..1)
+var _flow := 0.0
+var _arc_wait := 0.0
+var _arc_left := 0.0
 
 @onready var anim: AnimationPlayer = $AnimationPlayer
 @onready var juice: AnimationPlayer = $Juice
 @onready var core: Node2D = $Hover/Core
 @onready var cracks: Node2D = $Hover/Cracks
-@onready var link: Line2D = $Link
+@onready var link: Node2D = $Link
+@onready var cable: Line2D = $Link/Cable
+@onready var pulses: Array = $Link/Pulses.get_children()
+@onready var arc: Line2D = $Link/Arc
+@onready var plug: Node2D = $Link/PlugKing
 @onready var art: AnimatedSprite2D = $Hover/Art
 @onready var shot_timer: Timer = $ShotTimer
 
@@ -45,20 +62,47 @@ func _physics_process(delta: float) -> void:
 		position.y = move_toward(position.y, clampf(player.global_position.y - ABOVE, -1000.0, 420.0), SPEED * delta)
 
 
-## The power link: a zig-zag bolt from the core to the power target, re-jagged every other frame.
-func _process(_delta: float) -> void:
+## The power cable: it hangs in a sagging curve from its core to the power target, plugged into
+## the target's chest; energy pulses flow along it into the target, and now and then a small
+## spark arcs off it.
+func _process(delta: float) -> void:
 	link.visible = is_instance_valid(power_target) and hp > 0
-	if not link.visible or Engine.get_process_frames() % 2:
+	if not link.visible:
 		return
 	var from := core.global_position
-	var to := power_target.global_position
-	var side := (to - from).orthogonal().normalized()
-	var bolt := PackedVector2Array([from])  # sized for phase 4's 3x zoom-out
-	for k in range(1, 12):
-		bolt.append((from.lerp(to, k / 12.0) + side * randf_range(0.4, 1.0) * 70.0 * (1 if k % 2 else -1)).snapped(Vector2(4, 4)))
-	bolt.append(to)
-	link.points = bolt
-	link.get_node("Bolt").points = bolt
+	var to := from.lerp(power_target.global_position, _reach)
+	var bend := (from + to) / 2.0 + Vector2(0.0, clampf(from.distance_to(to) * SAG, 30.0, 600.0))
+	var points := PackedVector2Array()
+	for k in CABLE_STEPS + 1:
+		points.append(_along(from, bend, to, k / float(CABLE_STEPS)))
+	cable.points = points
+	plug.global_position = to
+	plug.visible = _reach >= 1.0
+	_flow = fmod(_flow + PULSE_SPEED * delta, 1.0)
+	for i in pulses.size():
+		pulses[i].global_position = _along(from, bend, to, fmod(_flow + i / float(pulses.size()), 1.0))
+	_arc_left -= delta
+	arc.visible = _arc_left > 0.0
+	_arc_wait -= delta
+	if _arc_wait <= 0.0:
+		_arc_wait = randf_range(0.25, 0.6)
+		_spark(_along(from, bend, to, randf_range(0.15, 0.85)))
+
+
+## A point `t` (0..1) along the cable's curve (quadratic, `bend` its control point).
+func _along(from: Vector2, bend: Vector2, to: Vector2, t: float) -> Vector2:
+	return from.lerp(bend, t).lerp(bend.lerp(to, t), t)
+
+
+## A short crackle jumping off the cable at `at`, lit for a blink.
+func _spark(at: Vector2) -> void:
+	var out := Vector2.from_angle(randf() * TAU)
+	var jag := PackedVector2Array([at])
+	for k in range(1, 5):
+		jag.append((at + out * k * 22.0 + out.orthogonal() * randf_range(-14.0, 14.0)).snapped(Vector2(4, 4)))
+	arc.points = jag
+	arc.get_node("Hot").points = jag
+	_arc_left = ARC_TIME
 
 
 ## WeakPoint.body_entered (connected in the scene).

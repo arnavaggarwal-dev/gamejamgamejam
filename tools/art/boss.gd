@@ -437,3 +437,22 @@ static func arm_joint():
 	c.px(7, 7, P.CREAM)
 	c.outline()
 	return c
+
+
+## Lil' Watt's power cable, one tile along its length (the Line2D tiles it): an armoured tube,
+## top-lit, ribbed, with a gold coupling collar per tile.
+static func cable():
+	var c = Canvas.new(24, 12)
+	for x in 24:
+		c.px(x, 0, P.INK)
+		c.vline(x, 1, 2, P.PERI)
+		c.vline(x, 3, 7, P.BLUE)
+		c.vline(x, 8, 10, P.NAVY)
+		c.px(x, 11, P.INK)
+	for x in [8, 16]:  # ribs
+		c.vline(x, 3, 9, P.SLATE)
+		c.px(x, 2, P.BLUE)
+	_gold_band(c, 0, 1, 4, 10)
+	c.vline(0, 1, 10, P.INK)
+	c.vline(3, 1, 10, P.INK)
+	return c
