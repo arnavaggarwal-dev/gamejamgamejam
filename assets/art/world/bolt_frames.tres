@@ -1,0 +1,32 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/world/bolt.png" id="1_qx5aa"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2qdd5"]
+atlas = ExtResource("1_qx5aa")
+region = Rect2(0, 0, 48, 540)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2x6kp"]
+atlas = ExtResource("1_qx5aa")
+region = Rect2(48, 0, 48, 540)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7s8yf"]
+atlas = ExtResource("1_qx5aa")
+region = Rect2(96, 0, 48, 540)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2qdd5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2x6kp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7s8yf")
+}],
+"loop": 1,
+"name": &"flash",
+"speed": 30.0
+}]
