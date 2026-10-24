@@ -1,7 +1,7 @@
 class_name Bomb
 extends RigidBody2D
-## Lobbed by the boss. The player picks it up and throws it back at the boss's core. Its blast
-## never hurts the player: it bounces him away (Player.blast_from), so a bomb is a rocket jump.
+## The little guy's bomb: he pulls it out of his ammo, throws it at a core (or sets it off with
+## [A]). Its blast never hurts him: it bounces him away (Player.blast_from), a rocket jump.
 
 const LAYER_BOMB := 4  # physics layer 3 "bomb"
 const EXPLOSION := preload("res://scenes/fx/explosion.tscn")
@@ -9,13 +9,12 @@ const ARROW_OFFSET := Vector2(0, -48)
 const PIT_Y := 900.0
 const GROUND_DRAG := 350.0  # px/s² while touching a surface; rolling has no friction of its own
 const SPIN := 12.0  # rad/s while airborne
-const BLAST_REACH := 150.0  # px from the blast that bounces the player (times size)
+const BLAST_REACH := 150.0  # px from the blast that bounces the player
 const HOMING_RANGE := 240.0  # a thrown bomb this close to its target bends in on it
 const HOMING := 8.0  # how hard it bends (per second)
 
 var thrown := false
 var exploded := false
-var size := 1.0  # set before it enters the tree: phase 4's bombs come bigger, blast and all
 var target: Node2D  # the core it was thrown at, if any (it homes in over the last stretch)
 
 @onready var art: Node2D = $Art
@@ -24,10 +23,6 @@ var target: Node2D  # the core it was thrown at, if any (it homes in over the la
 
 
 func _ready() -> void:
-	art.scale *= size
-	$CollisionShape2D.scale *= size
-	particles.scale_amount_min *= size
-	particles.scale_amount_max *= size
 	$FuseTimer.timeout.connect(explode)
 	$AnimationPlayer.play(&"fuse")
 
@@ -53,7 +48,7 @@ func _process(delta: float) -> void:
 	else:
 		art.global_rotation = lerp_angle(art.global_rotation, 0.0, minf(1.0, 20.0 * delta))
 	arrow.global_rotation = 0.0
-	arrow.global_position = global_position + ARROW_OFFSET * size
+	arrow.global_position = global_position + ARROW_OFFSET
 	if global_position.y > PIT_Y:
 		queue_free()  # rolled into a pit
 
@@ -84,9 +79,8 @@ func explode() -> void:
 	var boom: Node2D = EXPLOSION.instantiate()
 	get_parent().add_child.call_deferred(boom)
 	boom.position = position
-	boom.scale = Vector2.ONE * size
 	get_tree().call_group("camera", "shake", 10.0)
-	get_tree().call_group("player", "blast_from", global_position, BLAST_REACH * size)
+	get_tree().call_group("player", "blast_from", global_position, BLAST_REACH)
 	await get_tree().create_timer(0.75).timeout
 	queue_free()
 

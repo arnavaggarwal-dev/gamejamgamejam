@@ -109,6 +109,16 @@ func _test_player() -> void:
 	player.velocity = Vector2.ZERO
 	player.blast_from(player.global_position + Vector2(400, 0), 150.0)
 	check(player.velocity == Vector2.ZERO, "a far blast leaves him alone")
+	check(player.ammo == Player.MAX_AMMO and Player.MAX_AMMO == 5, "he carries 5 bombs")
+	player.held_bomb = null
+	player._grab()
+	check(is_instance_valid(player.held_bomb) and player.ammo == Player.MAX_AMMO - 1, "[Z] with empty hands pulls a bomb out of his ammo")
+	player.held_bomb.queue_free()
+	player.held_bomb = null
+	player.ammo = 0
+	for i in Player.MAX_AMMO:
+		player._grab()
+	check(player.held_bomb == null, "out of ammo, [Z] pulls out nothing")
 	player.queue_free()
 	await process_frame
 
@@ -247,7 +257,7 @@ func _test_boss() -> void:
 	check(not boss.take_hit(), "boss ignores hits during the intro")
 	boss.start_fight()
 	check(is_equal_approx(boss.rig.position.y, -760.0), "intro drops the king in from above, no first-frame pop")
-	check([boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"stomp", &"rain", &"stomp"], "stage 1 (legs) cycles stomp, bomb rain")
+	check([boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"stomp", &"hop", &"stomp"], "stage 1 (legs) cycles the stomp and the jump-quake")
 	var phases := []
 	var won := [false]
 	boss.phase_changed.connect(func(p: int) -> void: phases.append(p))
@@ -309,7 +319,7 @@ func _test_giant_stages() -> void:
 	await create_timer(2.1).timeout  # the drop is over, his first attack is not yet
 	check(not boss.body.visible and boss.head.global_position.y > 300.0 and boss.head.global_position.y < 450.0 and boss.head.get_node("Jets").visible and armed.call(2) and not armed.call(1), "breaking the torso brings the head in, hovering on jets, and arms the eye")
 	check(boss.state == Boss.State.IDLE and boss.anim.current_animation == &"idle_3", "the head fights on")
-	check([boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"swoop", &"spit", &"laser"], "stage 3 swoops, spits bombs and fires the laser")
+	check([boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"swoop", &"spit", &"laser"], "stage 3 swoops, spits zap balls and fires the laser")
 	for i in Boss.HITS_PER_PHASE:
 		boss.state = Boss.State.IDLE
 		boss.take_hit()
@@ -340,10 +350,7 @@ func _test_giant_stages() -> void:
 	await create_timer(0.6).timeout
 	check(is_equal_approx(boss.position.x, from_x - Boss.GIANT_ROAM) and boss.stomp_anchor.position == anchor_rest, "a step moves his whole body (staying in his moat); the leg stays under him")
 	check(absf(boss.stomp_ring.global_position.x - boss.stomp_anchor.global_position.x) < 2.0, "the red ring marks where the foot comes down")
-	boss.rain_bomb()
-	var big: Bomb = root.get_children().filter(func(n: Node) -> bool: return n is Bomb).back()
-	check(is_equal_approx(big.size, Boss.GIANT_BIG_BOMB) and big.art.scale.is_equal_approx(Vector2.ONE * Boss.GIANT_BIG_BOMB), "the giant's rain bombs come big")
-	big.queue_free()
+	check(giant_moves.has(&"rocket") and not Boss.PHASES.any(func(p: Dictionary) -> bool: return p.attacks.has(&"rain") or p.attacks.has(&"bombs")), "the king throws no bombs; the giant fires his rocket hand")
 	check(boss.state == Boss.State.IDLE and boss.anim.current_animation == &"idle_4", "the giant fights on")
 	boss.queue_free()
 	await process_frame
@@ -526,13 +533,16 @@ func _test_final_phase() -> void:
 	check(camera.zoom.is_equal_approx(Vector2.ONE / 3.0) and camera.limit_right == 3840 and camera.limit_top == -1440, "phase 4 pulls the camera back threefold")
 	check(player.frozen and hud.bars[0].scale.y > 0.9 and not hud.boss_box.visible, "a cutscene starts: letterbox bars in, the player frozen")
 	check(stage.doom.can_process() and stage.get_node("WallR/CollisionShape2D").disabled, "the arena of doom opens: the floor runs on past the old wall")
-	check(stage.panels.slice(7, 17).all(func(p: FloorPanel) -> bool: return p.collapsed) and not stage.panels[6].collapsed and not stage.panels[17].collapsed, "the middle of the floor drops into a lava moat; the banks stay")
-	check(stage.get_node("DoomArena/Set/Ramparts").get_child_count() == 12 and stage.stones.all(func(c: CorePlatform) -> bool: return c.armed), "mirrored ramparts climb each side; armed core stones cross the moat")
-	check(stage.panels[2].belt_speed > 0.0 and stage.panels[21].belt_speed < 0.0 and stage.panels[4].belt_speed == 0.0, "the banks' belts flow toward the king")
+	check(stage.panels.all(func(p: FloorPanel) -> bool: return p.collapsed), "the whole floor dissolves into acid")
+	var conveyors := stage.get_node("DoomArena/Set/Conveyors").get_children()
+	check(conveyors.size() == 4 and conveyors[0].constant_linear_velocity.x > 0.0 and conveyors[2].constant_linear_velocity.x < 0.0, "floating conveyors, mirrored")
+	check(stage.breakers.size() == 4 and stage.breakers.all(func(c: CorePlatform) -> bool: return c.armed), "armed breakers that fall apart and come back")
+	check(stage.movers.size() == 8 and stage.movers.all(func(l: Node) -> bool: return l.get_node("AnimationPlayer").is_playing()), "sliders, flying loops and wall lifts all moving")
+	check(get_nodes_in_group(&"safe_ledge").size() == 8, "thin static ledges to land on")
 	await create_timer(1.6).timeout
 	check(not stage.get_node("PlatM").visible and not stage.get_node("PlatM").can_process(), "the castle's own platforms sink away")
-	var back := stage.safe_spot(1900.0).x
-	check(back < 1120.0 or back > 2720.0, "falling in the lava puts you back on a bank")
+	var back := stage.safe_spot(1900.0)
+	check(get_nodes_in_group(&"safe_ledge").any(func(l: Node2D) -> bool: return l.global_position.is_equal_approx(back + Vector2(0, 42))), "falling in the acid puts you back on a safe ledge")
 	var helper: TrainingBot = game.helper
 	check(is_instance_valid(helper) and camera.target == helper and not helper.link.visible, "Lil' Watt flies in, the camera following it")
 	await create_timer(2.6).timeout  # at the fallen crown: "...DAD?", then it turns on you
@@ -559,7 +569,7 @@ func _test_final_phase() -> void:
 	check(won[0] and boss.state == Boss.State.DEAD, "breaking Lil' Watt knocks the giant out")
 	check(is_instance_valid(helper) and helper.out_cold and not helper.link.visible and player.frozen and hud.bars[0].scale.y > 0.0, "the last hit knocks Lil' Watt out (no explosion), snaps the power link and starts the ending")
 	await create_timer(7.0).timeout
-	check(boss.rig.position.y > Boss.GROWN_POS.y + 1000.0 and not boss.head.get_node("Crown").visible, "the powerless king comes apart and sinks into his moat, his crown popped off")
+	check(boss.rig.position.y > Boss.GROWN_POS.y + 1000.0 and not boss.head.get_node("Crown").visible, "the powerless king comes apart and sinks into the acid, his crown popped off")
 	check(player.crown.visible and player.frozen, "the king's crown drops onto the little guy")
 	await create_timer(5.0).timeout
 	check(not player.frozen and hud.bars[0].scale.y < 0.05 and helper.anim.current_animation in [&"bow", &""], "Lil' Watt comes round and bows; the letterbox lifts")
@@ -600,7 +610,7 @@ func _test_phase_extras() -> void:
 	await process_frame
 	var boss: Boss = game.get_node("Boss")
 	boss.phase = 1
-	check([boss.next_attack(), boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"rocket", &"bombs", &"rocket", &"bombs"], "stage 2 (torso) fires his rocket hand and throws bombs, no charge")
+	check([boss.next_attack(), boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"rocket", &"slam", &"rocket", &"slam"], "stage 2 (torso) fires his rocket hand and slams his fists, no charge")
 	check(boss.anim.has_animation(&"laser"), "laser animation exists")
 	boss.phase_changed.emit(2)
 	var stage: Stage = game.get_node("Arena")
@@ -759,22 +769,27 @@ func _test_tutorial() -> void:
 	await physics_frame
 	Input.action_release("dash")
 	await create_timer(1.2).timeout
-	check(is_instance_valid(tutorial._practice), "walking, jumping then dashing brings out a practice bomb")
-	check(tutorial._practice.z_index > tutorial.spotlight.z_index, "the practice bomb stays in colour")
+	check(hud.coach_label.text.contains("PULL OUT A BOMB"), "walking, jumping then dashing: next, pull out a bomb")
+	Input.action_press("grab")
+	await physics_frame
+	await physics_frame
+	Input.action_release("grab")
+	await create_timer(0.2).timeout
+	check(is_instance_valid(player.held_bomb) and player.held_bomb.z_index > tutorial.spotlight.z_index, "[Z] pulls one out, and it stays in colour")
 	var skip := InputEventAction.new()
 	skip.action = "skip_tutorial"
 	skip.pressed = true
 	Input.parse_input_event(skip)
-	await create_timer(0.4).timeout
+	await create_timer(0.9).timeout  # (pressed during the "NICE!" pause, which plays out first)
 	check(Tutorial.done and not tutorial.spotlight.visible and player.z_index < tutorial.spotlight.z_index, "Enter skips the rest and lifts the grey-out")
-	await create_timer(1.8).timeout
+	await create_timer(1.3).timeout
 	check(not is_instance_valid(tutorial.bot) and boss.visible and boss.state == Boss.State.INTRO, "skipping blows up Lil' Watt and the king rises")
 	game.queue_free()
 	await process_frame
 	Engine.time_scale = 1.0
 
 
-## A player who grabs the practice bomb and hits the core before the lesson asks must not get stuck.
+## A player who pulls out a bomb and hits the core before the lesson asks must not get stuck.
 func _test_tutorial_rush() -> void:
 	Tutorial.done = false
 	var game: Node2D = load("res://scenes/game.tscn").instantiate()
@@ -793,25 +808,29 @@ func _test_tutorial_rush() -> void:
 		await physics_frame
 		Input.action_release(action)
 		await create_timer(1.0).timeout
-	while not is_instance_valid(tutorial._practice):
-		await physics_frame
-	player.global_position = tutorial._practice.global_position + Vector2(-30, -12)
-	await physics_frame
-	await physics_frame
 	player._grab()
 	var bomb := player.held_bomb
 	player._throw()
 	bomb.global_position = tutorial.bot.core.global_position
 	await create_timer(2.0).timeout
 	var hud: HUD = game.get_node("HUD")
-	check(tutorial.bot.hp == TrainingBot.HITS - 1 and hud.coach_label.text.begins_with("AGAIN"), "hitting the core early moves the lesson on")
+	check(tutorial.bot.hp == TrainingBot.HITS - 1 and hud.coach_label.text.contains("HOLD  A"), "hitting the core early moves the lesson on (to squeezing out more bombs)")
+	var before := player.ammo
+	Input.action_press("detonate")
+	await create_timer(0.5).timeout
+	check(player.charging and player.body.animation == &"strain", "holding [A] squeezes him flat, eyes screwed shut")
+	await create_timer(0.5).timeout
+	check(player.ammo > before, "...and squeezes out a bomb")
+	Input.action_release("detonate")
+	await create_timer(1.0).timeout
+	check(hud.coach_label.text.begins_with("AGAIN"), "then the lesson moves on")
 	check(player.hp == Player.MAX_HP, "a hit on Lil' Watt never hurts the thrower")
 	check(tutorial.bot.cracks.get_child(0).visible and not tutorial.bot.cracks.get_child(1).visible, "each hit cracks Lil' Watt a little more")
 	for i in TrainingBot.HITS - 1:
-		while not is_instance_valid(tutorial._practice) or tutorial._practice.exploded:
-			await physics_frame
-		tutorial._practice.throw(Vector2.ZERO)
-		tutorial._practice.global_position = tutorial.bot.core.global_position
+		player._grab()
+		var next := player.held_bomb
+		player._throw()
+		next.global_position = tutorial.bot.core.global_position
 		await create_timer(0.3).timeout
 	check(hud.boss_bar.value == 0, "every hit on Lil' Watt shows on the boss bar")
 	await create_timer(4.5).timeout

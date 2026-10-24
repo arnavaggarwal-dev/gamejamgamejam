@@ -1,10 +1,12 @@
 class_name Player
 extends CharacterBody2D
-## The little guy: runs, jumps, carries and throws the boss's bombs.
+## The little guy: runs, jumps, and makes his own bombs: [Z] pulls one out of his ammo (5) and
+## throws it; holding [A] squeezes out more (eyes screwed shut); a tap of [A] sets one off.
 
 signal hp_changed(hp: int)
 signal died
 signal fell_in_pit
+signal ammo_changed(ammo: int)
 
 const MAX_HP := 5
 const COYOTE_TIME := 0.1
@@ -18,6 +20,10 @@ const POOF := preload("res://scenes/fx/poof.tscn")
 const SLIME := preload("res://scenes/fx/slime.tscn")
 const GHOST := preload("res://scenes/fx/afterimage.tscn")
 const HARD_LANDING := 1500.0  # px/s fall speed for the biggest landing squash
+const BOMB := preload("res://scenes/boss/bomb.tscn")
+const MAX_AMMO := 5
+const CHARGE_DELAY := 0.2  # s of holding [A] before he starts squeezing (a tap only detonates)
+const CHARGE_TIME := 0.6  # s of squeezing per bomb
 const BOMB_BOUNCE := Vector2(650.0, -1150.0)  # off a blast: sideways away from it (at most), always this fast up
 const AIM_AHEAD := Vector2(100.0, 2400.0)  # a throw aims at a core this far ahead of him (min, max px)
 const MAX_FLIGHT := 1.5  # s: a far core gets a faster throw instead of a sky-high one
@@ -46,6 +52,11 @@ var _dash_dir := Vector2.RIGHT
 var _dash_grounded := false  # started on the floor (and not upward): you can still jump out of it
 var frozen := false  # cutscenes: no control and no harm, he just stands and watches
 var _thrown: Bomb = null  # the last bomb he threw, for [A] to set off
+var ammo := MAX_AMMO
+var charging := false  # squeezing out a bomb
+var projectiles: Node  # where his bombs go (the arena's Projectiles); his parent if unset
+var _charge_held := 0.0
+var _charge_left := 0.0
 
 @onready var art: Node2D = $Art
 @onready var flip: Node2D = $Art/Flip
@@ -80,7 +91,8 @@ func _physics_process(delta: float) -> void:
 	if frozen:
 		_stand_still(delta)
 		return
-	var dir := Input.get_axis("move_left", "move_right")
+	_charge(delta)
+	var dir := 0.0 if charging else Input.get_axis("move_left", "move_right")
 	if dir != 0.0 and not dashing:
 		var turned := (1 if dir > 0.0 else -1) != facing
 		facing = 1 if dir > 0.0 else -1
@@ -135,7 +147,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("detonate"):
 		_detonate()
 	if held_bomb:
-		held_bomb.global_position = hold_point.global_position + Vector2(0.0, -24.0 * (held_bomb.size - 1.0))  # a big bomb sits higher
+		held_bomb.global_position = hold_point.global_position
 	_update_aim()
 	_update_prompt()
 	_update_pose(dir)
@@ -221,6 +233,8 @@ func reset(at: Vector2) -> void:
 	global_position = at
 	velocity = Vector2.ZERO
 	hp = MAX_HP
+	ammo = MAX_AMMO
+	ammo_changed.emit(ammo)
 	held_bomb = null
 	_dead = false
 	invuln.stop()
@@ -251,8 +265,11 @@ func _nearest_bomb() -> Bomb:
 	return best
 
 
+## [Z] with empty hands: picks up a bomb lying in reach, else pulls a new one out of his ammo.
 func _grab() -> void:
 	var best := _nearest_bomb()
+	if best == null and ammo > 0:
+		best = _make_bomb()
 	if best:
 		best.pick_up()
 		held_bomb = best
@@ -262,6 +279,36 @@ func _grab() -> void:
 ## A plain throw at an armed core ahead of him is aimed: the usual sideways speed (faster for a far
 ## core), with the lift solved so the arc passes through the core (the aim dots show it). Lobs
 ## (aim_up) stay manual.
+func _make_bomb() -> Bomb:
+	var bomb: Bomb = BOMB.instantiate()
+	(projectiles if projectiles else get_parent()).add_child(bomb)
+	bomb.global_position = hold_point.global_position
+	ammo -= 1
+	ammo_changed.emit(ammo)
+	return bomb
+
+
+## Holding [A] with empty hands, on the ground, short of bombs: after CHARGE_DELAY he stops and
+## squeezes (squashed flat, eyes screwed shut), a new bomb every CHARGE_TIME.
+func _charge(delta: float) -> void:
+	var squeezing := Input.is_action_pressed("detonate") and not is_instance_valid(held_bomb) and is_on_floor() and not dashing and ammo < MAX_AMMO
+	_charge_held = _charge_held + delta if squeezing else 0.0
+	var was := charging
+	charging = _charge_held >= CHARGE_DELAY
+	if not charging:
+		if was:
+			_squash(Vector2(0.85, 1.2))  # pops back up
+		return
+	if not was:
+		_charge_left = CHARGE_TIME
+	_charge_left -= delta
+	if _charge_left <= 0.0:
+		_charge_left = CHARGE_TIME
+		ammo += 1
+		ammo_changed.emit(ammo)
+		_puff(POOF, hold_point.global_position)
+
+
 func _throw_velocity() -> Vector2:
 	if Input.is_action_pressed("aim_up"):
 		return Vector2(lob_velocity.x * facing, lob_velocity.y)
@@ -394,6 +441,9 @@ func _update_pose(dir: float) -> void:
 	var pose := &"idle"
 	if invuln.time_left > invuln.wait_time - 0.25:
 		pose = &"hurt"
+	elif charging:
+		pose = &"strain"
+		art.scale = Vector2(1.16 + sin(Time.get_ticks_msec() * 0.04) * 0.05, 0.8)  # squeezing
 	elif dashing and not held_bomb and absf(_dash_dir.x) >= absf(_dash_dir.y):
 		pose = &"dash"  # steep dashes fall through to the jump / fall poses
 	elif held_bomb:

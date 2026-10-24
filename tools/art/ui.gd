@@ -116,6 +116,23 @@ static func heart(full: bool):
 	return c
 
 
+## One bomb of ammo on the HUD (empty: a dim outline of one).
+static func bomb_icon(full: bool):
+	var c = Canvas.new(11, 12)
+	if full:
+		c.shade_ellipse(5, 7, 4, 4, P.BOMB, [-0.3, 0.3, 0.8])
+		c.px(3, 5, P.GREY)
+		c.rect(5, 1, 2, 2, P.CHARCOAL)
+		c.px(7, 0, P.BUTTER)
+		c.px(8, 1, P.PEACH)
+	else:
+		c.ellipse(5, 7, 4, 4, P.CHARCOAL)
+		c.ellipse(5, 7, 2.5, 2.5, P.INK)
+		c.rect(5, 1, 2, 2, P.CHARCOAL)
+	c.outline()
+	return c
+
+
 ## Key cap prompt ("J" by default) shown over a bomb in reach.
 static func key_cap(letter: String):
 	var c = Canvas.new(11, 12)

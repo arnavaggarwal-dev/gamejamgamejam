@@ -28,7 +28,9 @@
 [ext_resource type="PackedScene" path="res://scenes/boss/training_bot.tscn" id="26_bot"]
 [ext_resource type="PackedScene" path="res://scenes/stage/core_platform.tscn" id="27_coreplat"]
 [ext_resource type="Texture2D" path="res://assets/art/world/floor_tile.png" id="28_floortile"]
-[ext_resource type="SpriteFrames" path="res://assets/art/world/lava_frames.tres" id="29_lava"]
+[ext_resource type="SpriteFrames" path="res://assets/art/world/acid_frames.tres" id="29_acid"]
+[ext_resource type="Texture2D" path="res://assets/art/world/ledge.png" id="32_ledge"]
+[ext_resource type="PackedScene" path="res://scenes/stage/conveyor_platform.tscn" id="33_conveyor"]
 [ext_resource type="Texture2D" path="res://assets/art/world/moon.png" id="30_moon"]
 [ext_resource type="Texture2D" path="res://assets/art/boss/crown.png" id="31_crown"]
 
@@ -62,17 +64,41 @@ fill_to = Vector2(0, 1)
 offsets = PackedFloat32Array(0, 0.5, 1)
 colors = PackedColorArray(0.859, 0.851, 0.569, 1, 0.859, 0.588, 0.573, 1, 0.565, 0.337, 0.467, 0)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_slab240"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ledge200"]
+size = Vector2(200, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ledge240"]
 size = Vector2(240, 24)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_slab280"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ledge280"]
 size = Vector2(280, 24)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_slab320"]
-size = Vector2(320, 24)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ledge520"]
+size = Vector2(520, 24)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_slab600"]
-size = Vector2(600, 24)
+[sub_resource type="Curve2D" id="Curve2D_slide320"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, -160, 0, 0, 0, 0, 0, 160, 0)
+}
+point_count = 2
+
+[sub_resource type="Curve2D" id="Curve2D_slide600"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, -300, 0, 0, 0, 0, 0, 300, 0)
+}
+point_count = 2
+
+[sub_resource type="Curve2D" id="Curve2D_orbit150"]
+_data = {
+"points": PackedVector2Array(0, -82.84, 0, 82.84, 150, 0, 82.84, 0, -82.84, 0, 0, 150, 0, 82.84, 0, -82.84, -150, 0, -82.84, 0, 82.84, 0, 0, -150, 0, -82.84, 0, 82.84, 150, 0)
+}
+point_count = 5
+
+[sub_resource type="Curve2D" id="Curve2D_orbit220"]
+_data = {
+"points": PackedVector2Array(0, -121.51, 0, 121.51, 220, 0, 121.51, 0, -121.51, 0, 0, 220, 0, 121.51, 0, -121.51, -220, 0, -121.51, 0, 121.51, 0, 0, -220, 0, -121.51, 0, 121.51, 220, 0)
+}
+point_count = 5
 
 [sub_resource type="Curve2D" id="Curve2D_tall"]
 _data = {
@@ -157,34 +183,6 @@ tracks/5/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [false, true]
-}
-tracks/6/type = "method"
-tracks/6/imported = false
-tracks/6/enabled = true
-tracks/6/path = NodePath("Set/LiftL/AnimationPlayer")
-tracks/6/interp = 1
-tracks/6/loop_wrap = true
-tracks/6/keys = {
-"times": PackedFloat32Array(2),
-"transitions": PackedFloat32Array(1),
-"values": [{
-"args": [&"glide"],
-"method": &"play"
-}]
-}
-tracks/7/type = "method"
-tracks/7/imported = false
-tracks/7/enabled = true
-tracks/7/path = NodePath("Set/LiftR/AnimationPlayer")
-tracks/7/interp = 1
-tracks/7/loop_wrap = true
-tracks/7/keys = {
-"times": PackedFloat32Array(2),
-"transitions": PackedFloat32Array(1),
-"values": [{
-"args": [&"glide"],
-"method": &"play"
-}]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_doom"]
@@ -559,466 +557,531 @@ polygon = PackedVector2Array(0, 720, 60, -300, 30, -320, 150, -1250, 270, -320, 
 color = Color(0.3, 0.2, 0.3, 1)
 polygon = PackedVector2Array(3540, 720, 3600, -300, 3570, -320, 3690, -1250, 3810, -320, 3780, -300, 3840, 720)
 
-[node name="Lava" type="Node2D" parent="Arena/DoomArena/Set"]
+[node name="Acid" type="Node2D" parent="Arena/DoomArena/Set"]
 
-[node name="Tile1" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
-position = Vector2(1120, 656)
+[node name="Tile1" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(0, 656)
 scale = Vector2(4, 4)
-sprite_frames = ExtResource("29_lava")
+sprite_frames = ExtResource("29_acid")
 animation = &"bubble"
 autoplay = "bubble"
 frame_progress = 0
 centered = false
 
-[node name="Tile2" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
-position = Vector2(1280, 656)
+[node name="Tile2" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(160, 656)
 scale = Vector2(4, 4)
-sprite_frames = ExtResource("29_lava")
+sprite_frames = ExtResource("29_acid")
 animation = &"bubble"
 autoplay = "bubble"
 frame_progress = 0.37
 centered = false
 
-[node name="Tile3" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
-position = Vector2(1440, 656)
+[node name="Tile3" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(320, 656)
 scale = Vector2(4, 4)
-sprite_frames = ExtResource("29_lava")
+sprite_frames = ExtResource("29_acid")
 animation = &"bubble"
 autoplay = "bubble"
 frame_progress = 0.74
 centered = false
 
-[node name="Tile4" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
-position = Vector2(1600, 656)
+[node name="Tile4" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(480, 656)
 scale = Vector2(4, 4)
-sprite_frames = ExtResource("29_lava")
+sprite_frames = ExtResource("29_acid")
 animation = &"bubble"
 autoplay = "bubble"
 frame_progress = 0.11
 centered = false
 
-[node name="Tile5" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
-position = Vector2(1760, 656)
+[node name="Tile5" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(640, 656)
 scale = Vector2(4, 4)
-sprite_frames = ExtResource("29_lava")
+sprite_frames = ExtResource("29_acid")
 animation = &"bubble"
 autoplay = "bubble"
 frame_progress = 0.48
 centered = false
 
-[node name="Tile6" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
-position = Vector2(1920, 656)
+[node name="Tile6" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(800, 656)
 scale = Vector2(4, 4)
-sprite_frames = ExtResource("29_lava")
+sprite_frames = ExtResource("29_acid")
 animation = &"bubble"
 autoplay = "bubble"
 frame_progress = 0.85
 centered = false
 
-[node name="Tile7" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
-position = Vector2(2080, 656)
+[node name="Tile7" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(960, 656)
 scale = Vector2(4, 4)
-sprite_frames = ExtResource("29_lava")
+sprite_frames = ExtResource("29_acid")
 animation = &"bubble"
 autoplay = "bubble"
 frame_progress = 0.22
 centered = false
 
-[node name="Tile8" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
-position = Vector2(2240, 656)
+[node name="Tile8" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(1120, 656)
 scale = Vector2(4, 4)
-sprite_frames = ExtResource("29_lava")
+sprite_frames = ExtResource("29_acid")
 animation = &"bubble"
 autoplay = "bubble"
 frame_progress = 0.59
 centered = false
 
-[node name="Tile9" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
-position = Vector2(2400, 656)
+[node name="Tile9" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(1280, 656)
 scale = Vector2(4, 4)
-sprite_frames = ExtResource("29_lava")
+sprite_frames = ExtResource("29_acid")
 animation = &"bubble"
 autoplay = "bubble"
 frame_progress = 0.96
 centered = false
 
-[node name="Tile10" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Lava"]
-position = Vector2(2560, 656)
+[node name="Tile10" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(1440, 656)
 scale = Vector2(4, 4)
-sprite_frames = ExtResource("29_lava")
+sprite_frames = ExtResource("29_acid")
 animation = &"bubble"
 autoplay = "bubble"
 frame_progress = 0.33
 centered = false
 
-[node name="Ramparts" type="Node2D" parent="Arena/DoomArena/Set"]
-
-[node name="L1" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
-position = Vector2(380, 470)
-
-[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L1"]
-z_index = -1
-points = PackedVector2Array(-132, 80, -132, 170)
-width = 24.0
-default_color = Color(0.29, 0.2, 0.29, 1)
-
-[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L1"]
-z_index = -1
-points = PackedVector2Array(132, 80, 132, 170)
-width = 24.0
-default_color = Color(0.29, 0.2, 0.29, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/L1"]
-position = Vector2(0, 12)
-shape = SubResource("RectangleShape2D_slab320")
-one_way_collision = true
-
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/L1"]
-texture_repeat = 2
-position = Vector2(-160, 0)
+[node name="Tile11" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(1600, 656)
 scale = Vector2(4, 4)
-texture = ExtResource("28_floortile")
+sprite_frames = ExtResource("29_acid")
+animation = &"bubble"
+autoplay = "bubble"
+frame_progress = 0.7
 centered = false
-region_enabled = true
-region_rect = Rect2(0, 0, 80, 20)
 
-[node name="L2" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
-position = Vector2(700, 300)
-
-[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L2"]
-z_index = -1
-points = PackedVector2Array(-132, 80, -132, 340)
-width = 24.0
-default_color = Color(0.29, 0.2, 0.29, 1)
-
-[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L2"]
-z_index = -1
-points = PackedVector2Array(132, 80, 132, 340)
-width = 24.0
-default_color = Color(0.29, 0.2, 0.29, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/L2"]
-position = Vector2(0, 12)
-shape = SubResource("RectangleShape2D_slab320")
-one_way_collision = true
-
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/L2"]
-texture_repeat = 2
-position = Vector2(-160, 0)
+[node name="Tile12" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(1760, 656)
 scale = Vector2(4, 4)
-texture = ExtResource("28_floortile")
+sprite_frames = ExtResource("29_acid")
+animation = &"bubble"
+autoplay = "bubble"
+frame_progress = 0.07
 centered = false
-region_enabled = true
-region_rect = Rect2(0, 0, 80, 20)
 
-[node name="L3" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
-position = Vector2(1020, 130)
+[node name="Tile13" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(1920, 656)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("29_acid")
+animation = &"bubble"
+autoplay = "bubble"
+frame_progress = 0.44
+centered = false
 
-[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L3"]
+[node name="Tile14" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(2080, 656)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("29_acid")
+animation = &"bubble"
+autoplay = "bubble"
+frame_progress = 0.81
+centered = false
+
+[node name="Tile15" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(2240, 656)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("29_acid")
+animation = &"bubble"
+autoplay = "bubble"
+frame_progress = 0.18
+centered = false
+
+[node name="Tile16" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(2400, 656)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("29_acid")
+animation = &"bubble"
+autoplay = "bubble"
+frame_progress = 0.55
+centered = false
+
+[node name="Tile17" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(2560, 656)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("29_acid")
+animation = &"bubble"
+autoplay = "bubble"
+frame_progress = 0.92
+centered = false
+
+[node name="Tile18" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(2720, 656)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("29_acid")
+animation = &"bubble"
+autoplay = "bubble"
+frame_progress = 0.29
+centered = false
+
+[node name="Tile19" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(2880, 656)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("29_acid")
+animation = &"bubble"
+autoplay = "bubble"
+frame_progress = 0.66
+centered = false
+
+[node name="Tile20" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(3040, 656)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("29_acid")
+animation = &"bubble"
+autoplay = "bubble"
+frame_progress = 0.03
+centered = false
+
+[node name="Tile21" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(3200, 656)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("29_acid")
+animation = &"bubble"
+autoplay = "bubble"
+frame_progress = 0.4
+centered = false
+
+[node name="Tile22" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(3360, 656)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("29_acid")
+animation = &"bubble"
+autoplay = "bubble"
+frame_progress = 0.77
+centered = false
+
+[node name="Tile23" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(3520, 656)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("29_acid")
+animation = &"bubble"
+autoplay = "bubble"
+frame_progress = 0.14
+centered = false
+
+[node name="Tile24" type="AnimatedSprite2D" parent="Arena/DoomArena/Set/Acid"]
+position = Vector2(3680, 656)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("29_acid")
+animation = &"bubble"
+autoplay = "bubble"
+frame_progress = 0.51
+centered = false
+
+[node name="Ledges" type="Node2D" parent="Arena/DoomArena/Set"]
+
+[node name="LedgeL1" type="StaticBody2D" parent="Arena/DoomArena/Set/Ledges" groups=["safe_ledge"]]
+position = Vector2(300, 290)
+
+[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ledges/LedgeL1"]
 z_index = -1
-points = PackedVector2Array(-112, 80, -112, 510)
-width = 24.0
+points = PackedVector2Array(-116, 40, -116, 370)
+width = 16.0
 default_color = Color(0.29, 0.2, 0.29, 1)
 
-[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L3"]
+[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ledges/LedgeL1"]
 z_index = -1
-points = PackedVector2Array(112, 80, 112, 510)
-width = 24.0
+points = PackedVector2Array(116, 40, 116, 370)
+width = 16.0
 default_color = Color(0.29, 0.2, 0.29, 1)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/L3"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ledges/LedgeL1"]
 position = Vector2(0, 12)
-shape = SubResource("RectangleShape2D_slab280")
+shape = SubResource("RectangleShape2D_ledge280")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/L3"]
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ledges/LedgeL1"]
 texture_repeat = 2
 position = Vector2(-140, 0)
 scale = Vector2(4, 4)
-texture = ExtResource("28_floortile")
+texture = ExtResource("32_ledge")
 centered = false
 region_enabled = true
-region_rect = Rect2(0, 0, 70, 20)
+region_rect = Rect2(0, 0, 70, 10)
 
-[node name="L4" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
-position = Vector2(760, -40)
+[node name="LedgeL2" type="StaticBody2D" parent="Arena/DoomArena/Set/Ledges" groups=["safe_ledge"]]
+position = Vector2(1040, 100)
 
-[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L4"]
+[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ledges/LedgeL2"]
 z_index = -1
-points = PackedVector2Array(-112, 0, -112, -1400)
-width = 8.0
-default_color = Color(0.18, 0.15, 0.2, 1)
+points = PackedVector2Array(-96, 40, -96, 560)
+width = 16.0
+default_color = Color(0.29, 0.2, 0.29, 1)
 
-[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L4"]
+[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ledges/LedgeL2"]
 z_index = -1
-points = PackedVector2Array(112, 0, 112, -1400)
-width = 8.0
-default_color = Color(0.18, 0.15, 0.2, 1)
+points = PackedVector2Array(96, 40, 96, 560)
+width = 16.0
+default_color = Color(0.29, 0.2, 0.29, 1)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/L4"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ledges/LedgeL2"]
 position = Vector2(0, 12)
-shape = SubResource("RectangleShape2D_slab280")
+shape = SubResource("RectangleShape2D_ledge240")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/L4"]
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ledges/LedgeL2"]
 texture_repeat = 2
-position = Vector2(-140, 0)
+position = Vector2(-120, 0)
 scale = Vector2(4, 4)
-texture = ExtResource("28_floortile")
+texture = ExtResource("32_ledge")
 centered = false
 region_enabled = true
-region_rect = Rect2(0, 0, 70, 20)
+region_rect = Rect2(0, 0, 60, 10)
 
-[node name="L5" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
+[node name="LedgeL3" type="StaticBody2D" parent="Arena/DoomArena/Set/Ledges" groups=["safe_ledge"]]
 position = Vector2(520, -210)
 
-[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L5"]
+[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ledges/LedgeL3"]
 z_index = -1
-points = PackedVector2Array(-272, 0, -272, -1230)
+points = PackedVector2Array(-236, 0, -236, -1230)
 width = 8.0
 default_color = Color(0.18, 0.15, 0.2, 1)
 
-[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L5"]
+[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ledges/LedgeL3"]
 z_index = -1
-points = PackedVector2Array(272, 0, 272, -1230)
+points = PackedVector2Array(236, 0, 236, -1230)
 width = 8.0
 default_color = Color(0.18, 0.15, 0.2, 1)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/L5"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ledges/LedgeL3"]
 position = Vector2(0, 12)
-shape = SubResource("RectangleShape2D_slab600")
+shape = SubResource("RectangleShape2D_ledge520")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/L5"]
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ledges/LedgeL3"]
 texture_repeat = 2
-position = Vector2(-300, 0)
+position = Vector2(-260, 0)
 scale = Vector2(4, 4)
-texture = ExtResource("28_floortile")
+texture = ExtResource("32_ledge")
 centered = false
 region_enabled = true
-region_rect = Rect2(0, 0, 150, 20)
+region_rect = Rect2(0, 0, 130, 10)
 
-[node name="L6" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
-position = Vector2(1060, -380)
+[node name="LedgeL4" type="StaticBody2D" parent="Arena/DoomArena/Set/Ledges" groups=["safe_ledge"]]
+position = Vector2(1180, -430)
 
-[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L6"]
+[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ledges/LedgeL4"]
 z_index = -1
-points = PackedVector2Array(-92, 0, -92, -1060)
+points = PackedVector2Array(-76, 0, -76, -1010)
 width = 8.0
 default_color = Color(0.18, 0.15, 0.2, 1)
 
-[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/L6"]
+[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ledges/LedgeL4"]
 z_index = -1
-points = PackedVector2Array(92, 0, 92, -1060)
+points = PackedVector2Array(76, 0, 76, -1010)
 width = 8.0
 default_color = Color(0.18, 0.15, 0.2, 1)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/L6"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ledges/LedgeL4"]
 position = Vector2(0, 12)
-shape = SubResource("RectangleShape2D_slab240")
+shape = SubResource("RectangleShape2D_ledge200")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/L6"]
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ledges/LedgeL4"]
+texture_repeat = 2
+position = Vector2(-100, 0)
+scale = Vector2(4, 4)
+texture = ExtResource("32_ledge")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 50, 10)
+
+[node name="LedgeR1" type="StaticBody2D" parent="Arena/DoomArena/Set/Ledges" groups=["safe_ledge"]]
+position = Vector2(3540, 290)
+
+[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ledges/LedgeR1"]
+z_index = -1
+points = PackedVector2Array(-116, 40, -116, 370)
+width = 16.0
+default_color = Color(0.29, 0.2, 0.29, 1)
+
+[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ledges/LedgeR1"]
+z_index = -1
+points = PackedVector2Array(116, 40, 116, 370)
+width = 16.0
+default_color = Color(0.29, 0.2, 0.29, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ledges/LedgeR1"]
+position = Vector2(0, 12)
+shape = SubResource("RectangleShape2D_ledge280")
+one_way_collision = true
+
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ledges/LedgeR1"]
+texture_repeat = 2
+position = Vector2(-140, 0)
+scale = Vector2(4, 4)
+texture = ExtResource("32_ledge")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 70, 10)
+
+[node name="LedgeR2" type="StaticBody2D" parent="Arena/DoomArena/Set/Ledges" groups=["safe_ledge"]]
+position = Vector2(2800, 100)
+
+[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ledges/LedgeR2"]
+z_index = -1
+points = PackedVector2Array(-96, 40, -96, 560)
+width = 16.0
+default_color = Color(0.29, 0.2, 0.29, 1)
+
+[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ledges/LedgeR2"]
+z_index = -1
+points = PackedVector2Array(96, 40, 96, 560)
+width = 16.0
+default_color = Color(0.29, 0.2, 0.29, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ledges/LedgeR2"]
+position = Vector2(0, 12)
+shape = SubResource("RectangleShape2D_ledge240")
+one_way_collision = true
+
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ledges/LedgeR2"]
 texture_repeat = 2
 position = Vector2(-120, 0)
 scale = Vector2(4, 4)
-texture = ExtResource("28_floortile")
+texture = ExtResource("32_ledge")
 centered = false
 region_enabled = true
-region_rect = Rect2(0, 0, 60, 20)
+region_rect = Rect2(0, 0, 60, 10)
 
-[node name="R1" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
-position = Vector2(3460, 470)
-
-[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R1"]
-z_index = -1
-points = PackedVector2Array(-132, 80, -132, 170)
-width = 24.0
-default_color = Color(0.29, 0.2, 0.29, 1)
-
-[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R1"]
-z_index = -1
-points = PackedVector2Array(132, 80, 132, 170)
-width = 24.0
-default_color = Color(0.29, 0.2, 0.29, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/R1"]
-position = Vector2(0, 12)
-shape = SubResource("RectangleShape2D_slab320")
-one_way_collision = true
-
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/R1"]
-texture_repeat = 2
-position = Vector2(-160, 0)
-scale = Vector2(4, 4)
-texture = ExtResource("28_floortile")
-centered = false
-region_enabled = true
-region_rect = Rect2(0, 0, 80, 20)
-
-[node name="R2" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
-position = Vector2(3140, 300)
-
-[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R2"]
-z_index = -1
-points = PackedVector2Array(-132, 80, -132, 340)
-width = 24.0
-default_color = Color(0.29, 0.2, 0.29, 1)
-
-[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R2"]
-z_index = -1
-points = PackedVector2Array(132, 80, 132, 340)
-width = 24.0
-default_color = Color(0.29, 0.2, 0.29, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/R2"]
-position = Vector2(0, 12)
-shape = SubResource("RectangleShape2D_slab320")
-one_way_collision = true
-
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/R2"]
-texture_repeat = 2
-position = Vector2(-160, 0)
-scale = Vector2(4, 4)
-texture = ExtResource("28_floortile")
-centered = false
-region_enabled = true
-region_rect = Rect2(0, 0, 80, 20)
-
-[node name="R3" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
-position = Vector2(2820, 130)
-
-[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R3"]
-z_index = -1
-points = PackedVector2Array(-112, 80, -112, 510)
-width = 24.0
-default_color = Color(0.29, 0.2, 0.29, 1)
-
-[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R3"]
-z_index = -1
-points = PackedVector2Array(112, 80, 112, 510)
-width = 24.0
-default_color = Color(0.29, 0.2, 0.29, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/R3"]
-position = Vector2(0, 12)
-shape = SubResource("RectangleShape2D_slab280")
-one_way_collision = true
-
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/R3"]
-texture_repeat = 2
-position = Vector2(-140, 0)
-scale = Vector2(4, 4)
-texture = ExtResource("28_floortile")
-centered = false
-region_enabled = true
-region_rect = Rect2(0, 0, 70, 20)
-
-[node name="R4" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
-position = Vector2(3080, -40)
-
-[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R4"]
-z_index = -1
-points = PackedVector2Array(-112, 0, -112, -1400)
-width = 8.0
-default_color = Color(0.18, 0.15, 0.2, 1)
-
-[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R4"]
-z_index = -1
-points = PackedVector2Array(112, 0, 112, -1400)
-width = 8.0
-default_color = Color(0.18, 0.15, 0.2, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/R4"]
-position = Vector2(0, 12)
-shape = SubResource("RectangleShape2D_slab280")
-one_way_collision = true
-
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/R4"]
-texture_repeat = 2
-position = Vector2(-140, 0)
-scale = Vector2(4, 4)
-texture = ExtResource("28_floortile")
-centered = false
-region_enabled = true
-region_rect = Rect2(0, 0, 70, 20)
-
-[node name="R5" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
+[node name="LedgeR3" type="StaticBody2D" parent="Arena/DoomArena/Set/Ledges" groups=["safe_ledge"]]
 position = Vector2(3320, -210)
 
-[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R5"]
+[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ledges/LedgeR3"]
 z_index = -1
-points = PackedVector2Array(-272, 0, -272, -1230)
+points = PackedVector2Array(-236, 0, -236, -1230)
 width = 8.0
 default_color = Color(0.18, 0.15, 0.2, 1)
 
-[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R5"]
+[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ledges/LedgeR3"]
 z_index = -1
-points = PackedVector2Array(272, 0, 272, -1230)
+points = PackedVector2Array(236, 0, 236, -1230)
 width = 8.0
 default_color = Color(0.18, 0.15, 0.2, 1)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/R5"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ledges/LedgeR3"]
 position = Vector2(0, 12)
-shape = SubResource("RectangleShape2D_slab600")
+shape = SubResource("RectangleShape2D_ledge520")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/R5"]
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ledges/LedgeR3"]
 texture_repeat = 2
-position = Vector2(-300, 0)
+position = Vector2(-260, 0)
 scale = Vector2(4, 4)
-texture = ExtResource("28_floortile")
+texture = ExtResource("32_ledge")
 centered = false
 region_enabled = true
-region_rect = Rect2(0, 0, 150, 20)
+region_rect = Rect2(0, 0, 130, 10)
 
-[node name="R6" type="StaticBody2D" parent="Arena/DoomArena/Set/Ramparts"]
-position = Vector2(2780, -380)
+[node name="LedgeR4" type="StaticBody2D" parent="Arena/DoomArena/Set/Ledges" groups=["safe_ledge"]]
+position = Vector2(2660, -430)
 
-[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R6"]
+[node name="Hold1" type="Line2D" parent="Arena/DoomArena/Set/Ledges/LedgeR4"]
 z_index = -1
-points = PackedVector2Array(-92, 0, -92, -1060)
+points = PackedVector2Array(-76, 0, -76, -1010)
 width = 8.0
 default_color = Color(0.18, 0.15, 0.2, 1)
 
-[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ramparts/R6"]
+[node name="Hold2" type="Line2D" parent="Arena/DoomArena/Set/Ledges/LedgeR4"]
 z_index = -1
-points = PackedVector2Array(92, 0, 92, -1060)
+points = PackedVector2Array(76, 0, 76, -1010)
 width = 8.0
 default_color = Color(0.18, 0.15, 0.2, 1)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ramparts/R6"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/DoomArena/Set/Ledges/LedgeR4"]
 position = Vector2(0, 12)
-shape = SubResource("RectangleShape2D_slab240")
+shape = SubResource("RectangleShape2D_ledge200")
 one_way_collision = true
 
-[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ramparts/R6"]
+[node name="Art" type="Sprite2D" parent="Arena/DoomArena/Set/Ledges/LedgeR4"]
 texture_repeat = 2
-position = Vector2(-120, 0)
+position = Vector2(-100, 0)
 scale = Vector2(4, 4)
-texture = ExtResource("28_floortile")
+texture = ExtResource("32_ledge")
 centered = false
 region_enabled = true
-region_rect = Rect2(0, 0, 60, 20)
+region_rect = Rect2(0, 0, 50, 10)
 
-[node name="Stones" type="Node2D" parent="Arena/DoomArena/Set"]
+[node name="Conveyors" type="Node2D" parent="Arena/DoomArena/Set"]
 
-[node name="Stone1" parent="Arena/DoomArena/Set/Stones" instance=ExtResource("27_coreplat")]
-position = Vector2(1440, 470)
+[node name="ConveyorL1" parent="Arena/DoomArena/Set/Conveyors" instance=ExtResource("33_conveyor")]
+position = Vector2(440, 480)
+speed = 140
 
-[node name="Stone2" parent="Arena/DoomArena/Set/Stones" instance=ExtResource("27_coreplat")]
-position = Vector2(1920, 470)
+[node name="ConveyorL2" parent="Arena/DoomArena/Set/Conveyors" instance=ExtResource("33_conveyor")]
+position = Vector2(1280, 300)
+speed = -140
 
-[node name="Stone3" parent="Arena/DoomArena/Set/Stones" instance=ExtResource("27_coreplat")]
-position = Vector2(2400, 470)
+[node name="ConveyorR1" parent="Arena/DoomArena/Set/Conveyors" instance=ExtResource("33_conveyor")]
+position = Vector2(3400, 480)
+speed = -140
 
-[node name="LiftL" parent="Arena/DoomArena/Set" instance=ExtResource("9_lift")]
+[node name="ConveyorR2" parent="Arena/DoomArena/Set/Conveyors" instance=ExtResource("33_conveyor")]
+position = Vector2(2560, 300)
+speed = 140
+
+[node name="Breakers" type="Node2D" parent="Arena/DoomArena/Set"]
+
+[node name="BreakerL1" parent="Arena/DoomArena/Set/Breakers" instance=ExtResource("27_coreplat")]
+position = Vector2(860, 480)
+
+[node name="BreakerL2" parent="Arena/DoomArena/Set/Breakers" instance=ExtResource("27_coreplat")]
+position = Vector2(620, 110)
+
+[node name="BreakerR1" parent="Arena/DoomArena/Set/Breakers" instance=ExtResource("27_coreplat")]
+position = Vector2(2980, 480)
+
+[node name="BreakerR2" parent="Arena/DoomArena/Set/Breakers" instance=ExtResource("27_coreplat")]
+position = Vector2(3220, 110)
+
+[node name="Movers" type="Node2D" parent="Arena/DoomArena/Set"]
+
+[node name="LiftL" parent="Arena/DoomArena/Set/Movers" instance=ExtResource("9_lift")]
 position = Vector2(110, 600)
 curve = SubResource("Curve2D_tall")
+metadata/move = &"glide"
 
-[node name="LiftR" parent="Arena/DoomArena/Set" instance=ExtResource("9_lift")]
+[node name="LiftR" parent="Arena/DoomArena/Set/Movers" instance=ExtResource("9_lift")]
 position = Vector2(3730, 600)
 curve = SubResource("Curve2D_tall")
+metadata/move = &"glide"
+
+[node name="SliderL" parent="Arena/DoomArena/Set/Movers" instance=ExtResource("9_lift")]
+position = Vector2(1310, 470)
+curve = SubResource("Curve2D_slide320")
+metadata/move = &"glide"
+
+[node name="SliderR" parent="Arena/DoomArena/Set/Movers" instance=ExtResource("9_lift")]
+position = Vector2(2530, 470)
+curve = SubResource("Curve2D_slide320")
+metadata/move = &"glide"
+
+[node name="SliderC" parent="Arena/DoomArena/Set/Movers" instance=ExtResource("9_lift")]
+position = Vector2(1920, 470)
+curve = SubResource("Curve2D_slide600")
+metadata/move = &"glide"
+
+[node name="FlyerL" parent="Arena/DoomArena/Set/Movers" instance=ExtResource("9_lift")]
+position = Vector2(880, -10)
+curve = SubResource("Curve2D_orbit150")
+metadata/move = &"orbit"
+
+[node name="FlyerR" parent="Arena/DoomArena/Set/Movers" instance=ExtResource("9_lift")]
+position = Vector2(2960, -10)
+curve = SubResource("Curve2D_orbit150")
+metadata/move = &"orbit"
+
+[node name="FlyerC" parent="Arena/DoomArena/Set/Movers" instance=ExtResource("9_lift")]
+position = Vector2(1920, 120)
+curve = SubResource("Curve2D_orbit220")
+metadata/move = &"orbit"
 
 [node name="FarWall" type="StaticBody2D" parent="Arena/DoomArena"]
 position = Vector2(3860, -360)

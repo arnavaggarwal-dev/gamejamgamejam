@@ -1,13 +1,13 @@
 extends Node2D
 ## Arena root: wires player, boss, stage, backdrop, tutorial and HUD together and handles restarts.
 
-const GOAL_HINT := "GRAB BOMBS [Z] AND THROW THEM AT THE CORE!"
+const GOAL_HINT := "PULL OUT A BOMB [Z], THROW IT AT THE CORE!  HOLD [A] TO MAKE MORE."
 const HELPER := preload("res://scenes/boss/training_bot.tscn")
 const DOOM_ZOOM := Vector2.ONE / 3.0  # phase 4 pulls the camera back threefold
 const WATT_SPOT := Vector2(2450.0, -560.0)  # phase 4: Lil' Watt beams into the rising king from here
 const WATT_SIZE := Vector2(2.0, 2.0)  # phase 4's Lil' Watt is powered up (and readable zoomed out)
 const CINEMA_DROP := 240  # world px the view drops during the letterbox, so the floor clears the bottom bar
-const WATT_DOWN_Y := 496.0  # Lil' Watt (2x) lying on the floor
+const WATT_DOWN := Vector2(0.0, -102.0)  # Lil' Watt (2x) lying on a ledge, from where the hero would stand
 
 @onready var player: Player = $Player
 @onready var boss: Boss = $Boss
@@ -25,6 +25,8 @@ var helper: TrainingBot  # Lil' Watt powering the giant in phase 4
 
 func _ready() -> void:
 	player.hp_changed.connect(hud.set_hearts)
+	player.ammo_changed.connect(hud.set_ammo)
+	player.projectiles = projectiles
 	player.died.connect(_on_player_died)
 	player.fell_in_pit.connect(_on_player_fell)
 	boss.health_changed.connect(hud.set_boss_health)
@@ -37,6 +39,7 @@ func _ready() -> void:
 	hud.skip_phase_pressed.connect(boss.skip_phase)
 	tutorial.setup(player, boss, hud, stage, projectiles)
 	hud.set_hearts(player.hp)
+	hud.set_ammo(player.ammo)
 	hud.set_boss_health(boss.hits_left(), boss.hits_total())
 	await hud.show_banner("LITTLE GUY  vs  BIG GUY", 2.0)
 	if Tutorial.done:
@@ -62,7 +65,7 @@ func _on_player_died() -> void:
 	await get_tree().create_timer(1.0, false).timeout
 	for child in projectiles.get_children():
 		child.queue_free()
-	player.reset(respawn.global_position)
+	player.reset(stage.safe_spot(respawn.global_position.x) if boss.phase == Boss.FINAL else respawn.global_position)
 	boss.restart_phase()
 	if boss.phase == Boss.FINAL and boss.state != Boss.State.PHASE_SHIFT:
 		_spawn_helper(Vector2(player.global_position.x + TrainingBot.LEAD, 200.0))  # a fresh Lil' Watt for the retry
@@ -190,7 +193,7 @@ func _ending() -> void:
 	hud.coach("")
 	hud.flash(1.0, 0.1)
 	if is_instance_valid(helper):
-		helper.knock_out(Vector2(stage.safe_spot(helper.global_position.x).x, WATT_DOWN_Y))
+		helper.knock_out(stage.safe_spot(helper.global_position.x) + WATT_DOWN)
 	await _wait(5.4)  # the king comes apart and sinks; the white-out fades
 	kings_crown.global_position = Vector2(player.global_position.x, -1700.0)
 	kings_crown.rotation = 0.8

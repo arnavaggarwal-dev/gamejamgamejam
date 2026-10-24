@@ -379,23 +379,39 @@ static func core_hub_frames() -> Array:
 	return frames
 
 
-## Lava for the gaps in the arena of doom: a glowing crust that bubbles (3 frames).
-static func lava_frames() -> Array:
+## Acid flooding the arena of doom's floor: a glowing green crust that bubbles (3 frames).
+static func acid_frames() -> Array:
 	var frames := []
 	for f in 3:
 		var c = Canvas.new(40, 20)
-		c.rect(0, 0, 40, 20, P.PLUM)
-		c.rect(0, 0, 40, 6, P.ROSE)
-		c.rect(0, 0, 40, 2, P.SALMON)
+		c.rect(0, 0, 40, 20, P.TEAL)
+		c.rect(0, 0, 40, 6, P.SAGE)
+		c.rect(0, 0, 40, 2, P.MINT)
 		for x in range(0, 40):
 			if (x + f * 3) % 9 < 4:
-				c.px(x, 0, P.PEACH)
-		for b in [[6, 9], [19, 13], [31, 8]]:
-			var r: int = (f + b[0]) % 3
-			c.ellipse(b[0], b[1] - f, 1.5 + r * 0.5, 1.5 + r * 0.5, P.SALMON)
-			c.px(b[0], b[1] - f - 1, P.BUTTER)
+				c.px(x, 0, P.CREAM)
+		for bub in [[6, 9], [19, 13], [31, 8]]:
+			var r: int = (f + bub[0]) % 3
+			c.ellipse(bub[0], bub[1] - f, 1.5 + r * 0.5, 1.5 + r * 0.5, P.MINT)
+			c.px(bub[0], bub[1] - f - 1, P.CREAM)
 		frames.append(c)
 	return frames
+
+
+## A thin stone ledge for the arena of doom (tiles along its length): a lit top edge, stone
+## blocks, a dark underside with rivets.
+static func ledge():
+	var c = Canvas.new(40, 10)
+	c.rect(0, 0, 40, 10, P.ROSE)
+	c.hline(0, 39, 0, P.PEACH)
+	c.hline(0, 39, 1, P.SALMON)
+	c.rect(0, 7, 40, 3, P.PLUM)
+	for x in [0, 20]:
+		c.vline(x, 2, 6, P.PLUM)
+	for x in [6, 26]:
+		c.px(x, 8, P.SALMON)
+	c.hline(0, 39, 9, P.INK)
+	return c
 
 
 ## The arena of doom's huge red moon.
@@ -493,3 +509,23 @@ static func strike_mark():
 	c.ellipse(19.5, 5, 9, 2, P.PEACH)
 	c.ellipse(19.5, 5, 4, 1, P.CREAM)
 	return c
+
+
+## A floating conveyor's belt (4 frames, the treads roll right): treads on top, a navy frame
+## with a roller at each end.
+static func belt_thin_frames() -> Array:
+	var frames := []
+	for f in 4:
+		var c = Canvas.new(40, 10)
+		c.rect(0, 0, 40, 10, P.NAVY)
+		c.hline(0, 39, 3, P.BLUE)
+		for x in 40:
+			c.px(x, 1, P.BUTTER if (x - f * 2) % 8 < 4 else P.CHARCOAL)
+			c.px(x, 2, P.PEACH if (x - f * 2) % 8 < 4 else P.INK)
+		for rx in [5, 34]:
+			c.ellipse(rx, 6.5, 2.5, 2.5, P.CHARCOAL)
+			c.px(rx, 6, P.BUTTER)
+		c.hline(0, 39, 0, P.INK)
+		c.hline(0, 39, 9, P.INK)
+		frames.append(c)
+	return frames

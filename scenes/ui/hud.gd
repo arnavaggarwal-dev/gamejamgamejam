@@ -7,6 +7,8 @@ signal skip_phase_pressed
 
 const HEART_FULL := preload("res://assets/art/ui/heart_full.png")
 const HEART_EMPTY := preload("res://assets/art/ui/heart_empty.png")
+const BOMB_FULL := preload("res://assets/art/ui/bomb_full.png")
+const BOMB_EMPTY := preload("res://assets/art/ui/bomb_empty.png")
 
 var _banner_id := 0
 var _hint_id := 0
@@ -15,6 +17,8 @@ var _cinema := false  # letterbox in: hints wait
 
 @onready var hearts_row: Control = $Hearts
 @onready var hearts: Array = $Hearts.get_children()
+@onready var ammo_row: Control = $Ammo
+@onready var ammo_icons: Array = $Ammo.get_children()
 @onready var boss_box: Control = $BossBar
 @onready var boss_bar: ProgressBar = $BossBar/Bar
 @onready var boss_name: Label = $BossBar/Name
@@ -39,6 +43,11 @@ func _ready() -> void:
 func set_hearts(hp: int) -> void:
 	for i in hearts.size():
 		hearts[i].texture = HEART_FULL if i < hp else HEART_EMPTY
+
+
+func set_ammo(ammo: int) -> void:
+	for i in ammo_icons.size():
+		ammo_icons[i].texture = BOMB_FULL if i < ammo else BOMB_EMPTY
 
 
 func set_boss_name(text: String) -> void:
@@ -105,6 +114,7 @@ func flash(strength := 0.7, hold := 0.0) -> void:
 func cinema(on: bool) -> void:
 	_cinema = on
 	hearts_row.visible = not on
+	ammo_row.visible = not on
 	boss_box.visible = not on
 	if on:
 		show_hint("")

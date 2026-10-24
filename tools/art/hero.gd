@@ -61,6 +61,10 @@ static func frame(pose: Dictionary):
 	c.px(8, ey + 3, P.SALMON)
 	c.px(14, ey + 3, P.SALMON)
 	c.px(11, ey + 4, P.INK)
+	if pose.get("sweat", false):
+		c.px(16, ey - 2, P.SKY)
+		c.px(16, ey - 1, P.SKY)
+		c.px(17, ey - 1, P.CREAM)
 
 	# Near arm.
 	if arms == "side":
@@ -99,4 +103,9 @@ static func animations() -> Dictionary:
 		"carry_run": _run_poses("up"),
 		"hurt": [{"eyes": "hurt", "bob": 1, "rx": 7.2, "ry": 5.8, "arm_dy": -1, "tail": [[3, 1], [1, 0], [0, -1]]}],
 		"dash": [{"rx": 7.6, "ry": 5.6, "bob": 1, "feet": [[2, 18], [6, 19]], "arm_dy": 0, "tail": [[3, 1], [1, 1], [0, 1]], "leaf": 1}],
+		# holding [A] to squeeze out a bomb: squashed flat, eyes screwed shut, sweating
+		"strain": [
+			{"eyes": "hurt", "rx": 8.2, "ry": 5.2, "bob": 2, "arm_dy": 0, "tail": [[3, 1], [1, 1], [0, 1]], "sweat": true},
+			{"eyes": "hurt", "rx": 7.8, "ry": 5.5, "bob": 2, "arm_dy": 1, "tail": [[3, 2], [1, 2], [0, 2]], "leaf": 1, "sweat": true},
+		],
 	}

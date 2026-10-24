@@ -202,27 +202,51 @@ tracks/4/keys = {
 }]
 }
 
-[sub_resource type="Animation" id="Animation_rain"]
-resource_name = "rain"
-length = 1.6
-tracks/0/type = "method"
+[sub_resource type="Animation" id="Animation_hop"]
+resource_name = "hop"
+length = 2
+tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath(".")
+tracks/0/path = NodePath("Rig/Legs:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0.3, 0.4, 1),
+"times": PackedFloat32Array(0, 0.35, 0.4, 0.45, 0.5, 0.55, 0.85, 1.15, 1.25, 1.4),
+"transitions": PackedFloat32Array(0.5, 1, 1, 1, 1, 0.4, 2.5, 0.5, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(6, 26), Vector2(-6, 26), Vector2(6, 26), Vector2(-6, 26), Vector2(0, 26), Vector2(0, -420), Vector2(0, 0), Vector2(0, 18), Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig/Legs/StompAnchor/LegF/Hitbox/CollisionShape2D:disabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1.1, 1.25),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [true, false, true]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.3, 1.15, 1.17),
 "transitions": PackedFloat32Array(1, 1, 1),
 "values": [{
-"args": [5.0],
+"args": [4.0],
 "method": &"shake"
 }, {
 "args": [],
-"method": &"rain_bomb"
+"method": &"hop_land"
 }, {
-"args": [],
-"method": &"rain_bomb"
+"args": [NodePath("Rig/Legs/StompAnchor/LegF/Foot")],
+"method": &"land"
 }]
 }
 
@@ -307,9 +331,9 @@ tracks/3/keys = {
 }]
 }
 
-[sub_resource type="Animation" id="Animation_bombs"]
-resource_name = "bombs"
-length = 1.5
+[sub_resource type="Animation" id="Animation_slam"]
+resource_name = "slam"
+length = 2.2
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -317,26 +341,71 @@ tracks/0/path = NodePath("Rig/Upper/Body/FistL:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.3, 0.45, 0.75, 0.9, 1.5),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.45, 0.9, 1.05, 1.6, 2),
+"transitions": PackedFloat32Array(-2, 1, 2.5, 1, -2, 1),
 "update": 0,
-"values": [Vector2(870, 470), Vector2(900, 180), Vector2(780, 330), Vector2(900, 180), Vector2(780, 330), Vector2(870, 470)]
+"values": [Vector2(870, 470), Vector2(900, 140), Vector2(900, 140), Vector2(800, 590), Vector2(800, 590), Vector2(870, 470)]
 }
-tracks/1/type = "method"
+tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".")
+tracks/1/path = NodePath("Rig/Upper/Body/FistR:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0.45, 0.9),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0, 0.45, 0.9, 1.05, 1.6, 2),
+"transitions": PackedFloat32Array(-2, 1, 2.5, 1, -2, 1),
+"update": 0,
+"values": [Vector2(1290, 470), Vector2(1260, 140), Vector2(1260, 140), Vector2(1360, 590), Vector2(1360, 590), Vector2(1290, 470)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Rig/Upper/Body/ArmL/Elbow/Wrist/Hand:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.45, 0.55, 0.65, 0.75, 0.85, 0.95),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1), Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1), Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Rig/Upper/Body/ArmR/Elbow/Wrist/Hand:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.45, 0.55, 0.65, 0.75, 0.85, 0.95),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1), Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1), Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Rig/Upper/Body/FistL/Hitbox/CollisionShape2D:disabled")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 1, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [true, false, true]
+}
+tracks/5/type = "method"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath(".")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(1.05),
+"transitions": PackedFloat32Array(1),
 "values": [{
 "args": [],
-"method": &"spawn_bomb"
-}, {
-"args": [],
-"method": &"spawn_bomb"
+"method": &"slam_impact"
 }]
 }
 
@@ -819,10 +888,10 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
 "args": [],
-"method": &"spit_bomb"
+"method": &"spit_zap"
 }, {
 "args": [],
-"method": &"spit_bomb"
+"method": &"spit_zap"
 }]
 }
 
@@ -1662,8 +1731,8 @@ tracks/1/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_boss"]
 _data = {
-&"bombs": SubResource("Animation_bombs"),
 &"death": SubResource("Animation_death"),
+&"hop": SubResource("Animation_hop"),
 &"idle_1": SubResource("Animation_idle_1"),
 &"idle_2": SubResource("Animation_idle_2"),
 &"idle_3": SubResource("Animation_idle_3"),
@@ -1672,10 +1741,10 @@ _data = {
 &"laser": SubResource("Animation_laser"),
 &"phase_2": SubResource("Animation_phase_2"),
 &"phase_3": SubResource("Animation_phase_3"),
-&"rain": SubResource("Animation_rain"),
 &"revive": SubResource("Animation_revive"),
 &"rocket": SubResource("Animation_rocket"),
 &"shatter": SubResource("Animation_shatter"),
+&"slam": SubResource("Animation_slam"),
 &"spit": SubResource("Animation_spit"),
 &"stagger": SubResource("Animation_stagger"),
 &"step": SubResource("Animation_step"),
@@ -1911,9 +1980,6 @@ shape = SubResource("CircleShape2D_core")
 
 [node name="FistL" type="Node2D" parent="Rig/Upper/Body"]
 position = Vector2(870, 470)
-
-[node name="BombSpawn" type="Marker2D" parent="Rig/Upper/Body/FistL"]
-position = Vector2(-20, -60)
 
 [node name="FistR" type="Marker2D" parent="Rig/Upper/Body"]
 position = Vector2(1290, 470)

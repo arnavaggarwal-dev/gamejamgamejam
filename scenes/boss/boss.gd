@@ -7,7 +7,7 @@ extends Node2D
 ## as a giant as tall as the zoomed-out screen (phase 4). Hits on Lil' Watt reach him through
 ## power_hit(). Only thrown bombs hurt, and each hit cracks the part being fought.
 ## Attacks live in the AnimationPlayer: value tracks move the rig and toggle hitboxes, method
-## tracks call stomp_* / aim_* / swoop / rain_bomb / spawn_bomb / spit_bomb / boom / land / shake.
+## tracks call stomp_* / aim_* / swoop / hop_land / slam_impact / spit_zap / boom / land / shake.
 ## His arms are articulated (shoulder, elbow, wrist): clips move the FistL / FistR wrist targets
 ## and two-bone IK (_reach) bends the arms to them every frame.
 ## Moves that chase the player (the stomp's walk, the head's dash) are tweens started there.
@@ -24,27 +24,27 @@ enum State { INTRO, IDLE, ATTACK, STAGGER, PHASE_SHIFT, DEAD }
 
 const HITS_PER_PHASE := 3
 const FLOOR_Y := 640.0
-const BOMB_SCENE := preload("res://scenes/boss/bomb.tscn")
 const SHOCKWAVE_SCENE := preload("res://scenes/boss/shockwave.tscn")
 const SPARK_SCENE := preload("res://scenes/fx/spark.tscn")
 const EXPLOSION_SCENE := preload("res://scenes/fx/explosion.tscn")
 const DUST_SCENE := preload("res://scenes/fx/dust.tscn")
 const ROCKET_SCENE := preload("res://scenes/boss/rocket_hand.tscn")
+const ZAP_SCENE := preload("res://scenes/boss/zap_ball.tscn")
+const ZAP_SPEED := 600.0
 const ROCKET_SPEED := 1100.0
 const ARM_BONE := 144.0  # upper arm and forearm length (36 art px at 4x)
 const ARM_REACH := 270.0  # how far the aiming wrist sits from the shoulder (arm nearly straight)
 const PHASES := [
-	{attacks = [&"stomp", &"rain"], speed = 1.0, rest = 1.2},  # legs
-	{attacks = [&"rocket", &"bombs"], speed = 1.2, rest = 0.9},  # torso (moves by roaming, no charge)
+	{attacks = [&"stomp", &"hop"], speed = 1.0, rest = 1.2},  # legs
+	{attacks = [&"rocket", &"slam"], speed = 1.2, rest = 0.9},  # torso (moves by roaming, no charge)
 	{attacks = [&"swoop", &"spit", &"laser", &"spit"], speed = 1.3, rest = 0.7},  # head
-	{attacks = [&"step", &"rain", &"laser", &"rain"], speed = 1.0, rest = 1.1},  # rebuilt giant
+	{attacks = [&"rocket", &"laser", &"step", &"laser"], speed = 1.0, rest = 1.1},  # rebuilt giant
 ]
 const FINAL := 3  # the rebuilt giant's phase: no weak spot of his own, Lil' Watt powers him
 const GROWN_SCALE := 1.58  # the giant's crown reaches the top of the 3x zoomed-out view
 const GROWN_POS := Vector2(-661, -371)  # Rig offset once he has grown, scaled about his feet (1140, 640)
 const FINAL_X := 780.0  # where the giant rises: torso at x 1920, mid screen, in the lava moat
 const GIANT_ROAM := 420.0  # px the giant may step either side of his spot (he stays in his moat)
-const GIANT_BIG_BOMB := 2.5  # phase 4's rain bombs, scaled up for the zoomed-out view
 
 @export var projectiles: Node2D
 
@@ -90,7 +90,6 @@ var _hand_dir := Vector2.LEFT  # where the rocket hand will fly (set by aim_hand
 @onready var fallen_crown: Node2D = $Rig/Upper/FallenCrown
 @onready var body: Node2D = $Rig/Upper/Body
 @onready var fist_l: Node2D = $Rig/Upper/Body/FistL
-@onready var bomb_spawn: Marker2D = $Rig/Upper/Body/FistL/BombSpawn
 @onready var fist_r: Node2D = $Rig/Upper/Body/FistR
 @onready var arm_l: Node2D = $Rig/Upper/Body/ArmL
 @onready var arm_r: Node2D = $Rig/Upper/Body/ArmR
@@ -308,6 +307,7 @@ func fire_hand() -> void:
 	var rocket: Node2D = ROCKET_SCENE.instantiate()
 	_spawn_parent().add_child(rocket)
 	rocket.global_position = hand_l.global_position
+	rocket.scale = rig.scale  # the giant's rocket hand is giant too
 	rocket.launch(_hand_dir * ROCKET_SPEED)
 	wrist_l.hide()
 	sputter.emitting = true
@@ -389,18 +389,16 @@ func _reset_eye() -> void:
 	eye.modulate = Color.WHITE
 
 
-func spawn_bomb() -> void:
-	_drop_bomb(bomb_spawn.global_position, Vector2(randf_range(-650.0, -250.0), -350.0))
+## Stage 1: he jumps (legs out of frame) and lands with a quake, shockwaves running both ways.
+func hop_land() -> void:
+	var feet: float = (leg_f.get_node("Foot").global_position.x + leg_b.get_node("Foot").global_position.x) / 2.0
+	_quake(feet, 18.0)
 
 
-## Stages 1 and 4: his hands are out of frame, so bombs fall from the sky near the player
-## (from above the zoomed-out view in phase 4).
-func rain_bomb() -> void:
-	var x := clampf(_player_x() + randf_range(-320.0, 320.0), 80.0, (DOOM_W if phase == FINAL else ARENA_W) - 80.0)
-	if phase == FINAL:
-		_drop_bomb(Vector2(x, -1500.0), Vector2.ZERO, GIANT_BIG_BOMB)
-	else:
-		_drop_bomb(Vector2(x, -60.0), Vector2.ZERO)
+## Stage 2: both fists slam the floor; shockwaves run out from each.
+func slam_impact() -> void:
+	_quake(fist_l.global_position.x, 12.0)
+	_quake(fist_r.global_position.x, 12.0)
 
 
 ## Phase 4, once Lil' Watt's power reaches the wreck: the pieces gather mid arena of doom (out
@@ -419,8 +417,13 @@ func heal_cracks() -> void:
 			crack.hide()
 
 
-func spit_bomb() -> void:
-	_drop_bomb(mouth.global_position, Vector2(randf_range(-700.0, -350.0), -420.0))
+## Stage 3: the head spits a crackling zap ball straight at the player.
+func spit_zap() -> void:
+	var ball: Node2D = ZAP_SCENE.instantiate()
+	_spawn_parent().add_child(ball)
+	ball.global_position = mouth.global_position
+	ball.scale = Vector2(0.6, 0.6)
+	ball.velocity = (_player_pos() - mouth.global_position).normalized() * ZAP_SPEED
 
 
 ## The knockout: his crown pops off his head; the game flies it up and later drops it on the hero.
@@ -481,14 +484,6 @@ func _chase() -> Tween:
 		_move.kill()
 	_move = create_tween()
 	return _move
-
-
-func _drop_bomb(at: Vector2, velocity: Vector2, size := 1.0) -> void:
-	var bomb: Bomb = BOMB_SCENE.instantiate()
-	bomb.size = size
-	_spawn_parent().add_child(bomb)
-	bomb.global_position = at
-	bomb.linear_velocity = velocity
 
 
 func _player_pos() -> Vector2:

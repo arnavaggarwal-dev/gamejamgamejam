@@ -1,0 +1,32 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/world/acid.png" id="1_w4xau"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_afwvp"]
+atlas = ExtResource("1_w4xau")
+region = Rect2(0, 0, 40, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_abi7t"]
+atlas = ExtResource("1_w4xau")
+region = Rect2(40, 0, 40, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_me35w"]
+atlas = ExtResource("1_w4xau")
+region = Rect2(80, 0, 40, 20)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_afwvp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_abi7t")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_me35w")
+}],
+"loop": 1,
+"name": &"bubble",
+"speed": 5.0
+}]

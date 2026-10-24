@@ -3,12 +3,11 @@ extends Node2D
 ## The arena's own moves. Phase 1 is plain stone so the king's attacks read cleanly; phase 2
 ## switches on the conveyors, the lifts, zaps near the player and the core platforms that fall
 ## apart underfoot; phase 3 flips the belts, zaps more often and collapses two panels into pits;
-## phase 4 raises the arena of doom, the Throne Moat: one locked, mirrored screen (0..3840). The
-## castle's platforms sink away, the middle of the floor collapses into a lava moat where the
-## giant stands (core-platform stepping stones over it), the banks' belts flow toward him, and
-## on each side ramparts rise in a loop (steps on posts up toward the king, a battlement on
-## chains out to a wall lift, a perch at his chest). Once the fight resumes (start_strikes),
-## lightning strikes near the player instead of the zaps.
+## phase 4 raises the arena of doom: one locked, mirrored screen (0..3840). The castle's
+## platforms sink away and the whole floor dissolves into acid, the giant standing in it; you
+## fight on action platforms (floating conveyors, breakers, sliders, flying loops, wall lifts)
+## and thin static ledges (the safe spots a fall puts you back on). Once the fight resumes
+## (start_strikes), lightning strikes near the player instead of the zaps.
 
 signal zap_started
 signal collapsed
@@ -21,8 +20,6 @@ const ZAP_WIDTH := [2, 2, 3]  # panels per zap, per phase
 const DOOM_W := 3840.0  # the arena of doom's width (phase 4): exactly one zoomed-out screen
 const ARENA_W := 2560.0
 const FLOOR_Y := 640.0
-const MOAT := [7, 17]  # phase 4: floor panels 7..16 collapse into the lava moat under the giant
-const DOOM_BELTS := {2: 140.0, 3: 140.0, 20: -140.0, 21: -140.0}  # phase 4: the banks flow toward the king
 const ARENA_PANELS := 16  # panels inside the castle walls (the rest only open up in phase 4)
 const SKY_STRIKE := preload("res://scenes/stage/sky_strike.tscn")
 
@@ -32,7 +29,8 @@ var phase := 0
 @onready var zap_timer: Timer = $ZapTimer
 @onready var strike_timer: Timer = $StrikeTimer
 @onready var doom: Node2D = $DoomArena
-@onready var stones: Array = $DoomArena/Set/Stones.get_children()
+@onready var breakers: Array = $DoomArena/Set/Breakers.get_children()
+@onready var movers: Array = $DoomArena/Set/Movers.get_children()
 @onready var lifts: Array = [$Piston, $Slider]
 @onready var core_platforms: Array = $CorePlatforms.get_children()
 
@@ -66,14 +64,12 @@ func set_phase(p: int) -> void:
 		zap_timer.stop()
 		doom.set_deferred(&"process_mode", Node.PROCESS_MODE_INHERIT)  # deferred: phase changes fire inside physics callbacks
 		doom.get_node("AnimationPlayer").play(&"reveal")
-		for i in range(MOAT[0], MOAT[1]):
-			panels[i].collapse()
-		for i in BELTS:
-			panels[i].set_belt(0.0)
-		for i in DOOM_BELTS:
-			panels[i].set_belt(DOOM_BELTS[i])
-		for stone in stones:
-			stone.armed = true
+		for panel in panels:
+			panel.collapse()  # the whole floor dissolves into acid
+		for breaker in breakers:
+			breaker.armed = true
+		for mover: Node in movers:
+			mover.get_node("AnimationPlayer").play(mover.get_meta(&"move"))
 		for piece: Node2D in get_tree().get_nodes_in_group(&"castle_set"):
 			_sink(piece)
 		return
@@ -116,11 +112,15 @@ func zap_near_player() -> void:
 	zap_started.emit()
 
 
-## Nearest standing spot that is not over a pit or the lava (for respawning after a fall);
-## only inside the castle walls until phase 4 opens the rest.
+## Nearest standing spot that is not over a pit (for respawning after a fall), inside the castle
+## walls; in phase 4, with the floor all acid, the nearest safe ledge.
 func safe_spot(x: float) -> Vector2:
+	if phase == 3:
+		var ledges := get_tree().get_nodes_in_group(&"safe_ledge")
+		ledges.sort_custom(func(a: Node2D, b: Node2D) -> bool: return absf(a.global_position.x - x) < absf(b.global_position.x - x))
+		return ledges[0].global_position + Vector2(0.0, -42.0)
 	var best := -1
-	for i in (panels.size() if phase == 3 else ARENA_PANELS):
+	for i in ARENA_PANELS:
 		if panels[i].collapsed:
 			continue
 		if best < 0 or absf(_panel_x(i) - x) < absf(_panel_x(best) - x):

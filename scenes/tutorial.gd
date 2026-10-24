@@ -5,7 +5,6 @@ extends Node
 ## breaks). Afterwards it shows a one-time tip the first time each danger appears.
 ## Enter (or Tab / gamepad Back) skips the lesson.
 
-const BOMB := preload("res://scenes/boss/bomb.tscn")
 const STEP_PAUSE := 0.7
 const ARROW_ABOVE_CORE := Vector2(0, -140)
 const LIFT := 60  # z added to whatever the current step is about, above the Spotlight (z 50)
@@ -20,8 +19,8 @@ var stage: Stage
 var projectiles: Node2D
 
 var _skip := false
-var _practice: Bomb
 var _start_x := 0.0
+var _recharged := false
 var _lifted: Array[CanvasItem] = []
 
 @onready var core_arrow: AnimatedSprite2D = $CoreArrow
@@ -46,6 +45,7 @@ func setup(p: Player, b: Boss, h: HUD, s: Stage, proj: Node2D) -> void:
 	for plat in stage.core_platforms:
 		plat.broke.connect(_tip.bind("core_platform", "GLOWING PLATFORMS FALL APART!  THEY COME BACK."))
 	player.hp_changed.connect(_on_hp_changed)
+	player.ammo_changed.connect(func(_ammo: int) -> void: _recharged = _recharged or player.charging)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -64,13 +64,11 @@ func run() -> void:
 	await _step("WALK WITH THE  ARROW KEYS", _walked)
 	await _step("JUMP WITH  X\nAND AGAIN IN THE AIR!", _jumped)
 	await _step("DASH WITH  C\nHOLD ARROWS TO AIM IT", _dashed)
-	if not _skip:
-		_spawn_practice_bomb()
-	await _step("A BOMB!  WALK OVER TO IT", _next_to_bomb)
-	await _step("PRESS  Z  TO PICK IT UP", _holding_bomb)
+	await _step("PRESS  Z  TO PULL OUT A BOMB", _holding_bomb)
 	core_arrow.show()
-	_focus([player, _practice, bot, core_arrow])  # the whole bot, so its cracks show
+	_focus([player, player.held_bomb, bot, core_arrow])  # the whole bot, so its cracks show
 	await _step("THROW IT AT THE GLOWING CORE!\nFACE THE ROBOT AND PRESS  Z", _bot_hit)
+	await _step("HOLD  A  TO SQUEEZE OUT MORE BOMBS", _made_bomb)
 	await _step("AGAIN!  BREAK LIL' WATT!", _bot_broken)
 	core_arrow.hide()
 	_focus([])
@@ -108,41 +106,23 @@ func _dashed() -> bool:
 	return player.dashing
 
 
-func _next_to_bomb() -> bool:
-	return _bot_hit() or player.held_bomb != null or player._nearest_bomb() == _practice
-
-
 func _holding_bomb() -> bool:
 	return _bot_hit() or player.held_bomb != null
 
 
-## A hit on the bot also ends the earlier bomb steps, so a player who rushes ahead (grab and
-## throw before the lesson asks) never waits on a step they already did.
+## A hit on the bot also ends the earlier bomb steps, so a player who rushes ahead (pulls out a
+## bomb and throws before the lesson asks) never waits on a step they already did.
 func _bot_hit() -> bool:
-	_restock()
 	return bot.hp < TrainingBot.HITS
 
 
+## Squeezed out at least one bomb (or already broke the bot).
+func _made_bomb() -> bool:
+	return _recharged or bot.hp <= 0
+
+
 func _bot_broken() -> bool:
-	_restock()
 	return bot.hp <= 0
-
-
-## Hands over a fresh practice bomb once the last one has exploded or been lost.
-func _restock() -> void:
-	if not is_instance_valid(_practice) and player.held_bomb == null and bot.hp > 0:
-		_spawn_practice_bomb()
-
-
-## A practice bomb that never goes off, dropped a few steps ahead of the player.
-func _spawn_practice_bomb() -> void:
-	_practice = BOMB.instantiate()
-	projectiles.add_child(_practice)
-	_practice.global_position = Vector2(clampf(player.global_position.x + 220.0 * player.facing, 120.0, 2440.0), 610.0)
-	_practice.get_node("FuseTimer").stop()
-	_practice.get_node("AnimationPlayer").stop()
-	if not _lifted.is_empty():
-		_focus(_lifted + [_practice])  # the lesson is now about the bomb too
 
 
 ## Greys out the world except `nodes`, lifted above the Spotlight; an empty list clears it.
@@ -170,17 +150,13 @@ func _finish() -> void:
 	core_arrow.hide()
 	if is_instance_valid(bot):
 		bot.break_down()
-	if is_instance_valid(_practice) and not _practice.exploded:
-		if player.held_bomb == _practice:
-			_practice.get_node("FuseTimer").start()  # skipped mid-carry: it becomes a real bomb
-			_practice.get_node("AnimationPlayer").play(&"fuse")
-		else:
-			_practice.queue_free()
 
 
 func _process(_delta: float) -> void:
 	if core_arrow.visible and is_instance_valid(bot):
 		core_arrow.global_position = bot.core.global_position + ARROW_ABOVE_CORE
+	if not done and not _lifted.is_empty() and is_instance_valid(player.held_bomb) and not _lifted.has(player.held_bomb):
+		_focus(_lifted + [player.held_bomb])  # a bomb he pulls out stays in colour
 	if not done or player == null:
 		return
 	if player.is_on_floor() and stage.panel_at(player.global_position.x).belt_speed != 0.0:
@@ -190,6 +166,8 @@ func _process(_delta: float) -> void:
 		var fuse: Timer = held.get_node("FuseTimer")
 		if not fuse.is_stopped() and fuse.time_left < 1.3:
 			_tip("hot_bomb", "IT'S ABOUT TO BLOW!  THROW IT, OR [A] TO BOUNCE OFF IT!")
+	if player.ammo == 0 and not is_instance_valid(held):
+		_tip("no_ammo", "OUT OF BOMBS!  HOLD [A] TO SQUEEZE OUT MORE.")
 
 
 func _on_attack_started(attack: StringName) -> void:
@@ -202,8 +180,12 @@ func _on_attack_started(attack: StringName) -> void:
 			_tip("rocket", "ROCKET HAND!  JUMP OVER IT  (OR DASH THROUGH).")
 		&"swoop":
 			_tip("swoop", "HE DASHES ALONG THE LIGHT BEAM!  GET OFF IT!")
-		&"rain", &"bombs", &"spit":
-			_tip("bombs", "BOMBS!  GRAB ONE [Z], THROW IT AT THE CORE!")
+		&"hop":
+			_tip("hop", "HE JUMPS!  JUMP THE SHOCKWAVES WHEN HE LANDS.")
+		&"slam":
+			_tip("slam", "FIST SLAM!  JUMP THE SHOCKWAVES.")
+		&"spit":
+			_tip("spit", "ZAP BALLS!  DODGE THEM (OR DASH THROUGH).")
 		&"laser":
 			_tip("laser", "EYE LASER!  STEP OUT OF THE RED LINE!")
 

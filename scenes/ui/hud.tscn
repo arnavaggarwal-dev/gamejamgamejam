@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scenes/ui/hud.gd" id="1_hud"]
 [ext_resource type="Texture2D" path="res://assets/art/ui/heart_full.png" id="2_heart"]
+[ext_resource type="Texture2D" path="res://assets/art/ui/bomb_full.png" id="3_bomb"]
 
 [node name="HUD" type="CanvasLayer"]
 layer = 10
@@ -85,12 +86,49 @@ layout_mode = 2
 texture = ExtResource("2_heart")
 expand_mode = 1
 
+[node name="Ammo" type="HBoxContainer" parent="."]
+offset_left = 24.0
+offset_top = 74.0
+offset_right = 276.0
+offset_bottom = 110.0
+theme_override_constants/separation = 6
+
+[node name="Bomb1" type="TextureRect" parent="Ammo"]
+custom_minimum_size = Vector2(33, 36)
+layout_mode = 2
+texture = ExtResource("3_bomb")
+expand_mode = 1
+
+[node name="Bomb2" type="TextureRect" parent="Ammo"]
+custom_minimum_size = Vector2(33, 36)
+layout_mode = 2
+texture = ExtResource("3_bomb")
+expand_mode = 1
+
+[node name="Bomb3" type="TextureRect" parent="Ammo"]
+custom_minimum_size = Vector2(33, 36)
+layout_mode = 2
+texture = ExtResource("3_bomb")
+expand_mode = 1
+
+[node name="Bomb4" type="TextureRect" parent="Ammo"]
+custom_minimum_size = Vector2(33, 36)
+layout_mode = 2
+texture = ExtResource("3_bomb")
+expand_mode = 1
+
+[node name="Bomb5" type="TextureRect" parent="Ammo"]
+custom_minimum_size = Vector2(33, 36)
+layout_mode = 2
+texture = ExtResource("3_bomb")
+expand_mode = 1
+
 [node name="SkipPhase" type="Button" parent="."]
 visible = false
 offset_left = 24.0
-offset_top = 76.0
+offset_top = 122.0
 offset_right = 416.0
-offset_bottom = 128.0
+offset_bottom = 174.0
 focus_mode = 0
 text = "SKIP PHASE [F2]"
 

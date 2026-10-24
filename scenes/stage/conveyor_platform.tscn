@@ -1,0 +1,32 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/stage/conveyor_platform.gd" id="1_script"]
+[ext_resource type="SpriteFrames" path="res://assets/art/world/belt_thin_frames.tres" id="2_belt"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_belt"]
+size = Vector2(320, 24)
+
+[node name="ConveyorPlatform" type="StaticBody2D"]
+script = ExtResource("1_script")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 12)
+shape = SubResource("RectangleShape2D_belt")
+one_way_collision = true
+
+[node name="Belts" type="Node2D" parent="."]
+
+[node name="BeltL" type="AnimatedSprite2D" parent="Belts"]
+position = Vector2(-80, 20)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("2_belt")
+animation = &"roll"
+autoplay = "roll"
+
+[node name="BeltR" type="AnimatedSprite2D" parent="Belts"]
+position = Vector2(80, 20)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("2_belt")
+animation = &"roll"
+autoplay = "roll"
+frame_progress = 0.5
