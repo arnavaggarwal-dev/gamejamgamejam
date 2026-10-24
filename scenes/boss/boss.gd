@@ -128,7 +128,8 @@ func take_hit() -> bool:
 		return false
 	hp -= 1
 	health_changed.emit(hits_left(), hits_total())
-	get_tree().call_group("camera", "hitstop", 0.08)
+	get_tree().call_group("hud", "flash", 0.8)
+	get_tree().call_group("camera", "hitstop", 0.12)
 	_fx(SPARK_SCENE, weak_point().global_position)
 	if hp <= 0:
 		_advance_phase()

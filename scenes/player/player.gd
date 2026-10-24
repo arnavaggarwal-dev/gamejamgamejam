@@ -36,6 +36,7 @@ var _was_on_floor := true
 var _dead := false
 var _air_dash_ready := true  # one dash per jump
 var _dash_dir := Vector2.RIGHT
+var _dash_grounded := false  # started on the floor (and not upward): you can still jump out of it
 
 @onready var art: Node2D = $Art
 @onready var flip: Node2D = $Art/Flip
@@ -70,9 +71,9 @@ func _physics_process(delta: float) -> void:
 		facing = 1 if dir > 0.0 else -1
 		flip.scale.x = facing
 
-	if is_on_floor():
-		_coyote = COYOTE_TIME
-		_air_dash_ready = true
+	if is_on_floor() or (dashing and _dash_grounded):
+		_coyote = COYOTE_TIME  # a ground dash off a ledge can still jump at the end
+		_air_dash_ready = _air_dash_ready or is_on_floor()
 	else:
 		_coyote -= delta
 	if Input.is_action_just_pressed("dash") and dash_cooldown.is_stopped() and _air_dash_ready:
@@ -86,6 +87,8 @@ func _physics_process(delta: float) -> void:
 
 	_jump_buffer = JUMP_BUFFER if Input.is_action_just_pressed("jump") else _jump_buffer - delta
 	if _jump_buffer > 0.0 and _coyote > 0.0:
+		if dashing:
+			_cancel_dash()
 		velocity.y = jump_velocity
 		_jump_buffer = 0.0
 		_coyote = 0.0
@@ -120,6 +123,8 @@ func take_hit() -> void:
 	hp -= 1
 	hp_changed.emit(hp)
 	get_tree().call_group("camera", "shake", 8.0)
+	get_tree().call_group("hud", "flash", 0.85)
+	get_tree().call_group("camera", "hitstop", 0.1)
 	if hp <= 0:
 		_die()
 		return
@@ -136,6 +141,7 @@ func _start_dash() -> void:
 	if is_on_floor():
 		aim.y = minf(aim.y, 0.0)
 	_dash_dir = Vector2(facing, 0.0) if aim.is_zero_approx() else aim.normalized()
+	_dash_grounded = is_on_floor() and _dash_dir.y >= 0.0
 	if not is_on_floor() or _dash_dir.y < 0.0:
 		_air_dash_ready = false  # an upward dash off the ground is the air dash
 	dash_timer.start()
@@ -146,6 +152,13 @@ func _start_dash() -> void:
 	trail.emitting = true
 	juice.play(&"dash_v" if absf(_dash_dir.y) > absf(_dash_dir.x) else &"dash")
 	_puff(DUST, _feet())
+
+
+## Jump pressed mid-dash: the dash ends early and the jump keeps most of its sideways speed.
+func _cancel_dash() -> void:
+	dash_timer.stop()
+	trail.emitting = false
+	velocity.x = _dash_dir.x * dash_speed * 0.7
 
 
 ## DashTimer.timeout (connected in the scene). If the dash ended inside a hazard, it still hurts.

@@ -58,10 +58,12 @@ func _on_player_died() -> void:
 	hud.show_banner("AGAIN!", 1.0)
 
 
-## A pit costs a heart (even mid-blink) and puts the player back on solid floor.
+## A pit costs a heart (even mid-blink): the screen goes fully white, the player is put back on
+## solid floor while it is white, and the hurt blink makes him look like he warped there.
 func _on_player_fell() -> void:
 	player.invuln.stop()
 	player.take_hit()
+	hud.flash(1.0, 0.18)
 	if player.hp > 0:
 		player.global_position = stage.safe_spot(player.global_position.x)
 		player.velocity = Vector2.ZERO

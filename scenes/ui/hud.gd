@@ -10,6 +10,7 @@ const HEART_EMPTY := preload("res://assets/art/ui/heart_empty.png")
 
 var _banner_id := 0
 var _hint_id := 0
+var _flash: Tween
 
 @onready var hearts: Array = $Hearts.get_children()
 @onready var boss_bar: ProgressBar = $BossBar/Bar
@@ -25,6 +26,7 @@ var _hint_id := 0
 
 
 func _ready() -> void:
+	add_to_group("hud")  # get_tree().call_group("hud", "flash", strength, hold)
 	retry.pressed.connect(retry_pressed.emit)
 	skip_button.visible = OS.is_debug_build()  # testing aid: never shows in a release export
 	skip_button.pressed.connect(skip_phase_pressed.emit)
@@ -84,9 +86,14 @@ func coach(text: String) -> void:
 		create_tween().tween_property(coach_label, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
-func flash() -> void:
-	flash_rect.modulate.a = 0.7
-	create_tween().tween_property(flash_rect, "modulate:a", 0.0, 0.35)
+## White screen flash: `strength` is the starting opacity, `hold` keeps it there before fading.
+func flash(strength := 0.7, hold := 0.0) -> void:
+	if _flash:
+		_flash.kill()
+	flash_rect.modulate.a = strength
+	_flash = create_tween()
+	_flash.tween_interval(hold)
+	_flash.tween_property(flash_rect, "modulate:a", 0.0, 0.35)
 
 
 func show_end(text: String) -> void:

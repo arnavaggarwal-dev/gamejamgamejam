@@ -7,6 +7,7 @@ const EXPLOSION := preload("res://scenes/fx/explosion.tscn")
 const ARROW_OFFSET := Vector2(0, -48)
 const PIT_Y := 900.0
 const GROUND_DRAG := 350.0  # px/s² while touching a surface; rolling has no friction of its own
+const SPIN := 12.0  # rad/s while airborne
 
 var thrown := false
 var exploded := false
@@ -30,9 +31,13 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		state.linear_velocity.x = move_toward(state.linear_velocity.x, belt, GROUND_DRAG * state.step)
 
 
-## The body rolls (so bombs tumble off platforms) but pixel art must not rotate.
-func _process(_delta: float) -> void:
-	art.global_rotation = 0.0
+## The body rolls (so bombs tumble off platforms) but the art stays upright while it rests or is
+## carried; in the air it spins with its flight, and settles back upright on landing.
+func _process(delta: float) -> void:
+	if not freeze and get_contact_count() == 0:
+		art.global_rotation += SPIN * (1.0 if linear_velocity.x >= 0.0 else -1.0) * delta
+	else:
+		art.global_rotation = lerp_angle(art.global_rotation, 0.0, minf(1.0, 20.0 * delta))
 	arrow.global_rotation = 0.0
 	arrow.global_position = global_position + ARROW_OFFSET
 	if global_position.y > PIT_Y:
@@ -57,6 +62,8 @@ func explode() -> void:
 		return
 	exploded = true
 	_settle.call_deferred(global_position)
+	get_tree().call_group("hud", "flash", 0.35)
+	get_tree().call_group("camera", "hitstop", 0.04)
 	art.hide()
 	arrow.hide()
 	blast_shape.set_deferred("disabled", false)

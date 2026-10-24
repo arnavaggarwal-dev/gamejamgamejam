@@ -123,6 +123,16 @@ func _test_arena() -> void:
 	await create_timer(0.25).timeout
 	var air_down: Vector2 = await _aimed_dash(player, ["move_down"])
 	check(air_down.is_equal_approx(Vector2(0, player.dash_speed)), "Down + C in the air dashes straight down")
+	await _land(player)
+	Input.action_press("dash")
+	await physics_frame
+	await physics_frame
+	Input.action_release("dash")
+	Input.action_press("jump")
+	await physics_frame
+	await physics_frame
+	Input.action_release("jump")
+	check(not player.dashing and player.velocity.y < 0.0 and absf(player.velocity.x) > player.speed, "jumping mid-dash cuts the dash into a jump that keeps its speed")
 	game.queue_free()
 	await process_frame
 
@@ -316,6 +326,7 @@ func _test_stage() -> void:
 	await physics_frame
 	await physics_frame
 	check(player.hp == hp_before - 1 and player.global_position.y < 700 and not stage.panel_at(player.global_position.x).collapsed, "a pit costs a heart and respawns the player on solid floor")
+	check(game.get_node("HUD").flash_rect.modulate.a > 0.9 and player.anim.current_animation == &"hurt", "a fall whites out the screen as he warps back, then he blinks")
 	game.queue_free()
 	await process_frame
 	Engine.time_scale = 1.0
