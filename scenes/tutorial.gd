@@ -45,6 +45,9 @@ func setup(p: Player, b: Boss, h: HUD, s: Stage, proj: Node2D) -> void:
 	for plat in stage.core_platforms:
 		plat.broke.connect(_tip.bind("core_platform", "GLOWING PLATFORMS FALL APART!  THEY COME BACK."))
 	player.hp_changed.connect(_on_hp_changed)
+	boss.phase_changed.connect(func(p: int) -> void:
+		if p == 1:
+			_tip("guard", "HIS CHEST IS ARMOURED!  THROW WHEN IT OPENS, RIGHT AFTER HIS ATTACKS.", 5.0))
 	player.ammo_changed.connect(func(_ammo: int) -> void: _recharged = _recharged or player.charging)
 
 

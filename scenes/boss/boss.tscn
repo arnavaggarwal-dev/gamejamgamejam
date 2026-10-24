@@ -23,6 +23,7 @@
 [ext_resource type="Texture2D" path="res://assets/art/boss/shard.png" id="26_shard"]
 [ext_resource type="Texture2D" path="res://assets/art/boss/arm_bone.png" id="27_bone"]
 [ext_resource type="Texture2D" path="res://assets/art/boss/arm_joint.png" id="28_joint"]
+[ext_resource type="Texture2D" path="res://assets/art/boss/core_shield.png" id="29_shield"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_core"]
 radius = 70.0
@@ -296,8 +297,8 @@ tracks/3/path = NodePath(".")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.58, 0.65, 1.5, 2.1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.58, 0.65, 0.67, 1.5, 2.1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "values": [{
 "args": [],
 "method": &"aim_hand"
@@ -322,6 +323,9 @@ tracks/3/keys = {
 }, {
 "args": [],
 "method": &"fire_hand"
+}, {
+"args": [],
+"method": &"open_guard"
 }, {
 "args": [],
 "method": &"regrow_hand"
@@ -401,11 +405,14 @@ tracks/5/path = NodePath(".")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(1.05),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(1.05, 1.07),
+"transitions": PackedFloat32Array(1, 1),
 "values": [{
 "args": [],
 "method": &"slam_impact"
+}, {
+"args": [],
+"method": &"open_guard"
 }]
 }
 
@@ -479,10 +486,10 @@ tracks/5/path = NodePath("Rig/Upper/Body/Core/WeakPoint:monitoring")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0, 1.2),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [false, true]
+"values": [false]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
@@ -1980,6 +1987,11 @@ shape = SubResource("CircleShape2D_core")
 
 [node name="FistL" type="Node2D" parent="Rig/Upper/Body"]
 position = Vector2(870, 470)
+
+[node name="Shield" type="Sprite2D" parent="Rig/Upper/Body/Core"]
+visible = false
+scale = Vector2(4, 4)
+texture = ExtResource("29_shield")
 
 [node name="FistR" type="Marker2D" parent="Rig/Upper/Body"]
 position = Vector2(1290, 470)

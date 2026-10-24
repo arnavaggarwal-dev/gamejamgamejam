@@ -456,3 +456,19 @@ static func cable():
 	c.vline(0, 1, 10, P.INK)
 	c.vline(3, 1, 10, P.INK)
 	return c
+
+
+## The armour plate over his chest core in stage 2 (it pops off when his attacks leave him open):
+## a riveted dome split down the middle, a gold lock bolt.
+static func core_shield():
+	var c = Canvas.new(32, 32)
+	c.shade_ellipse(15.5, 15.5, 13, 13, P.METAL, [-0.3, 0.3, 0.8])
+	c.ring(15.5, 15.5, 12.5, 1.5, P.INK)
+	for k in 8:
+		var a := TAU * k / 8.0
+		c.px(roundi(15.5 + cos(a) * 10.0), roundi(15.5 + sin(a) * 10.0), P.PERI)
+	c.vline(15, 4, 27, P.INK)
+	c.ellipse(15.5, 15.5, 3, 3, P.BUTTER)
+	c.px(15, 14, P.CREAM)
+	c.outline()
+	return c

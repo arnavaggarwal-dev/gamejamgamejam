@@ -96,6 +96,7 @@ var _hand_dir := Vector2.LEFT  # where the rocket hand will fly (set by aim_hand
 @onready var wrist_l: Node2D = $Rig/Upper/Body/ArmL/Elbow/Wrist
 @onready var hand_l: Sprite2D = $Rig/Upper/Body/ArmL/Elbow/Wrist/Hand
 @onready var sputter: CPUParticles2D = $Rig/Upper/Body/ArmL/Elbow/Sputter
+@onready var shield: Sprite2D = $Rig/Upper/Body/Core/Shield
 @onready var cores: Array = [$Rig/Legs/StompAnchor/LegF/KneeCore, $Rig/Upper/Body/Core, $Rig/Upper/Head/EyeCore]
 @onready var cracks: Array = [$Rig/Legs/StompAnchor/LegF/Cracks, $Rig/Upper/Body/Cracks, $Rig/Upper/Head/Cracks]
 @onready var anim: AnimationPlayer = $AnimationPlayer
@@ -297,6 +298,23 @@ func aim_hand() -> void:
 	_hand_dir = (_player_pos() - arm_l.global_position).normalized()
 	var goal := arm_l.position + _hand_dir * ARM_REACH
 	_chase().tween_property(fist_l, "position", goal, 0.12).set_trans(Tween.TRANS_SINE)
+
+
+## Stage 2's chest core sits behind a shield (no target, no hits, nothing for the throw to aim
+## at) except in the openings his attacks leave: it pops off when the rocket hand fires and when
+## his fists hit the floor, and is back on as soon as the attack is over.
+func open_guard() -> void:
+	if phase != 1:
+		return
+	_guard(false)
+	_fx(SPARK_SCENE, shield.global_position)
+	shake(5.0)
+
+
+func _guard(closed: bool) -> void:
+	shield.visible = closed
+	cores[1].get_node("Target").visible = not closed
+	cores[1].get_node("WeakPoint").set_deferred(&"monitoring", not closed)
 
 
 ## The hand blasts off his wrist along the arm: a muzzle blast and sparks at the wrist, a freeze,
@@ -539,6 +557,8 @@ func _reset_rig() -> void:
 	body.modulate = Color.WHITE
 	hand_l.modulate = Color.WHITE
 	hand_l.position = Vector2(-8, 72)
+	if phase == 1:
+		_guard(true)  # stage 2: every move starts shielded
 	sputter.emitting = false
 	wrist_l.show()
 	wrist_l.scale = Vector2.ONE

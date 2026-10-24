@@ -63,6 +63,8 @@ func _on_first_hit(_hits_left: int, _hits_total: int) -> void:
 
 func _on_player_died() -> void:
 	await get_tree().create_timer(1.0, false).timeout
+	if boss.state == Boss.State.DEAD:
+		return  # he already won: no retry, no fresh Lil' Watt
 	for child in projectiles.get_children():
 		child.queue_free()
 	player.reset(stage.safe_spot(respawn.global_position.x) if boss.phase == Boss.FINAL else respawn.global_position)
@@ -184,7 +186,7 @@ func _on_boss_defeated() -> void:
 ## The knockout, letterboxed. Lil' Watt is knocked out of the sky and the power link snaps; the
 ## king goes limp and comes apart in his moat (his "death" clip), his crown popping off into the
 ## sky. Once he is gone the crown drops out of the sky onto the little guy (much too big); Lil'
-## Watt comes round, takes it in, and bows to the new king.
+## Watt comes round, takes it in, and bows to the new king. The hero stays frozen afterwards.
 func _ending() -> void:
 	player.frozen = true
 	camera.target = player
@@ -219,7 +221,7 @@ func _ending() -> void:
 	hud.cinema(false)
 	hud.boss_box.hide()  # nobody left to fight
 	create_tween().tween_property(camera, "limit_bottom", 720, 0.5).set_trans(Tween.TRANS_SINE)
-	player.frozen = false
+	# he stays frozen (and unhurtable) from here on: the fight is won
 
 
 ## The king's crown pops off as he comes apart: it spins up out of sight (it comes back down

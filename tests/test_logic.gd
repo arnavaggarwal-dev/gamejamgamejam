@@ -311,7 +311,13 @@ func _test_giant_stages() -> void:
 	boss.state = Boss.State.IDLE
 	boss.take_hit()
 	await create_timer(2.6).timeout
-	check(not boss.legs.visible and is_zero_approx(boss.upper.position.y) and armed.call(1) and not armed.call(0), "breaking the legs drops the torso into view and arms the chest core")
+	check(not boss.legs.visible and is_zero_approx(boss.upper.position.y) and not armed.call(0), "breaking the legs drops the torso into view")
+	check(boss.shield.visible and not armed.call(1) and not boss.cores[1].get_node("Target").visible, "...his chest core shielded: no target, nothing to hit")
+	boss._play(&"rocket", Boss.State.ATTACK)
+	await create_timer(0.75).timeout
+	check(not boss.shield.visible and armed.call(1) and boss.cores[1].get_node("Target").visible, "firing the rocket hand leaves his chest open")
+	await create_timer(1.8).timeout
+	check(boss.state == Boss.State.IDLE and boss.shield.visible and not armed.call(1), "...and the shield is back once the attack is over")
 	check(boss.head.position == Vector2(1090, 170) and boss.head.global_position.y > 0.0 and cracked.call(1) == 0, "stage 2: his head sits on the torso's shoulders (no stretched neck), torso uncracked")
 	for i in Boss.HITS_PER_PHASE:
 		boss.state = Boss.State.IDLE
@@ -572,9 +578,12 @@ func _test_final_phase() -> void:
 	check(boss.rig.position.y > Boss.GROWN_POS.y + 1000.0 and not boss.head.get_node("Crown").visible, "the powerless king comes apart and sinks into the acid, his crown popped off")
 	check(player.crown.visible and player.frozen, "the king's crown drops onto the little guy")
 	await create_timer(5.0).timeout
-	check(not player.frozen and hud.bars[0].scale.y < 0.05 and helper.anim.current_animation in [&"bow", &""], "Lil' Watt comes round and bows; the letterbox lifts")
+	check(player.frozen and hud.bars[0].scale.y < 0.05 and helper.anim.current_animation in [&"bow", &""], "Lil' Watt comes round and bows; the letterbox lifts, the hero stays locked")
 	await create_timer(3.4).timeout
 	check(hud.end_panel.visible and hud.end_label.text == "YOU WIN!" and not hud.boss_box.visible, "then the win screen (no boss bar left)")
+	player.died.emit()
+	await create_timer(1.4).timeout
+	check(game.helper == helper and boss.state == Boss.State.DEAD and hud.banner.text != "AGAIN!", "a death after the win changes nothing (no retry, no fresh Lil' Watt)")
 	game.queue_free()
 	await process_frame
 	Engine.time_scale = 1.0
