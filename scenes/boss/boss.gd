@@ -25,7 +25,7 @@ const EXPLOSION_SCENE := preload("res://scenes/fx/explosion.tscn")
 const DUST_SCENE := preload("res://scenes/fx/dust.tscn")
 const PHASES := [
 	{attacks = [&"stomp", &"rain"], speed = 1.0, rest = 1.2},  # legs
-	{attacks = [&"swipe", &"bombs", &"charge", &"bombs"], speed = 1.2, rest = 0.9},  # torso
+	{attacks = [&"swipe", &"bombs"], speed = 1.2, rest = 0.9},  # torso (moves by roaming, no charge)
 	{attacks = [&"swoop", &"spit", &"laser", &"spit"], speed = 1.3, rest = 0.7},  # head
 ]
 
@@ -375,7 +375,7 @@ func _reset_rig() -> void:
 	body.modulate = Color.WHITE
 	fist_l.modulate = Color.WHITE
 	stomp_ring.hide()
-	for box in [leg_f.get_node("Hitbox"), fist_l.get_node("Hitbox"), body.get_node("ChargeHitbox"), head.get_node("RamHitbox")]:
+	for box in [leg_f.get_node("Hitbox"), fist_l.get_node("Hitbox"), head.get_node("RamHitbox")]:
 		box.get_node("CollisionShape2D").set_deferred("disabled", true)
 	eye_beam.get_node("Warn").hide()
 	eye_beam.get_node("Beam").hide()

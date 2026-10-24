@@ -198,8 +198,6 @@ func _on_attack_started(attack: StringName) -> void:
 			_tip("stomp", "HIS FOOT WALKS TO THE RED RING.  MOVE!")
 		&"swipe":
 			_tip("swipe", "HAND SWIPE!  JUMP OVER IT  (OR DASH THROUGH).")
-		&"charge":
-			_tip("charge", "HE'S CHARGING!  GET BACK!")
 		&"swoop":
 			_tip("swoop", "HE DASHES ALONG THE LIGHT BEAM!  GET OFF IT!")
 		&"rain", &"bombs", &"spit":

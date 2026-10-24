@@ -30,9 +30,6 @@ size = Vector2(240, 100)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hand"]
 size = Vector2(140, 110)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_torso"]
-size = Vector2(300, 380)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_head"]
 size = Vector2(260, 200)
 
@@ -285,72 +282,6 @@ tracks/3/keys = {
 "transitions": PackedFloat32Array(1),
 "values": [{
 "args": [8.0],
-"method": &"shake"
-}]
-}
-
-[sub_resource type="Animation" id="Animation_charge"]
-resource_name = "charge"
-length = 1.9
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Rig/Upper/Body:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.45, 0.5, 0.8, 1.25, 1.9),
-"transitions": PackedFloat32Array(0.5, 1, 2, 1, 0.5, 1),
-"update": 0,
-"values": [Vector2(0, 0), Vector2(40, 0), Vector2(40, 0), Vector2(-420, 0), Vector2(-420, 0), Vector2(0, 0)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Rig/Upper/Head:position")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.45, 0.5, 0.8, 1.25, 1.9),
-"transitions": PackedFloat32Array(0.5, 1, 2, 1, 0.5, 1),
-"update": 0,
-"values": [Vector2(1090, 170), Vector2(1130, 170), Vector2(1130, 170), Vector2(670, 170), Vector2(670, 170), Vector2(1090, 170)]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Rig/Upper/Body:modulate")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.25, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Color(1, 1, 1, 1), Color(1, 0.55, 0.55, 1), Color(1, 1, 1, 1)]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("Rig/Upper/Body/ChargeHitbox/CollisionShape2D:disabled")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.5, 0.85),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 1,
-"values": [true, false, true]
-}
-tracks/4/type = "method"
-tracks/4/imported = false
-tracks/4/enabled = true
-tracks/4/path = NodePath(".")
-tracks/4/interp = 1
-tracks/4/loop_wrap = true
-tracks/4/keys = {
-"times": PackedFloat32Array(0.8),
-"transitions": PackedFloat32Array(1),
-"values": [{
-"args": [12.0],
 "method": &"shake"
 }]
 }
@@ -974,7 +905,6 @@ tracks/1/keys = {
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_boss"]
 _data = {
 &"bombs": SubResource("Animation_bombs"),
-&"charge": SubResource("Animation_charge"),
 &"death": SubResource("Animation_death"),
 &"idle_1": SubResource("Animation_idle_1"),
 &"idle_2": SubResource("Animation_idle_2"),
@@ -1144,16 +1074,6 @@ monitoring = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Rig/Upper/Body/FistL/Hitbox"]
 shape = SubResource("RectangleShape2D_hand")
-disabled = true
-
-[node name="ChargeHitbox" type="Area2D" parent="Rig/Upper/Body"]
-position = Vector2(1080, 470)
-collision_layer = 8
-collision_mask = 0
-monitoring = false
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Rig/Upper/Body/ChargeHitbox"]
-shape = SubResource("RectangleShape2D_torso")
 disabled = true
 
 [node name="Cracks" type="Node2D" parent="Rig/Upper/Body"]

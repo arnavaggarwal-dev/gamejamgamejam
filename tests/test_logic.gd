@@ -305,13 +305,7 @@ func _test_boss_moves() -> void:
 	check(absf(boss.stomp_anchor.global_position.x - 400.0) < 2.0 and is_equal_approx(boss.stomp_ring.global_position.x, 400.0), "the raised leg walks over to the player's spot, under the red ring")
 	await create_timer(1.8).timeout
 	check(is_equal_approx(boss.stomp_anchor.position.x, 1020.0), "then walks back under him")
-	boss.phase = 1
-	boss._play(&"charge", Boss.State.ATTACK)
-	await create_timer(0.55).timeout
-	check(not boss.body.get_node("ChargeHitbox/CollisionShape2D").disabled, "the torso charge is dangerous while it lunges")
-	await create_timer(0.25).timeout
-	check(boss.body.position.x < -400.0, "the torso lunges ~420 px toward the player")
-	check(is_equal_approx(boss.head.position.x - boss.body.position.x, 1090.0), "his head stays on the torso through the lunge")
+	check(not boss.anim.has_animation(&"charge"), "the torso has no charge attack")
 	boss.phase = 2
 	var hover := Vector2(1030, 380)  # the stage-3 hover spot the tell quivers around
 	boss._play(&"swoop", Boss.State.ATTACK)
@@ -391,6 +385,16 @@ func _test_roam() -> void:
 		lift[0] = maxf(lift[0], -minf(boss.leg_f.position.y, boss.leg_b.position.y))
 	check(span[1] - span[0] > 150.0, "he roams the stage while the player stands still (%.0f px)" % (span[1] - span[0]))
 	check(lift[0] > 10.0, "his legs step as he walks")
+	boss.skip_phase()  # torso stage: no charge any more, but he still moves
+	while boss.state != Boss.State.IDLE:
+		await physics_frame
+	boss.rest_timer.stop()
+	var torso_span := [INF, -INF]
+	for i in 240:
+		await physics_frame
+		torso_span[0] = minf(torso_span[0], boss.position.x)
+		torso_span[1] = maxf(torso_span[1], boss.position.x)
+	check(torso_span[1] - torso_span[0] > 150.0, "the torso still roams the stage (%.0f px)" % (torso_span[1] - torso_span[0]))
 	game.queue_free()
 	await process_frame
 
@@ -421,7 +425,7 @@ func _test_phase_extras() -> void:
 	await process_frame
 	var boss: Boss = game.get_node("Boss")
 	boss.phase = 1
-	check([boss.next_attack(), boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"swipe", &"bombs", &"charge", &"bombs"], "stage 2 (torso) swipes, throws bombs and charges")
+	check([boss.next_attack(), boss.next_attack(), boss.next_attack(), boss.next_attack()] == [&"swipe", &"bombs", &"swipe", &"bombs"], "stage 2 (torso) swipes and throws bombs, no charge")
 	check(boss.anim.has_animation(&"laser"), "laser animation exists")
 	boss.phase_changed.emit(2)
 	var stage: Stage = game.get_node("Arena")
