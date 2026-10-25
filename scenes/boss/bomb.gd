@@ -8,14 +8,15 @@ const EXPLOSION := preload("res://scenes/fx/explosion.tscn")
 const ARROW_OFFSET := Vector2(0, -48)
 const PIT_Y := 900.0
 const GROUND_DRAG := 350.0  # px/s² while touching a surface; rolling has no friction of its own
-const SPIN := 12.0  # rad/s while airborne
+const SPIN := 12.0  # rad/s while airborne (no air drag: linear damp is 0, so it flies the arc the aim predicts)
 const BLAST_REACH := 150.0  # px from the blast that bounces the player
-const HOMING_RANGE := 240.0  # a thrown bomb this close to its target bends in on it
-const HOMING := 8.0  # how hard it bends (per second)
+const HOMING_RANGE := 240.0  # a thrown bomb this close to its target may nudge toward it
+const HOMING_TURN := 3.0  # rad/s at most that nudge turns it (aim help, not a magnet)
+const HOMING_CONE := 0.5  # only while the target is within ~60 degrees of its heading (cosine)
 
 var thrown := false
 var exploded := false
-var target: Node2D  # the core it was thrown at, if any (it homes in over the last stretch)
+var target: Node2D  # the core it was thrown at, if any (a gentle nudge over the last stretch)
 
 @onready var art: Node2D = $Art
 @onready var arrow: Node2D = $Arrow
@@ -31,13 +32,25 @@ func _ready() -> void:
 ## conveyor); flight, and so the player's aim arc, is untouched.
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	if thrown and is_instance_valid(target):
-		var to := target.global_position - state.transform.origin
-		if to.length() < HOMING_RANGE:
-			var aim := to.normalized() * maxf(state.linear_velocity.length(), 600.0)
-			state.linear_velocity = state.linear_velocity.lerp(aim, minf(1.0, HOMING * state.step))
+		_nudge(state)
 	if state.get_contact_count() > 0:
 		var belt := state.get_contact_collider_velocity_at_position(0).x
 		state.linear_velocity.x = move_toward(state.linear_velocity.x, belt, GROUND_DRAG * state.step)
+
+
+## Aim help over the last stretch: while the target is still ahead (within HOMING_CONE of where
+## the bomb is flying) the bomb's heading turns a little toward it, its speed untouched. Once it
+## has gone past or wide, the help is off for good: a bomb never turns back.
+func _nudge(state: PhysicsDirectBodyState2D) -> void:
+	var to := target.global_position - state.transform.origin
+	var v := state.linear_velocity
+	if to.length() > HOMING_RANGE or v.length() < 1.0:
+		return
+	if v.normalized().dot(to.normalized()) < HOMING_CONE:
+		target = null
+		return
+	var most := HOMING_TURN * state.step
+	state.linear_velocity = v.rotated(clampf(v.angle_to(to), -most, most))
 
 
 ## The body rolls (so bombs tumble off platforms) but the art stays upright while it rests or is

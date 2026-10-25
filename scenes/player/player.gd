@@ -23,7 +23,7 @@ const HARD_LANDING := 1500.0  # px/s fall speed for the biggest landing squash
 const BOMB := preload("res://scenes/boss/bomb.tscn")
 const MAX_AMMO := 5
 const CHARGE_DELAY := 0.2  # s of holding [A] before he starts squeezing (a tap only detonates)
-const CHARGE_TIME := 0.6  # s of squeezing per bomb
+const CHARGE_TIME := 0.3  # s of squeezing per bomb
 const KNOCKBACK := 480.0  # px/s a hit shoves him off whatever hit him
 const KNOCK_HOP := -380.0  # ...with a little hop
 const BOMB_BOUNCE := Vector2(650.0, -1150.0)  # off a blast: sideways away from it (at most), always this fast up
@@ -58,6 +58,9 @@ var ammo := MAX_AMMO
 var charging := false  # squeezing out a bomb
 var projectiles: Node  # where his bombs go (the arena's Projectiles); his parent if unset
 var _charge_held := 0.0
+var _lead_target: Node2D = null  # the core his aim is on, and how fast it is moving (to lead it)
+var _lead_last := Vector2.ZERO
+var _lead_velocity := Vector2.ZERO
 var _charge_left := 0.0
 
 @onready var art: Node2D = $Art
@@ -150,6 +153,7 @@ func _physics_process(delta: float) -> void:
 		_detonate()
 	if held_bomb:
 		held_bomb.global_position = hold_point.global_position
+		_track_target(delta)
 	_update_aim()
 	_update_prompt()
 	_update_pose(dir)
@@ -298,9 +302,7 @@ func _grab() -> void:
 		juice.play(&"grab")
 
 
-## A plain throw at an armed core ahead of him is aimed: the usual sideways speed (faster for a far
-## core), with the lift solved so the arc passes through the core (the aim dots show it). Lobs
-## (aim_up) stay manual.
+## Pulls a new bomb out of his ammo, into his hands.
 func _make_bomb() -> Bomb:
 	var bomb: Bomb = BOMB.instantiate()
 	(projectiles if projectiles else get_parent()).add_child(bomb)
@@ -333,6 +335,9 @@ func _charge(delta: float) -> void:
 		_puff(POOF, hold_point.global_position)
 
 
+## A plain throw at an armed core ahead of him is aimed: the usual sideways speed (faster for a far
+## core), with the lift solved so the arc passes through where the core will be when the bomb
+## gets there (it leads a moving core; the aim dots show the arc). Lobs (aim_up) stay manual.
 func _throw_velocity() -> Vector2:
 	if Input.is_action_pressed("aim_up"):
 		return Vector2(lob_velocity.x * facing, lob_velocity.y)
@@ -341,10 +346,26 @@ func _throw_velocity() -> Vector2:
 		return Vector2(throw_velocity.x * facing, throw_velocity.y)
 	var start := held_bomb.global_position
 	var g: float = ProjectSettings.get_setting("physics/2d/default_gravity") * held_bomb.gravity_scale
-	var reach := absf(target.global_position.x - start.x)
-	var t := minf(reach / throw_velocity.x, MAX_FLIGHT)
-	var lift := (target.global_position.y - start.y - 0.5 * g * t * t) / t
-	return Vector2(reach / t * facing, clampf(lift, -1500.0, 200.0))
+	var lead := _lead_velocity if target == _lead_target else Vector2.ZERO
+	var at := target.global_position
+	var t := 0.1
+	for i in 3:  # where it will be by the time the bomb arrives (a couple of passes settle it)
+		at = target.global_position + lead * t
+		t = maxf(minf(absf(at.x - start.x) / throw_velocity.x, MAX_FLIGHT), 0.1)
+	var lift := (at.y - start.y - 0.5 * g * t * t) / t
+	return Vector2(absf(at.x - start.x) / t * facing, clampf(lift, -1500.0, 200.0))
+
+
+## While he holds a bomb: how fast the core his aim is on is moving (smoothed), so throws lead it.
+func _track_target(delta: float) -> void:
+	var target := _bomb_target()
+	if target != _lead_target:
+		_lead_target = target
+		_lead_velocity = Vector2.ZERO
+	elif target:
+		_lead_velocity = _lead_velocity.lerp((target.global_position - _lead_last) / delta, 0.3)
+	if target:
+		_lead_last = target.global_position
 
 
 ## The nearest armed bomb target (a core's WeakPoint, group "bomb_target") ahead of him.

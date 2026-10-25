@@ -26,7 +26,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	Tutorial.done = true  # fight-logic tests skip the lesson; _test_tutorial runs it on its own
-	_test_bomb()
+	await _test_bomb()
 	await _test_player()
 	await _test_knockback()
 	await _test_arena()
@@ -63,6 +63,37 @@ func check(ok: bool, what: String) -> void:
 		printerr("FAIL  ", what)
 
 
+## The throw's aim help only nudges a bomb's heading toward a target still ahead of it; a bomb
+## that overshoots carries on, it never turns back.
+func _test_bomb_nudge() -> void:
+	var shot := func(target_at: Vector2) -> Bomb:
+		var b: Bomb = load("res://scenes/boss/bomb.tscn").instantiate()
+		root.add_child(b)
+		b.global_position = Vector2(-6000, -6000)
+		b.gravity_scale = 0.0
+		b.get_node("FuseTimer").stop()
+		var spot := Marker2D.new()
+		b.add_sibling(spot)
+		spot.global_position = b.global_position + target_at
+		b.target = spot
+		b.throw(Vector2(700, 0))
+		return b
+	var past: Bomb = shot.call(Vector2(-120, 30))  # its target already behind it
+	for i in 12:
+		await physics_frame
+	check(past.linear_velocity.x > 600.0 and past.target == null, "a bomb that has overshot its target carries on (it never turns back)")
+	var ahead: Bomb = shot.call(Vector2(220, 90))  # its target ahead and a little below
+	var start: float = ahead.linear_velocity.angle()
+	for i in 6:
+		await physics_frame
+	var turned: float = ahead.linear_velocity.angle() - start
+	check(turned > 0.0 and turned < Bomb.HOMING_TURN * 6.0 / 60.0 + 0.01 and absf(ahead.linear_velocity.length() - 700.0) < 1.0, "a target still ahead gets a gentle nudge (a capped turn, same speed, no drag)")
+	for b: Bomb in [past, ahead]:
+		b.target.queue_free() if is_instance_valid(b.target) else null
+		b.queue_free()
+	await process_frame
+
+
 func _test_bomb() -> void:
 	var bomb: Bomb = load("res://scenes/boss/bomb.tscn").instantiate()
 	root.add_child(bomb)
@@ -74,6 +105,7 @@ func _test_bomb() -> void:
 	bomb.explode()
 	bomb.explode()
 	check(bomb.exploded, "explode is safe to call twice")
+	await _test_bomb_nudge()
 
 
 func _test_player() -> void:
@@ -480,11 +512,12 @@ func _test_aimed_throw() -> void:
 	bomb.global_position = player.hold_point.global_position
 	bomb.pick_up()
 	player.held_bomb = bomb
-	await physics_frame
+	for i in 20:  # holding it a moment, the aim settles on how fast he roams
+		await physics_frame
 	var far := core.global_position.x - player.global_position.x
 	player._throw()
 	await create_timer(2.0).timeout
-	check(boss.hp == Boss.HITS_PER_PHASE - 1, "a plain throw reaches his core %d px away" % far)
+	check(boss.hp == Boss.HITS_PER_PHASE - 1, "a plain throw reaches his core %d px away, leading him as he roams" % far)
 	game.queue_free()
 	await process_frame
 	Engine.time_scale = 1.0
@@ -875,10 +908,10 @@ func _test_tutorial_rush() -> void:
 	check(tutorial.bot.hp == TrainingBot.HITS - 1 and hud.coach_label.text.contains("HOLD  A"), "hitting the core early moves the lesson on (to squeezing out more bombs)")
 	var before := player.ammo
 	Input.action_press("detonate")
-	await create_timer(0.5).timeout
+	await create_timer(0.35).timeout
 	check(player.charging and player.body.animation == &"strain", "holding [A] squeezes him flat, eyes screwed shut")
-	await create_timer(0.5).timeout
-	check(player.ammo > before, "...and squeezes out a bomb")
+	await create_timer(0.4).timeout
+	check(player.ammo > before and Player.CHARGE_TIME == 0.3, "...and squeezes out a bomb every 0.3 s")
 	Input.action_release("detonate")
 	await create_timer(1.0).timeout
 	check(hud.coach_label.text.begins_with("AGAIN"), "then the lesson moves on")
