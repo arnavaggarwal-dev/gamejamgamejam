@@ -13,7 +13,7 @@ const MUSIC_PATH := "res://assets/audio/music/%s.wav"
 const SOUNDS: Array[StringName] = [
 	&"jump", &"air_jump", &"land", &"dash", &"pop", &"pull", &"throw", &"hurt", &"splat", &"squish",
 	&"crown", &"coin", &"boom", &"clang", &"quake", &"whoosh", &"rocket", &"ratchet", &"click",
-	&"ping", &"charge", &"laser", &"pew", &"buzz", &"blast", &"roar", &"crumble", &"chirp", &"konk",
+	&"charge", &"laser", &"pew", &"buzz", &"blast", &"roar", &"crumble", &"chirp", &"konk",
 	&"blip", &"select", &"tick", &"stamp", &"firework", &"heartbeat", &"pause",
 ]
 

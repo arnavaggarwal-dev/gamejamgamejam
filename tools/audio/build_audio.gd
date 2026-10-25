@@ -32,7 +32,6 @@ const SOUNDS := {
 	"rocket": {wave = 3, base_freq = 0.3, freq_ramp = -0.22, env_punch = 0.5, env_sustain = 0.12, env_decay = 0.42, vib_strength = 0.2, vib_speed = 0.5, seed = 5},
 	"ratchet": {wave = 0, duty = 0.3, base_freq = 0.62, env_punch = 0.5, env_sustain = 0.04, env_decay = 0.1, hpf_freq = 0.3, tile = 6, gap = 0.04},
 	"click": {wave = 0, duty = 0.3, base_freq = 0.7, env_punch = 0.5, env_sustain = 0.05, env_decay = 0.15, hpf_freq = 0.3},
-	"ping": {wave = 2, base_freq = 0.68, freq_ramp = -0.03, env_punch = 0.3, env_sustain = 0.04, env_decay = 0.32},
 	"charge": {wave = 2, base_freq = 0.25, freq_ramp = 0.12, vib_strength = 0.3, vib_speed = 0.7, env_attack = 0.25, env_sustain = 0.25, env_decay = 0.05},
 	"laser": {wave = 1, base_freq = 0.8, freq_limit = 0.25, freq_ramp = -0.22, env_sustain = 0.18, env_decay = 0.3, hpf_freq = 0.1, pha_offset = 0.1, pha_ramp = -0.1},
 	"pew": {wave = 0, duty = 0.3, base_freq = 0.65, freq_ramp = -0.35, env_sustain = 0.15, env_decay = 0.22},

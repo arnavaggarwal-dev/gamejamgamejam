@@ -1,5 +1,6 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
-/build/*
-!/build/.gdignore
+
+# exports, zips and screenshots
+/build/
