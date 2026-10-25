@@ -458,8 +458,8 @@ static func cable():
 	return c
 
 
-## The armour plate over his chest core in stage 2 (it pops off when his attacks leave him open):
-## a riveted dome split down the middle, a gold lock bolt.
+## The armour plate over Lil' Watt's core in phase 4 (it pops open after each shot): a riveted dome
+## split down the middle, a gold lock bolt.
 static func core_shield():
 	var c = Canvas.new(32, 32)
 	c.shade_ellipse(15.5, 15.5, 13, 13, P.METAL, [-0.3, 0.3, 0.8])

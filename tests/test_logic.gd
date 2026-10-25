@@ -390,12 +390,7 @@ func _test_giant_stages() -> void:
 	boss.take_hit()
 	await create_timer(2.6).timeout
 	check(not boss.legs.visible and is_zero_approx(boss.upper.position.y) and not armed.call(0), "breaking the legs drops the torso into view")
-	check(boss.shield.visible and not armed.call(1) and not boss.cores[1].get_node("Target").visible, "...his chest core shielded: no target, nothing to hit")
-	boss._play(boss._clip_for(&"rocket"), Boss.State.ATTACK)
-	await create_timer(0.75).timeout
-	check(not boss.shield.visible and armed.call(1) and boss.cores[1].get_node("Target").visible, "firing the rocket hand leaves his chest open")
-	await create_timer(1.8).timeout
-	check(boss.state == Boss.State.IDLE and boss.shield.visible and not armed.call(1), "...and the shield is back once the attack is over")
+	check(armed.call(1) and boss.cores[1].get_node("Target").visible and not boss.body.get_node("Core").has_node("Shield"), "...his chest core open to hits (no shield in stage 2)")
 	check(boss.head.position == Vector2(1090, 170) and boss.head.global_position.y > 0.0 and cracked.call(1) == 0, "stage 2: his head sits on the torso's shoulders (no stretched neck), torso uncracked")
 	for i in Boss.HITS_PER_PHASE:
 		boss.state = Boss.State.IDLE
@@ -517,7 +512,7 @@ func _test_arms() -> void:
 	var right: Array = bones.call(boss.arm_r)
 	check(left[0].dot(Vector2.LEFT) > 0.99 and right[0].dot(Vector2.RIGHT) > 0.99 and left[1].dot(Vector2.UP) > 0.99 and right[1].dot(Vector2.UP) > 0.99, "he holds both arms up at right angles: upper arms level, forearms straight up")
 	await create_timer(0.75).timeout
-	check(boss.wrists[0].visible and boss.wrists[1].visible and not boss.shield.visible, "both new hands twist on together, his chest open")
+	check(boss.wrists[0].visible and boss.wrists[1].visible, "both new hands twist on together")
 	await create_timer(1.0).timeout
 	check(boss.state == Boss.State.IDLE and boss.wrists[0].scale.is_equal_approx(Vector2.ONE) and not boss.sputters[1].emitting and boss.fist_r.position.is_equal_approx(boss._rest_pose[boss.fist_r]), "...clicked home, arms back at his sides")
 	boss.phase = Boss.FINAL

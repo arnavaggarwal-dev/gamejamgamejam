@@ -102,7 +102,6 @@ var _firing: Array[int] = [0]  # the hands this rocket clip fires (0 left, 1 rig
 @onready var arms: Array[Node2D] = [arm_l, arm_r]
 @onready var wrists: Array[Node2D] = [$Rig/Upper/Body/ArmL/Elbow/Wrist, $Rig/Upper/Body/ArmR/Elbow/Wrist]
 @onready var sputters: Array[CPUParticles2D] = [$Rig/Upper/Body/ArmL/Elbow/Sputter, $Rig/Upper/Body/ArmR/Elbow/Sputter]
-@onready var shield: Sprite2D = $Rig/Upper/Body/Core/Shield
 @onready var cores: Array = [$Rig/Legs/StompAnchor/LegF/KneeCore, $Rig/Upper/Body/Core, $Rig/Upper/Head/EyeCore]
 @onready var cracks: Array = [$Rig/Legs/StompAnchor/LegF/Cracks, $Rig/Upper/Body/Cracks, $Rig/Upper/Head/Cracks]
 @onready var anim: AnimationPlayer = $AnimationPlayer
@@ -308,24 +307,6 @@ func aim_hands() -> void:
 	for i in _firing:
 		_hand_dirs[i] = (_player_pos() - arms[i].global_position).normalized()
 		aim.tween_property(fists[i], "position", arms[i].position + _hand_dirs[i] * ARM_REACH, 0.12).set_trans(Tween.TRANS_SINE)
-
-
-## Stage 2's chest core sits behind a shield (no target, no hits, nothing for the throw to aim
-## at) except in the openings his attacks leave: it pops off when the rocket hand fires and when
-## his fists hit the floor, and is back on as soon as the attack is over.
-func open_guard() -> void:
-	if phase != 1:
-		return
-	_guard(false)
-	Sfx.play(&"ping")
-	_fx(SPARK_SCENE, shield.global_position)
-	shake(5.0)
-
-
-func _guard(closed: bool) -> void:
-	shield.visible = closed
-	cores[1].get_node("Target").visible = not closed
-	cores[1].get_node("WeakPoint").set_deferred(&"monitoring", not closed)
 
 
 ## The hands blast off their wrists along the arms: a muzzle blast and sparks at each wrist, a
@@ -581,8 +562,6 @@ func _reset_rig() -> void:
 		wrists[i].visible = _hand_on[i]
 		wrists[i].scale = Vector2.ONE
 		sputters[i].emitting = not _hand_on[i]  # a bare wrist smokes
-	if phase == 1:
-		_guard(true)  # stage 2: every move starts shielded
 	stomp_ring.hide()
 	for box in [leg_f.get_node("Hitbox"), fist_l.get_node("Hitbox"), head.get_node("RamHitbox")]:
 		box.get_node("CollisionShape2D").set_deferred("disabled", true)
