@@ -100,6 +100,7 @@ func _initialize() -> void:
 		"title": [_title(), true],
 		"fight": [_fight(150, false), true],
 		"final": [_fight(168, true), true],
+		"rise": [_rise(), true],
 		"win": [_win(), false],
 		"lose": [_lose(), false],
 	}
@@ -152,6 +153,31 @@ func _title() -> Dictionary:
 		var chord: String = chords[k % 4]
 		bars.append({lead = TITLE_LEAD[k], bass = _bass(chord, "@:8 %:8"), arp = _arp(chord, 2)})
 	return {bpm = 92, bars = bars, duty = 0.125, mix = {lead = 0.2, arp = 0.08, bass = 0.3, drums = 0.0}}
+
+
+## The phase 4 cutscene, Lil' Watt raising his dad: Am F G E twice over, building. Lone
+## timpani-like hits under the sad lines, then the arpeggio joins, the lead climbs an octave and
+## the drums double up into a snare roll as he rises (about 19 s, the length of the scene).
+func _rise() -> Dictionary:
+	var lead := [
+		"A4:12 -:4", "C5:12 -:4", "B4:8 D5:8", "G#4:12 B4:4",
+		"A4:4 C5:4 E5:4 A5:4", "A5:6 G5:2 F5:4 C5:4", "G5:4 B5:4 D6:4 B5:4", "G#5:8 B5:4 E6:4",
+	]
+	var drums := [
+		"k.......k.......", "k.......k...k.k.", "k...s...k...s...", "k...s...k.k.s.ss",
+		"k.h.s.h.k.h.s.h.", "k.h.s.h.k.k.s.h.", "k.hhs.hhk.hhs.hh", "k.s.s.s.ssssssss",
+	]
+	var bars := []
+	var chords := ["Am", "F", "G", "E"]
+	for k in 8:
+		var chord: String = chords[k % 4]
+		bars.append({
+			lead = lead[k],
+			bass = _bass(chord, "@:4 @:4 @:4 ^:4" if k < 4 else "@:2 @:2 ^:2 @:2 @:2 ^:2 %:2 ^:2"),
+			arp = "" if k < 2 else _arp(chord, 2 if k < 4 else 1, 1 if k >= 6 else 0),
+			drums = drums[k],
+		})
+	return {bpm = 100, bars = bars, duty = 0.5, mix = {lead = 0.2, arp = 0.09, bass = 0.34, drums = 0.4}}
 
 
 ## The crowning: a short major fanfare.

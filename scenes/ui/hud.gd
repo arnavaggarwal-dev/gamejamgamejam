@@ -143,6 +143,11 @@ func coach(text: String) -> void:
 		coach_fx.play(&"pop")
 
 
+## A cutscene line: who says it, small and in `tint`, over what they say.
+func say(who: String, text: String, tint: Color) -> void:
+	coach("[font_size=28][color=#%s]%s[/color][/font_size]\n%s" % [tint.to_html(false), who, text])
+
+
 ## The hero splattered against the screen, Smash style: real goo (the screen_goo shader) spatters
 ## the glass in five gobs spread across it (high and low by turns), each with a couple of lumps and a streak of spray
 ## flung out one way (smaller drops the further they fly); it merges, drips, then slides down

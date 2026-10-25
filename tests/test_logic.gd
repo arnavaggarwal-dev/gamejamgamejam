@@ -698,9 +698,9 @@ func _test_final_phase() -> void:
 	check(get_nodes_in_group(&"safe_ledge").any(func(l: Node2D) -> bool: return l.global_position.is_equal_approx(back + Vector2(0, 42))), "falling in the acid puts you back on a safe ledge")
 	var helper: TrainingBot = game.helper
 	check(is_instance_valid(helper) and camera.target == helper and not helper.link.visible, "Lil' Watt flies in, the camera following it")
-	await create_timer(2.6).timeout  # at the fallen crown: "...DAD?", then it turns on you
-	check(helper.face == &"angry" and hud.coach_label.text == "YOU BROKE MY DAD!!", "Lil' Watt finds the wreck and gets angry")
-	await create_timer(9.8).timeout  # flies to the wreck, beams in, and the king rises
+	await create_timer(3.6).timeout  # at the fallen crown: "...DAD?", the king answers, then it turns on you
+	check(helper.face == &"angry" and hud.coach_label.get_parsed_text() == "LIL' WATT\nYOU BROKE MY DAD!!", "Lil' Watt finds the wreck, talks with its dad and gets angry, its name over the line")
+	await create_timer(15.4).timeout  # more talk, flies to the wreck, beams in, the king rises: "THAT'S MY BOY!!"
 	check(boss.rig.scale.is_equal_approx(Vector2.ONE * Boss.GROWN_SCALE) and boss.state != Boss.State.PHASE_SHIFT, "Lil' Watt's power revives the king, giant-sized")
 	check(not player.frozen and camera.target == player and hud.bars[0].scale.y < 0.05 and hud.boss_box.visible, "the cutscene ends: bars out, control back")
 	check(hud.boss_box.global_position.x > 700.0, "the boss bar moves to the top-right corner, clear of the giant's head")
@@ -795,8 +795,8 @@ func _test_sound() -> void:
 	check(Sfx._player == null, "headless runs stay quiet")
 	check(sfx.voices.size() == 12 and sfx.voices.all(func(v: AudioStreamPlayer) -> bool: return v.bus == &"SFX") and sfx.music_player.bus == &"Music" and AudioServer.get_bus_index(&"Music") > 0, "effects play off 12 voices on the SFX bus, music on its own bus")
 	check(sfx._streams.size() == Sfx.SOUNDS.size() and Sfx.SOUNDS.all(func(n: StringName) -> bool: return sfx._streams[n] is AudioStreamWAV), "every sound effect is loaded")
-	var looped := ["title", "fight", "final"].all(func(t: String) -> bool: return (load(Sfx.MUSIC_PATH % t) as AudioStreamWAV).loop_mode == AudioStreamWAV.LOOP_FORWARD)
-	check(looped and ResourceLoader.exists(Sfx.MUSIC_PATH % "win") and ResourceLoader.exists(Sfx.MUSIC_PATH % "lose"), "the title, fight and final music loop; the fanfare and the sting play once")
+	var looped := ["title", "fight", "final", "rise"].all(func(t: String) -> bool: return (load(Sfx.MUSIC_PATH % t) as AudioStreamWAV).loop_mode == AudioStreamWAV.LOOP_FORWARD)
+	check(looped and ResourceLoader.exists(Sfx.MUSIC_PATH % "win") and ResourceLoader.exists(Sfx.MUSIC_PATH % "lose"), "the title, fight, final and cutscene music loop; the fanfare and the sting play once")
 	var button := Button.new()
 	root.add_child(button)
 	check(button.focus_entered.get_connections().size() == 1 and button.pressed.get_connections().size() == 1, "every button gets a blip and a click")

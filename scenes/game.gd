@@ -6,6 +6,8 @@ const GOAL_HINT := "PULL OUT A BOMB  [Z]  THROW IT AT THE CORE!  HOLD  [A]  TO M
 const HELPER := preload("res://scenes/boss/training_bot.tscn")
 const FIREWORK := preload("res://scenes/fx/firework.tscn")
 const FIREWORK_COLORS := [Color("#db9692"), Color("#dbd991"), Color("#96db91"), Color("#92b5db"), Color("#db91d3"), Color("#b991dc")]
+const WATT_TINT := Color(0.588, 0.859, 0.569)  # speaker names in the phase 4 cutscene
+const KING_TINT := Color(0.859, 0.851, 0.569)
 const WATT_SPOT := Vector2(2450.0, -560.0)  # phase 4: Lil' Watt beams into the rising king from here
 const WATT_SIZE := Vector2(2.0, 2.0)  # phase 4's Lil' Watt is powered up (and readable zoomed out)
 const WATT_DOWN := Vector2(0.0, -102.0)  # Lil' Watt (2x) lying on a ledge, from where the hero would stand
@@ -124,11 +126,12 @@ func _on_boss_phase_changed(phase: int) -> void:
 
 
 ## Phase 4 cutscene. His head shatters and the camera pulls back threefold over the arena of
-## doom; Lil' Watt flies in to the fallen crown ("...DAD?"), turns on you, then beams his power
-## into the wreck and the king rises again, as tall as the screen. The camera follows Lil' Watt
-## until the fight resumes, with Lil' Watt fighting beside the king: break it to finish him.
+## doom; Lil' Watt flies in to the fallen crown to the "rise" music, and father and son talk (the
+## king from the wreck, his crown sparking) before it turns on you, beams its power into the wreck
+## and the king rises again, as tall as the screen. The camera follows Lil' Watt until the fight
+## resumes, with Lil' Watt fighting beside the king: break it to finish him.
 func _final_phase() -> void:
-	Sfx.music(&"")  # a hush for the cutscene
+	Sfx.music(&"")  # a hush while the camera pulls back
 	player.frozen = true
 	hud.cinema(true)
 	for child in projectiles.get_children():
@@ -140,23 +143,32 @@ func _final_phase() -> void:
 	var crown := boss.fallen_crown.global_position
 	_spawn_helper(crown + Vector2(1800.0, -1500.0))
 	camera.target = helper
+	Sfx.music(&"rise")
 	await _fly(crown + Vector2(0.0, -300.0), 1.8)
-	hud.coach("...DAD?")
-	await _wait(1.8)
+	_watt_says("...DAD?")
+	await _wait(1.5)
+	_king_says("S-SON...?  I'M IN PIECES...")
+	await _wait(2.0)
 	helper.get_angry()
-	hud.coach("YOU BROKE MY DAD!!")
-	await _wait(2.2)
+	_watt_says("YOU BROKE MY DAD!!")
+	await _wait(1.8)
+	_king_says("RUN...  YOU'RE JUST A LITTLE GUY.")
+	await _wait(2.4)
+	_watt_says("SO IS HE!!")
+	await _wait(1.6)
 	if boss.state == Boss.State.DEAD:
 		return
 	hud.coach("")
 	await _fly(WATT_SPOT, 1.4)
-	hud.coach("RISE, FATHER!!")
+	_watt_says("RISE, FATHER!!")
 	helper.channel()
 	helper.power_target = boss.weak_point()
 	boss.revive()
 	await boss.revived
 	Sfx.play(&"roar")
 	Sfx.music(&"final")
+	hud.say("KING KILOWATT", "THAT'S MY BOY!!", KING_TINT)
+	await _wait(1.4)
 	hud.coach("")
 	hud.boss_bar_aside()
 	hud.cinema(false)
@@ -166,6 +178,18 @@ func _final_phase() -> void:
 	helper.fight()
 	hud.show_banner("FINAL PHASE", 1.4)
 	hud.show_tip("LIL' WATT POWERS THE KING!  HIT ITS CORE RIGHT AFTER IT SHOOTS.", 5.0)
+
+
+## Lil' Watt's lines in the phase 4 cutscene, each with a chirp.
+func _watt_says(text: String) -> void:
+	hud.say("LIL' WATT", text, WATT_TINT)
+	Sfx.play(&"chirp")
+
+
+## The king, in pieces, speaking from the wreck.
+func _king_says(text: String) -> void:
+	hud.say("KING KILOWATT", text, KING_TINT)
+	boss.crackle()
 
 
 func _wait(seconds: float) -> void:

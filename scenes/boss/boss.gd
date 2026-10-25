@@ -97,6 +97,7 @@ var _firing: Array[int] = [0]  # the hands this rocket clip fires (0 left, 1 rig
 @onready var eye_beam: Node2D = $Rig/Upper/Head/EyeBeam
 @onready var dash_beam: Node2D = $Rig/Upper/Head/DashBeam
 @onready var fallen_crown: Node2D = $Rig/Upper/FallenCrown
+@onready var crown_sparks: CPUParticles2D = $Rig/Upper/FallenCrown/Sparks
 @onready var body: Node2D = $Rig/Upper/Body
 @onready var fist_l: Node2D = $Rig/Upper/Body/FistL
 @onready var fist_r: Node2D = $Rig/Upper/Body/FistR
@@ -446,6 +447,16 @@ func revive() -> void:
 	position.x = FINAL_X
 	_hand_on = [true, true]  # rebuilt with both hands
 	_play(&"revive", State.PHASE_SHIFT)
+
+
+## Phase 4 cutscene: the king speaks from the wreck, his fallen crown sparking and rattling.
+func crackle() -> void:
+	crown_sparks.restart()
+	Sfx.play(&"buzz", 0.5, -4.0)
+	var rattle := create_tween()
+	for k in 4:
+		rattle.tween_property(fallen_crown, "rotation", 0.35 + (0.12 if k % 2 == 0 else -0.12), 0.05)
+	rattle.tween_property(fallen_crown, "rotation", 0.35, 0.05)
 
 
 ## The rebuild in phase 4 mends every crack.
