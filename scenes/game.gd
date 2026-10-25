@@ -68,9 +68,13 @@ func _on_first_hit(_hits_left: int, _hits_total: int) -> void:
 		hud.show_hint("")
 
 
-## Losing all five hearts is game over: the whole fight starts again from stage 1 (a finished
-## tutorial is not replayed).
+## Losing all five hearts is game over: he splatters (goo over the screen too, Smash style), the
+## king celebrates, and the whole fight starts again from stage 1 (a finished tutorial is not
+## replayed).
 func _on_player_died() -> void:
+	if boss.state != Boss.State.DEAD:
+		hud.splat()
+		boss.celebrate()
 	await get_tree().create_timer(1.0, false).timeout
 	if boss.state == Boss.State.DEAD:
 		return  # he already won: no game over

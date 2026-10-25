@@ -35,6 +35,8 @@ var _ammo := -1  # what the ammo row last showed (-1: nothing yet)
 @onready var banner_fx: AnimationPlayer = $BannerFx
 @onready var coach_fx: AnimationPlayer = $CoachFx
 @onready var cinema_fx: AnimationPlayer = $CinemaFx
+@onready var goo_fx: AnimationPlayer = $GooFx
+@onready var goo: Control = $Goo
 
 
 func _ready() -> void:
@@ -108,6 +110,13 @@ func coach(text: String) -> void:
 
 
 ## White screen flash: `strength` is the starting opacity, `hold` keeps it there before fading.
+## The hero splattered against the screen, Smash style: gobs of goo slap onto the glass, then
+## slide down it and fade (the GooFx "splat" clip).
+func splat() -> void:
+	goo_fx.play(&"splat")
+	goo_fx.advance(0.0)
+
+
 func flash(strength := 0.7, hold := 0.0) -> void:
 	if _flash:
 		_flash.kill()

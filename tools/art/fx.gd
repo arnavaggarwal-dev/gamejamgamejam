@@ -152,6 +152,49 @@ static func slime_frames() -> Array:
 	return frames
 
 
+## A gob of the little guy flying off when he splatters (a goo particle).
+static func goo_blob():
+	var c = Canvas.new(7, 7)
+	c.shade_ellipse(3, 3, 2.8, 2.6, P.HERO, [-0.05, 0.5, 0.9])
+	c.outline()
+	return c
+
+
+## What is left of him after a splat: a flat puddle of goo with drips running off its rim, his
+## eyes crossed out (x x) and a scrap of salmon scarf in it.
+static func goo_puddle():
+	var c = Canvas.new(44, 11)
+	c.shade_ellipse(21.5, 7, 19, 3.2, P.HERO, [-0.05, 0.62, 0.92])
+	for blob in [[6, 6, 4.0, 2.2], [37, 6.5, 4.5, 2.0], [14, 5, 4.0, 2.4], [29, 5, 5.0, 2.6]]:
+		c.shade_ellipse(blob[0], blob[1], blob[2], blob[3], P.HERO, [-0.05, 0.62, 0.92])
+	for drop in [[2, 8], [41, 9], [11, 9], [33, 9]]:
+		c.px(drop[0], drop[1], P.TEAL)
+	for ex in [17, 24]:
+		for p in [[0, 0], [1, 1], [2, 2], [2, 0], [0, 2]]:
+			c.px(ex + p[0], 4 + p[1], P.INK)
+	c.hline(29, 34, 8, P.SALMON)
+	c.hline(30, 35, 9, P.ROSE)
+	c.outline()
+	return c
+
+
+## A splotch of him slapped onto the screen (Smash style): a glossy blob ringed with smaller
+## gobs, three drips running down from it.
+static func screen_goo():
+	var c = Canvas.new(64, 54)
+	for drip in [[22, 32, 46], [37, 33, 41], [47, 36, 50]]:
+		c.rect(drip[0], drip[1], 2, drip[2] - drip[1], P.TEAL)
+		c.px(drip[0], drip[1], P.MINT)
+		c.shade_ellipse(drip[0] + 0.5, drip[2], 2.4, 2.6, P.HERO, [-0.05, 0.55, 0.9])
+	c.shade_ellipse(30, 21, 18, 15, P.HERO, [-0.05, 0.6, 0.9])
+	for gob in [[11, 9, 5.5, 4.5], [50, 11, 7, 6], [47, 30, 6, 5], [13, 31, 5, 4], [58, 24, 3, 3], [4, 20, 2.5, 2.5], [31, 4, 3, 2.5]]:
+		c.shade_ellipse(gob[0], gob[1], gob[2], gob[3], P.HERO, [-0.05, 0.55, 0.9])
+	c.ellipse(23, 13, 4, 2, P.CREAM)
+	c.ellipse(48, 8, 2, 1, P.CREAM)
+	c.outline()
+	return c
+
+
 ## Bigger puff ring for the player's knock-out (6 frames).
 static func poof_frames() -> Array:
 	var frames := []

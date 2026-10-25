@@ -22,7 +22,7 @@ signal attack_started(attack: StringName)
 signal revived  # phase 4: back on his feet, giant-sized, and about to fight
 signal crown_popped(at: Vector2)  # the knockout: his crown flies off his head (the game takes it from there)
 
-enum State { INTRO, IDLE, ATTACK, STAGGER, PHASE_SHIFT, DEAD }
+enum State { INTRO, IDLE, ATTACK, STAGGER, PHASE_SHIFT, DEAD, CHEER }
 
 const HITS_PER_PHASE := 3
 const FLOOR_Y := 640.0
@@ -245,6 +245,16 @@ func take_hit() -> bool:
 	else:
 		_play(&"stagger", State.STAGGER)
 	return true
+
+
+## The hero splattered: he celebrates until the restart, each stage its own way (the legs
+## tap-dance, the torso pumps both fists, the head spins, the giant throws his arms up and
+## stamps). Not mid stage break, and never once he is beaten.
+func celebrate() -> void:
+	if state == State.DEAD or state == State.PHASE_SHIFT:
+		return
+	rest_timer.stop()
+	_play(StringName("cheer_%d" % (phase + 1)), State.CHEER)
 
 
 ## Debug shortcut: jump to the next phase (from the last phase, straight to the knockout).

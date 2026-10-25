@@ -1,0 +1,90 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/fx/goo_splat.gd" id="1_script"]
+[ext_resource type="SpriteFrames" path="res://assets/art/fx/slime_frames.tres" id="2_slime"]
+[ext_resource type="Texture2D" path="res://assets/art/fx/goo_blob.png" id="3_blob"]
+[ext_resource type="Texture2D" path="res://assets/art/fx/goo_puddle.png" id="4_puddle"]
+[ext_resource type="Texture2D" path="res://assets/art/hero/sprout.png" id="5_sprout"]
+
+[sub_resource type="Curve" id="Curve_shrink"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.7, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Animation" id="Animation_splat"]
+resource_name = "splat"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Puddle:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.32),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 2), Vector2(5.2, 3), Vector2(3.7, 4.3), Vector2(4, 4)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_splat"]
+_data = {
+&"splat": SubResource("Animation_splat")
+}
+
+[node name="GooSplat" type="Node2D"]
+z_index = 5
+script = ExtResource("1_script")
+
+[node name="Floor" type="RayCast2D" parent="."]
+target_position = Vector2(0, 800)
+
+[node name="Puddle" type="Sprite2D" parent="."]
+visible = false
+scale = Vector2(4, 4)
+texture = ExtResource("4_puddle")
+offset = Vector2(0, -4)
+
+[node name="Burst" type="AnimatedSprite2D" parent="."]
+scale = Vector2(9, 9)
+sprite_frames = ExtResource("2_slime")
+animation = &"play"
+autoplay = "play"
+
+[node name="Goo" type="CPUParticles2D" parent="."]
+amount = 28
+lifetime = 0.8
+one_shot = true
+explosiveness = 1.0
+texture = ExtResource("3_blob")
+emission_shape = 1
+emission_sphere_radius = 20.0
+direction = Vector2(0, -1)
+spread = 100.0
+gravity = Vector2(0, 2200)
+initial_velocity_min = 350.0
+initial_velocity_max = 950.0
+angular_velocity_min = -360.0
+angular_velocity_max = 360.0
+scale_amount_min = 2.5
+scale_amount_max = 5.0
+scale_amount_curve = SubResource("Curve_shrink")
+
+[node name="Sprout" type="CPUParticles2D" parent="."]
+amount = 1
+lifetime = 1.0
+one_shot = true
+texture = ExtResource("5_sprout")
+direction = Vector2(0, -1)
+spread = 25.0
+gravity = Vector2(0, 2000)
+initial_velocity_min = 750.0
+initial_velocity_max = 850.0
+angular_velocity_min = 540.0
+angular_velocity_max = 900.0
+scale_amount_min = 4.0
+scale_amount_max = 4.0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_splat")
+}

@@ -14,6 +14,14 @@ const LEAF := [
 ]
 
 
+## His sprout on its own, spinning off when he splatters.
+static func sprout():
+	var c = Canvas.new(7, 6)
+	c.grid(1, 1, LEAF[0], {"M": P.MINT, "S": P.SAGE})
+	c.outline()
+	return c
+
+
 static func frame(pose: Dictionary):
 	var c = Canvas.new(W, H)
 	var cx := 10.0

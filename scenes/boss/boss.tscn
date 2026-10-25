@@ -674,6 +674,207 @@ tracks/10/keys = {
 }]
 }
 
+[sub_resource type="Animation" id="Animation_cheer_1"]
+resource_name = "cheer_1"
+length = 1.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Legs/StompAnchor/LegF:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.15, 0.3, 0.6, 0.75, 0.9, 1.2),
+"transitions": PackedFloat32Array(0.5, 2, 1, 0.5, 2, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, -150), Vector2(0, 0), Vector2(0, 0), Vector2(0, -150), Vector2(0, 0), Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig/Legs/LegB:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.45, 0.6, 0.9, 1.05, 1.2),
+"transitions": PackedFloat32Array(1, 0.5, 2, 1, 0.5, 2, 1),
+"update": 0,
+"values": [Vector2(1260, 0), Vector2(1260, 0), Vector2(1260, -150), Vector2(1260, 0), Vector2(1260, 0), Vector2(1260, -150), Vector2(1260, 0)]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.3, 0.6, 0.9, 1.19),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"values": [{
+"args": [3.0],
+"method": &"shake"
+}, {
+"args": [3.0],
+"method": &"shake"
+}, {
+"args": [3.0],
+"method": &"shake"
+}, {
+"args": [3.0],
+"method": &"shake"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_cheer_2"]
+resource_name = "cheer_2"
+length = 0.8
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Upper/Body/FistL:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(900, 110), Vector2(900, 230), Vector2(900, 110), Vector2(900, 230), Vector2(900, 110)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig/Upper/Body/FistR:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(1260, 110), Vector2(1260, 230), Vector2(1260, 110), Vector2(1260, 230), Vector2(1260, 110)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Rig/Upper/Body:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, 12), Vector2(0, 0), Vector2(0, 12), Vector2(0, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Rig/Upper/Head:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(1090, 170), Vector2(1090, 182), Vector2(1090, 170), Vector2(1090, 182), Vector2(1090, 170)]
+}
+
+[sub_resource type="Animation" id="Animation_cheer_3"]
+resource_name = "cheer_3"
+length = 1.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Upper/Head:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 1.2),
+"transitions": PackedFloat32Array(-2, 1, 1),
+"update": 0,
+"values": [0.0, 6.28319, 6.28319]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig/Upper/Head:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.25, 0.5, 0.85, 1.2),
+"transitions": PackedFloat32Array(-2, -2, -2, -2, 1),
+"update": 0,
+"values": [Vector2(1030, 380), Vector2(1030, 280), Vector2(1030, 380), Vector2(1030, 396), Vector2(1030, 380)]
+}
+
+[sub_resource type="Animation" id="Animation_cheer_4"]
+resource_name = "cheer_4"
+length = 1.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Upper/Body/FistL:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.6, 0.9, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(806, 120), Vector2(830, 220), Vector2(806, 120), Vector2(830, 220), Vector2(806, 120)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig/Upper/Body/FistR:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.6, 0.9, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(1354, 120), Vector2(1330, 220), Vector2(1354, 120), Vector2(1330, 220), Vector2(1354, 120)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Rig/Upper:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.6, 0.9, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(60, -668), Vector2(60, -652), Vector2(60, -668), Vector2(60, -652), Vector2(60, -668)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Rig/Legs/StompAnchor/LegF:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.45, 0.6, 1.2),
+"transitions": PackedFloat32Array(0.5, 2, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, -120), Vector2(0, 0), Vector2(0, 0)]
+}
+tracks/4/type = "method"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath(".")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0.6),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [8.0],
+"method": &"shake"
+}]
+}
+
 [sub_resource type="Animation" id="Animation_slam"]
 resource_name = "slam"
 length = 2.2
@@ -2077,6 +2278,10 @@ tracks/1/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_boss"]
 _data = {
+&"cheer_1": SubResource("Animation_cheer_1"),
+&"cheer_2": SubResource("Animation_cheer_2"),
+&"cheer_3": SubResource("Animation_cheer_3"),
+&"cheer_4": SubResource("Animation_cheer_4"),
 &"death": SubResource("Animation_death"),
 &"hop": SubResource("Animation_hop"),
 &"idle_1": SubResource("Animation_idle_1"),

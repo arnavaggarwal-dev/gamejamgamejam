@@ -522,6 +522,16 @@ func _test_arms() -> void:
 	await create_timer(0.8).timeout
 	check(fired.call().size() == 2 and not boss.wrists[0].visible and not boss.wrists[1].visible, "the giant fires both hands at once")
 	check(boss._clip_for(&"rocket") == &"reload", "...and reloads the same way")
+	var cheers := []
+	for p in Boss.PHASES.size():
+		boss.phase = p
+		boss.state = Boss.State.IDLE
+		boss.celebrate()
+		cheers.append(boss.anim.current_animation)
+	check(cheers == [&"cheer_1", &"cheer_2", &"cheer_3", &"cheer_4"] and boss.state == Boss.State.CHEER and boss.rest_timer.is_stopped(), "each stage celebrates its own way, until the restart")
+	boss.state = Boss.State.DEAD
+	boss.celebrate()
+	check(boss.anim.current_animation == &"cheer_4" and boss.state == Boss.State.DEAD, "a beaten king never celebrates")
 	boss.queue_free()
 	await process_frame
 
@@ -729,7 +739,8 @@ func _test_game_wiring() -> void:
 	Engine.time_scale = 1.0
 
 
-## Losing all five hearts is game over: the whole fight starts again from the beginning.
+## Losing all five hearts is game over: he splatters (goo over the screen too), the king
+## celebrates, and the whole fight starts again from the beginning.
 func _test_game_over() -> void:
 	var game: Node2D = load("res://scenes/game.tscn").instantiate()
 	root.add_child(game)
@@ -737,7 +748,13 @@ func _test_game_over() -> void:
 	await process_frame
 	var boss: Boss = game.get_node("Boss")
 	boss.skip_phase()
-	game.get_node("Player").died.emit()
+	await create_timer(2.2).timeout  # the stage break into stage 2 plays out
+	game.get_node("Player")._die()
+	await process_frame
+	var splats := game.get_children().filter(func(n: Node) -> bool: return n.scene_file_path == "res://scenes/fx/goo_splat.tscn")
+	check(splats.size() == 1 and splats[0].puddle.visible and absf(splats[0].puddle.global_position.y - 640.0) < 30.0, "dying splatters him: goo everywhere, a puddle of him on the floor")
+	check(game.get_node("HUD").goo.visible and game.get_node("HUD").goo_fx.current_animation == &"splat", "...and over the screen, Smash style")
+	check(boss.state == Boss.State.CHEER and boss.anim.current_animation == &"cheer_2", "the king celebrates (stage 2: fist pumps)")
 	await create_timer(1.3).timeout
 	check(boss.phase == 1 and game.get_node("HUD").banner.text == "GAME OVER", "losing all five hearts is game over")
 	await create_timer(1.8).timeout

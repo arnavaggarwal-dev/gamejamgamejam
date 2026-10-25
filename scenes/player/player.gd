@@ -17,6 +17,7 @@ const AIM_DOTS := 14
 const AIM_STEP := 0.06
 const DUST := preload("res://scenes/fx/dust.tscn")
 const POOF := preload("res://scenes/fx/poof.tscn")
+const SPLAT := preload("res://scenes/fx/goo_splat.tscn")
 const SLIME := preload("res://scenes/fx/slime.tscn")
 const GHOST := preload("res://scenes/fx/afterimage.tscn")
 const HARD_LANDING := 1500.0  # px/s fall speed for the biggest landing squash
@@ -263,7 +264,7 @@ func _die() -> void:
 	aim.points = PackedVector2Array()
 	prompt.hide()
 	hide()
-	_puff(POOF, global_position)
+	_puff(SPLAT, global_position)  # he splatters completely
 	died.emit()
 
 

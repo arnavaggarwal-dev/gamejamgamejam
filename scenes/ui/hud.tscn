@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" path="res://assets/art/ui/heart_full.png" id="2_heart"]
 [ext_resource type="Texture2D" path="res://assets/art/ui/bomb_full.png" id="3_bomb"]
 [ext_resource type="SpriteFrames" path="res://assets/art/fx/poof_frames.tres" id="4_poof"]
+[ext_resource type="Texture2D" path="res://assets/art/fx/screen_goo.png" id="5_goo"]
 
 [sub_resource type="Animation" id="Animation_banner_pop"]
 resource_name = "pop"
@@ -154,6 +155,111 @@ tracks/2/keys = {
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_fill"]
 _data = {
 &"fill": SubResource("Animation_fill")
+}
+
+[sub_resource type="Animation" id="Animation_goo_splat"]
+resource_name = "splat"
+length = 2.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Goo:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Goo:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1.7, 2.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Goo:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.7, 2.5),
+"transitions": PackedFloat32Array(1, 2, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, 0), Vector2(0, 140)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Goo/Splot1:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.07, 0.15),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1.5, 1.5), Vector2(6, 6), Vector2(5, 5)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Goo/Splot2:scale")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.04, 0.11, 0.19),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(-1.5, 1.5), Vector2(-6, 6), Vector2(-5, 5)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Goo/Splot3:scale")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.08, 0.15, 0.23),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(-1.2, 1.2), Vector2(-4.8, 4.8), Vector2(-4, 4)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Goo/Splot4:scale")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.12, 0.19, 0.27),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(1.65, 1.65), Vector2(6.6, 6.6), Vector2(5.5, 5.5)]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Goo/Splot5:scale")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0, 0.16, 0.23, 0.31),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(1.05, 1.05), Vector2(4.2, 4.2), Vector2(3.5, 3.5)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_goo"]
+_data = {
+&"splat": SubResource("Animation_goo_splat")
 }
 
 [node name="HUD" type="CanvasLayer"]
@@ -399,6 +505,76 @@ theme_override_font_sizes/font_size = 54
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="Goo" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Splot1" type="TextureRect" parent="Goo"]
+layout_mode = 0
+offset_left = 198.0
+offset_top = 143.0
+offset_right = 262.0
+offset_bottom = 197.0
+rotation = 0.1
+scale = Vector2(5, 5)
+pivot_offset = Vector2(32, 27)
+mouse_filter = 2
+texture = ExtResource("5_goo")
+
+[node name="Splot2" type="TextureRect" parent="Goo"]
+layout_mode = 0
+offset_left = 1048.0
+offset_top = 203.0
+offset_right = 1112.0
+offset_bottom = 257.0
+rotation = -0.08
+scale = Vector2(-5, 5)
+pivot_offset = Vector2(32, 27)
+mouse_filter = 2
+texture = ExtResource("5_goo")
+
+[node name="Splot3" type="TextureRect" parent="Goo"]
+layout_mode = 0
+offset_left = 298.0
+offset_top = 543.0
+offset_right = 362.0
+offset_bottom = 597.0
+rotation = -0.12
+scale = Vector2(-4, 4)
+pivot_offset = Vector2(32, 27)
+mouse_filter = 2
+texture = ExtResource("5_goo")
+
+[node name="Splot4" type="TextureRect" parent="Goo"]
+layout_mode = 0
+offset_left = 928.0
+offset_top = 573.0
+offset_right = 992.0
+offset_bottom = 627.0
+rotation = 0.06
+scale = Vector2(5.5, 5.5)
+pivot_offset = Vector2(32, 27)
+mouse_filter = 2
+texture = ExtResource("5_goo")
+
+[node name="Splot5" type="TextureRect" parent="Goo"]
+layout_mode = 0
+offset_left = 628.0
+offset_top = 73.0
+offset_right = 692.0
+offset_bottom = 127.0
+rotation = 0.15
+scale = Vector2(3.5, 3.5)
+pivot_offset = Vector2(32, 27)
+mouse_filter = 2
+texture = ExtResource("5_goo")
+
 [node name="Banner" type="Label" parent="."]
 pivot_offset = Vector2(640, 60)
 visible = false
@@ -454,6 +630,11 @@ libraries = {
 [node name="CoachFx" type="AnimationPlayer" parent="."]
 libraries = {
 &"": SubResource("AnimationLibrary_coach")
+}
+
+[node name="GooFx" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_goo")
 }
 
 [node name="CinemaFx" type="AnimationPlayer" parent="."]
