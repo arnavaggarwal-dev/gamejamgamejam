@@ -537,11 +537,11 @@ func _test_arms() -> void:
 	boss.celebrate()
 	await process_frame
 	await process_frame  # (process_frame fires before _process, where the IK runs)
-	var up_right := Vector2(1, -1).normalized()
+	var up_left := Vector2(-cos(PI / 6.0), -sin(PI / 6.0))
 	var elbows: Array = boss.arms.map(func(a: Node2D) -> Vector2: return a.get_node("Elbow").global_position)
-	var upper_ok := func(i: int) -> bool: return (elbows[i] - boss.arms[i].global_position).normalized().dot(up_right) > 0.99
-	var fore_ok := func(i: int) -> bool: return (boss.wrists[i].global_position - elbows[i]).normalized().dot(Vector2.RIGHT) > 0.99
-	check(upper_ok.call(0) and upper_ok.call(1) and fore_ok.call(0) and fore_ok.call(1) and absf(elbows[0].y - elbows[1].y) < 2.0 and boss.arm_l.z_index > boss.head.z_index, "stage 2 celebrates with a dab: both upper arms up one 45-degree diagonal, both forearms level in one line, one across his face")
+	var upper := func(i: int) -> Vector2: return (elbows[i] - boss.arms[i].global_position).normalized()
+	var fore := func(i: int) -> Vector2: return (boss.wrists[i].global_position - elbows[i]).normalized()
+	check(upper.call(0).dot(Vector2.LEFT) > 0.99 and upper.call(1).dot(Vector2.RIGHT) > 0.99 and fore.call(0).dot(up_left) > 0.99 and fore.call(1).dot(up_left) > 0.99 and boss.arm_r.z_index > boss.head.z_index, "stage 2 celebrates with a dab: upper arms level out to his sides, both forearms parallel up 30 degrees, one folded over his head")
 	boss.phase = Boss.FINAL
 	boss.state = Boss.State.IDLE
 	boss.celebrate()

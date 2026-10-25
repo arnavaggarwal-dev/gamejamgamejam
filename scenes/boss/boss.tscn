@@ -716,7 +716,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.68, 0.8, 1.48, 1.6),
 "transitions": PackedFloat32Array(1, 0.4, 1, 0.4, 1),
 "update": 0,
-"values": [Vector2(1196, 228), Vector2(1196, 228), Vector2(704, 228), Vector2(704, 228), Vector2(1196, 228)]
+"values": [Vector2(681, 258), Vector2(681, 258), Vector2(931, 258), Vector2(931, 258), Vector2(681, 258)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -728,55 +728,31 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.68, 0.8, 1.48, 1.6),
 "transitions": PackedFloat32Array(1, 0.4, 1, 0.4, 1),
 "update": 0,
-"values": [Vector2(1456, 228), Vector2(1456, 228), Vector2(964, 228), Vector2(964, 228), Vector2(1456, 228)]
+"values": [Vector2(1229, 258), Vector2(1229, 258), Vector2(1479, 258), Vector2(1479, 258), Vector2(1229, 258)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath(".:flip_l")
+tracks/2/path = NodePath("Rig/Upper/Body/ArmL:z_index")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.68, 0.8, 1.48, 1.6),
-"transitions": PackedFloat32Array(1, 0.4, 1, 0.4, 1),
-"update": 0,
-"values": [1.0, 1.0, -1.0, -1.0, 1.0]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath(".:flip_r")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.68, 0.8, 1.48, 1.6),
-"transitions": PackedFloat32Array(1, 0.4, 1, 0.4, 1),
-"update": 0,
-"values": [-1.0, -1.0, 1.0, 1.0, -1.0]
-}
-tracks/4/type = "value"
-tracks/4/imported = false
-tracks/4/enabled = true
-tracks/4/path = NodePath("Rig/Upper/Body/ArmL:z_index")
-tracks/4/interp = 1
-tracks/4/loop_wrap = true
-tracks/4/keys = {
-"times": PackedFloat32Array(0, 0.74, 1.54),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 1,
-"values": [1, 0, 1]
-}
-tracks/5/type = "value"
-tracks/5/imported = false
-tracks/5/enabled = true
-tracks/5/path = NodePath("Rig/Upper/Body/ArmR:z_index")
-tracks/5/interp = 1
-tracks/5/loop_wrap = true
-tracks/5/keys = {
 "times": PackedFloat32Array(0, 0.74, 1.54),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
 "values": [0, 1, 0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Rig/Upper/Body/ArmR:z_index")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.74, 1.54),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [1, 0, 1]
 }
 
 [sub_resource type="Animation" id="Animation_cheer_3"]
