@@ -13,7 +13,8 @@ extends Node2D
 ## no new one grows per shot: stage 2 fires them in turn, the giant fires both at once, and once
 ## both wrists are bare his rocket turn is a reload (arms up, both hands screw back on).
 ## Moves that chase the player (the stomp's walk, the head's dash) are tweens started there.
-## Between attacks he roams: he drifts either side of his spot near the player, legs stepping.
+## Between attacks he roams: each rest he picks a new spot on either side of the player and heads
+## there (legs stepping, the torso sliding, the head flying and changing height too).
 
 signal health_changed(hits_left: int, hits_total: int)
 signal phase_changed(phase: int)  # 0-based: the second phase emits 1
@@ -51,15 +52,18 @@ const GIANT_ROAM := 420.0  # px the giant may step either side of his spot (he s
 
 @export var projectiles: Node2D
 
-# The king rides a rail behind the arena: between attacks he slides to stay RAIL_LEAD px
-# right of the player. Boss.position.x offsets the whole rig (torso rests at local x 1080;
-# the knee, chest and eye cores all sit near it, so the same throw reaches each stage).
-const RAIL_MIN := 0.0
+# Boss.position.x offsets the whole rig (torso rests at local x 1080; the knee, chest and eye
+# cores all sit near it, so the same throw reaches each stage). He drops in RAIL_LEAD px right
+# of the player; between attacks he roams to a new spot SPOT_GAP px either side of the player
+# (so he stays on screen), at least SPOT_MOVE px from where he is, at his stage's ROAM_SPEED.
+const RAIL_MIN := -800.0  # core at x 280: room to come round to the left of a player by the wall
 const RAIL_MAX := 1280.0
 const RAIL_LEAD := 560.0
-const RAIL_SPEED := 300.0
-const WANDER := 260.0  # px he roams either side of his spot near the player
-const WANDER_RATE := 0.6  # rad/s of the roaming sway
+const SPOT_GAP := Vector2(280.0, 560.0)  # min, max px from the player to his core
+const SPOT_MOVE := 300.0
+const ROAM_SPEED := [300.0, 380.0, 460.0]  # px/s: legs walking, torso sliding, head flying
+const HEAD_HEIGHT := Vector2(-180.0, 100.0)  # stage 3: how far the head's hover rises or sinks
+const DASH_BOUNDS := Rect2(150.0, 130.0, 2260.0, 410.0)  # where a head dash may end (it stays there)
 const STRIDE := 36.0  # px a leg lifts per step while he walks
 const DASH_OVERSHOOT := 300.0  # px the head dashes past where it aimed
 const TORSO_X := 1080.0
@@ -72,8 +76,8 @@ var hp := HITS_PER_PHASE
 var _attack_index := 0
 var _rest_pose := {}
 var _rail_dust := 0.0
+var _spot := Vector2.ZERO  # where he is roaming to: x his position, y (stage 3) his Upper's height
 var _move: Tween  # the running chase tween (stomp walk / head dash), killed on any new animation
-var _wander := 0.0
 var _stride := 0.0
 var _dash_target := Vector2.ZERO
 var _hand_dirs := [Vector2.LEFT, Vector2.LEFT]  # where each rocket hand will fly (set by aim_hands)
@@ -147,20 +151,18 @@ func _reach(shoulder: Node2D, target: Vector2, out: float) -> void:
 	shoulder.get_node("Elbow").rotation = -2.0 * open
 
 
-## Rides the rail while resting, roaming either side of his spot near the player so attacks
-## still land close; in the legs stage the legs step as he walks.
+## Roams to his spot while resting: the legs step as he walks, the torso slides along the floor,
+## the flying head also rises or sinks to its new height.
 func _physics_process(delta: float) -> void:
 	if state != State.IDLE or phase == FINAL:  # the giant stands his ground
 		return
-	var player := get_tree().get_first_node_in_group("player") as Node2D
-	if player == null:
-		return
-	_wander += WANDER_RATE * delta
-	var goal := clampf(_rail_goal(player) + sin(_wander) * WANDER, RAIL_MIN, RAIL_MAX)
 	var before := position.x
-	position.x = move_toward(position.x, goal, RAIL_SPEED * delta)
+	position.x = move_toward(position.x, _spot.x, ROAM_SPEED[phase] * delta)
 	var moving := absf(position.x - before) > 0.1
-	if moving:
+	if phase == 2:
+		upper.position.y = move_toward(upper.position.y, _spot.y, ROAM_SPEED[phase] * 0.5 * delta)
+		_rest_pose[upper] = upper.position  # (so the next move starts from here)
+	elif moving:
 		_rail_dust -= delta
 		if _rail_dust <= 0.0:
 			_rail_dust = 0.2
@@ -183,6 +185,20 @@ func _step_legs(delta: float, moving: bool) -> void:
 
 func _rail_goal(player: Node2D) -> float:
 	return clampf(player.global_position.x + RAIL_LEAD - TORSO_X, RAIL_MIN, RAIL_MAX)
+
+
+## A new spot to roam to: his core SPOT_GAP px from the player on either side (crossing over is
+## fine), at least SPOT_MOVE px from where he is if there is room; the head picks a new height.
+func _pick_spot() -> void:
+	var best := position.x
+	for attempt in 6:
+		var core := _player_x() + (-1.0 if randf() < 0.5 else 1.0) * randf_range(SPOT_GAP.x, SPOT_GAP.y)
+		var spot := clampf(core - TORSO_X, RAIL_MIN, RAIL_MAX)
+		if absf(spot - position.x) > absf(best - position.x):
+			best = spot
+		if absf(spot - position.x) >= SPOT_MOVE:
+			break
+	_spot = Vector2(best, randf_range(HEAD_HEIGHT.x, HEAD_HEIGHT.y))
 
 
 ## Cracks spread over the part being fought as it takes hits: one, then all three.
@@ -371,9 +387,9 @@ func aim_dash() -> void:
 	dash_beam.global_rotation = (_dash_target - head.global_position).angle()
 
 
-## Stage 3: the head dashes straight along the beam, through the aimed spot and past it, then
-## flies home (the swoop animation flashes it white and keeps the ram hitbox live). Diving at
-## a spot by the floor, it hits the spot and skids on along the floor instead of into it.
+## Stage 3: the head dashes straight along the beam, through the aimed spot and past it, and
+## stays there (the swoop animation flashes it white and keeps the ram hitbox live). Diving at a
+## spot by the floor, it hits the spot and skids on along the floor instead of into it.
 func swoop() -> void:
 	Sfx.play(&"whoosh", 0.8)
 	var dir := (_dash_target - head.global_position).normalized()
@@ -383,11 +399,22 @@ func swoop() -> void:
 	if past.y > 540.0:
 		path.tween_property(head, "global_position", _dash_target, 0.28 / s).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 		past = _dash_target + Vector2(signf(dir.x) * DASH_OVERSHOOT * 0.7, 0.0)
-		path.tween_property(head, "global_position:x", clampf(past.x, 80.0, ARENA_W - 80.0), 0.15 / s).set_ease(Tween.EASE_OUT)
+		path.tween_property(head, "global_position:x", clampf(past.x, DASH_BOUNDS.position.x, DASH_BOUNDS.end.x), 0.15 / s).set_ease(Tween.EASE_OUT)
 	else:
+		past = past.clamp(DASH_BOUNDS.position, DASH_BOUNDS.end)
 		path.tween_property(head, "global_position", past, 0.35 / s).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	path.tween_interval(0.15 / s)
-	path.tween_property(head, "position", _rest_pose[head], 0.6 / s).set_trans(Tween.TRANS_SINE)
+	path.tween_callback(_settle_head)
+
+
+## The head stays where its dash ended instead of flying home: its offset moves onto the boss
+## (sideways) and his Upper (up and down), so every later move starts from there.
+func _settle_head() -> void:
+	var drift: Vector2 = head.position - _rest_pose[head]
+	head.position = _rest_pose[head]
+	position.x += drift.x
+	upper.position.y += drift.y
+	_rest_pose[upper] = upper.position
+	_spot = Vector2(position.x, upper.position.y)
 
 
 ## Stage 3 laser tell: point the eye beam at the player (called repeatedly, then it locks).
@@ -534,6 +561,8 @@ func _advance_phase() -> void:
 
 
 func _rest() -> void:
+	if phase != FINAL:
+		_pick_spot()
 	_play(StringName("idle_%d" % (phase + 1)), State.IDLE)
 	rest_timer.start(PHASES[phase].rest)
 

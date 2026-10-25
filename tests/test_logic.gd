@@ -459,6 +459,7 @@ func _test_boss_moves() -> void:
 	var beam_art: Texture2D = boss.dash_beam.get_node("Beam").sprite_frames.get_frame_texture(&"shimmer", 0)
 	check(beam_art.get_height() * 4.0 >= 200.0, "the light beam is as wide as his head (%d px)" % (beam_art.get_height() * 4))
 	var aim := Vector2(400, 540)  # no player here: he aims at x 400, kept above the floor
+	var start: Vector2 = boss.head.global_position
 	var closest := [INF]
 	var flashed := [0.0]
 	var last: Vector2 = boss.head.global_position
@@ -470,6 +471,7 @@ func _test_boss_moves() -> void:
 		last = now
 	check(closest[0] < 20.0, "the head dashes straight through the aimed spot (closest %.0f px)" % closest[0])
 	check(flashed[0] > 0.9, "the head flashes white as it dashes")
+	check(boss.head.global_position.distance_to(start) > 300.0 and boss.head.position.distance_to(Vector2(1030, 380)) < 20.0 and boss.upper.position.y > -600.0, "...and stays out there instead of flying home (the boss and his Upper carry its new spot)")
 	boss.queue_free()
 	await process_frame
 
@@ -638,7 +640,7 @@ func _test_roam() -> void:
 		span[0] = minf(span[0], boss.position.x)
 		span[1] = maxf(span[1], boss.position.x)
 		lift[0] = maxf(lift[0], -minf(boss.leg_f.position.y, boss.leg_b.position.y))
-	check(span[1] - span[0] > 150.0, "he roams the stage while the player stands still (%.0f px)" % (span[1] - span[0]))
+	check(span[1] - span[0] >= Boss.SPOT_MOVE - 20.0, "he roams to a new spot on the stage while the player stands still (%.0f px)" % (span[1] - span[0]))
 	check(lift[0] > 10.0, "his legs step as he walks")
 	boss.skip_phase()  # torso stage: no charge any more, but he still moves
 	while boss.state != Boss.State.IDLE:
@@ -649,7 +651,17 @@ func _test_roam() -> void:
 		await physics_frame
 		torso_span[0] = minf(torso_span[0], boss.position.x)
 		torso_span[1] = maxf(torso_span[1], boss.position.x)
-	check(torso_span[1] - torso_span[0] > 150.0, "the torso still roams the stage (%.0f px)" % (torso_span[1] - torso_span[0]))
+	check(torso_span[1] - torso_span[0] > 250.0, "the torso slides off to new spots too (%.0f px)" % (torso_span[1] - torso_span[0]))
+	boss.skip_phase()  # the flying head
+	while boss.state != Boss.State.IDLE:
+		await physics_frame
+	boss.rest_timer.stop()
+	var head_from: Vector2 = boss.head.global_position
+	var head_far := [0.0]
+	for i in 180:
+		await physics_frame
+		head_far[0] = maxf(head_far[0], boss.head.global_position.distance_to(head_from))
+	check(head_far[0] > 250.0, "the flying head roams too, changing height (%.0f px)" % head_far[0])
 	game.queue_free()
 	await process_frame
 
