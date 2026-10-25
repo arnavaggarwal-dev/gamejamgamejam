@@ -807,7 +807,7 @@ func _test_game_over() -> void:
 	var splats := game.get_children().filter(func(n: Node) -> bool: return n.scene_file_path == "res://scenes/fx/goo_splat.tscn")
 	check(splats.size() == 1 and splats[0].puddle.visible and absf(splats[0].puddle.global_position.y - 640.0) < 30.0, "dying splatters him: goo everywhere, a puddle of him on the floor")
 	var goo: ColorRect = game.get_node("HUD").goo
-	check(goo.visible and game.get_node("HUD").goo_fx.current_animation == &"splat" and (goo.material as ShaderMaterial).get_shader_parameter(&"count") == 30, "...and real goo over the screen, Smash style (three gobs, each with lumps and a spray)")
+	check(goo.visible and game.get_node("HUD").goo_fx.current_animation == &"splat" and (goo.material as ShaderMaterial).get_shader_parameter(&"count") == 65, "...and real goo spattered over the screen, Smash style (five gobs, each with lumps and a streak of spray)")
 	check(boss.state == Boss.State.CHEER and boss.anim.current_animation == &"cheer_2", "the king celebrates (stage 2: fist pumps)")
 	await create_timer(1.3).timeout
 	check(boss.phase == 1 and game.get_node("HUD").banner.text == "GAME OVER", "losing all five hearts is game over")

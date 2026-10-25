@@ -5,8 +5,8 @@ shader_type canvas_item;
 // slides down the glass and fades. Drawn in 4 px blocks, ink edge, teal rim, mint body, a cream
 // glint on each blob, to match the pixel art. HUD.splat() scatters the blobs; GooFx runs t.
 
-const int MAX_BLOBS = 32;
-uniform vec4 blobs[32];
+const int MAX_BLOBS = 64;
+uniform vec4 blobs[64];
 uniform int count = 0;
 uniform float t = 0.0;  // seconds since the splat
 uniform vec2 size = vec2(1280.0, 720.0);

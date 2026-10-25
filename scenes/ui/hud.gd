@@ -143,23 +143,29 @@ func coach(text: String) -> void:
 		coach_fx.play(&"pop")
 
 
-## The hero splattered against the screen, Smash style: real goo (the screen_goo shader) splashes
-## onto the glass in three gobs, each with a spray of droplets around it, merges, drips, then
-## slides down and fades (the GooFx "splat" clip runs its time). A new layout every time.
+## The hero splattered against the screen, Smash style: real goo (the screen_goo shader) spatters
+## the glass in five gobs spread across it (high and low by turns), each with a couple of lumps and a streak of spray
+## flung out one way (smaller drops the further they fly); it merges, drips, then slides down
+## and fades (the GooFx "splat" clip runs its time). A new layout every time.
 func splat() -> void:
 	Sfx.play(&"squish")
 	var blobs := PackedVector4Array()
-	for k in 3:
-		var at := Vector2(randf_range(160.0, 1120.0), randf_range(90.0, 560.0))
-		var size := randf_range(70.0, 120.0)
-		var land := k * 0.05
+	var columns := range(5)
+	columns.shuffle()
+	for k in 5:
+		var high: bool = columns[k] % 2 == 0  # neighbours alternate high and low, so they don't run together
+		var at := Vector2((columns[k] + randf_range(0.2, 0.8)) * 256.0, randf_range(70.0, 320.0) if high else randf_range(380.0, 640.0))  # one per fifth of the screen
+		var size := randf_range(50.0, 80.0)
+		var land := k * 0.035
 		blobs.append(Vector4(at.x, at.y, size, land))
-		for i in 3:  # lumps around the gob
-			var off := Vector2.from_angle(randf() * TAU) * size * randf_range(0.6, 1.2)
-			blobs.append(Vector4(at.x + off.x, at.y + off.y, size * randf_range(0.3, 0.5), land + 0.02))
-		for i in 6:  # the spray flung out of it
-			var off := Vector2.from_angle(randf() * TAU) * size * randf_range(1.5, 2.8)
-			blobs.append(Vector4(at.x + off.x, at.y + off.y, randf_range(6.0, 16.0), land + randf_range(0.03, 0.1)))
+		for i in 2:  # lumps on the gob
+			var off := Vector2.from_angle(randf() * TAU) * size * randf_range(0.6, 1.1)
+			blobs.append(Vector4(at.x + off.x, at.y + off.y, size * randf_range(0.3, 0.45), land + 0.02))
+		var fling := randf() * TAU
+		for i in 10:  # the spray, streaked out one way
+			var reach := randf_range(1.3, 3.6)
+			var off := Vector2.from_angle(fling + randf_range(-0.8, 0.8)) * size * reach
+			blobs.append(Vector4(at.x + off.x, at.y + off.y, randf_range(5.0, 15.0) * (1.6 - reach / 4.0), land + reach * 0.03))
 	var mat := goo.material as ShaderMaterial
 	mat.set_shader_parameter(&"blobs", blobs)
 	mat.set_shader_parameter(&"count", blobs.size())
