@@ -159,7 +159,7 @@ func _spawn_helper(at: Vector2) -> void:
 	add_child(helper)
 	helper.global_position = at
 	helper.scale = WATT_SIZE
-	helper.z_index = 2  # its cable (z -1 relative) then runs over the king but under Lil' Watt
+	helper.z_index = 2  # over its cable (top_level, so its z 1 is absolute), which runs over the king
 	helper.roaming = false
 	helper.roam_max = Stage.DOOM_W - 120.0
 	helper.projectiles = projectiles

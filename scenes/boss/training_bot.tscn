@@ -518,7 +518,7 @@ script = ExtResource("1_script")
 
 [node name="Link" type="Node2D" parent="."]
 visible = false
-z_index = -1
+z_index = 1
 top_level = true
 
 [node name="Cable" type="Line2D" parent="Link"]

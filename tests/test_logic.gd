@@ -660,6 +660,7 @@ func _test_final_phase() -> void:
 	check(hud.boss_box.global_position.x > 700.0, "the boss bar moves to the top-right corner, clear of the giant's head")
 	check(helper.link.visible and helper.power_target == boss.weak_point() and helper.follow_y and not helper.shot_timer.is_stopped(), "Lil' Watt fights beside him: powering him, following you, shooting")
 	check(hud.boss_name.text == "LIL' WATT" and hud.boss_bar.value == TrainingBot.HITS, "the boss bar now shows Lil' Watt")
+	check(helper.link.top_level and helper.link.z_index > boss.z_index and helper.link.z_index < helper.z_index, "its cable runs in front of the king into his chest core, under Lil' Watt")
 	var shots := projectiles_of(game, "res://scenes/boss/zap_ball.tscn")
 	helper.shoot()
 	check(projectiles_of(game, "res://scenes/boss/zap_ball.tscn") == shots + 1, "Lil' Watt shoots zap balls")
