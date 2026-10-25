@@ -579,6 +579,7 @@ func _test_aimed_throw() -> void:
 		await physics_frame
 	var far := core.global_position.x - player.global_position.x
 	player._throw()
+	check(player.bombs_thrown == 1, "throws are counted for the win screen")
 	await create_timer(2.0).timeout
 	check(boss.hp == Boss.HITS_PER_PHASE - 1, "a plain throw reaches his core %d px away, leading him as he roams" % far)
 	game.queue_free()
@@ -717,14 +718,22 @@ func _test_final_phase() -> void:
 		if i == 0:
 			check(helper.shield.visible and not helper.core.get_node("WeakPoint").monitoring, "a hit shuts the opening at once (one hit per shot)")
 	check(won[0] and boss.state == Boss.State.DEAD, "breaking Lil' Watt knocks the giant out")
+	check(hud.banner.text == "K.O.!", "the knockout lands in slow motion under a big K.O.!")
 	check(is_instance_valid(helper) and helper.out_cold and not helper.link.visible and player.frozen and hud.bars[0].scale.y > 0.0, "the last hit knocks Lil' Watt out (no explosion), snaps the power link and starts the ending")
 	await create_timer(7.0).timeout
 	check(boss.rig.position.y > Boss.GROWN_POS.y + 1000.0 and not boss.head.get_node("Crown").visible, "the powerless king comes apart and sinks into the acid, his crown popped off")
 	check(player.crown.visible and player.frozen, "the king's crown drops onto the little guy")
+	check(player.celebrating and player.juice.current_animation == &"victory" and hud.confetti.emitting and not game.firework_timer.is_stopped(), "...who hops for joy with his arms up while confetti rains and fireworks go up")
+	check(camera.zoom.is_equal_approx(Vector2.ONE * Game.CLOSE_UP_ZOOM), "the camera closes in on the crowning")
 	await create_timer(5.0).timeout
-	check(player.frozen and hud.bars[0].scale.y < 0.05 and helper.anim.current_animation in [&"bow", &""], "Lil' Watt comes round and bows; the letterbox lifts, the hero stays locked")
-	await create_timer(3.4).timeout
-	check(hud.end_panel.visible and hud.end_label.text == "YOU WIN!" and not hud.boss_box.visible, "then the win screen (no boss bar left)")
+	check(game.get_children().any(func(n: Node) -> bool: return n.scene_file_path == "res://scenes/fx/firework.tscn"), "fireworks burst over the arena")
+	check(player.frozen and camera.zoom.is_equal_approx(Vector2.ONE / 3.0) and helper.anim.current_animation in [&"bow", &""], "the camera pulls back out and Lil' Watt comes round and bows; the hero stays locked")
+	await create_timer(5.4).timeout
+	check(hud.end_panel.visible and hud.end_label.text == "YOU WIN!" and not hud.boss_box.visible and hud.bars[0].scale.y < 0.05, "then the letterbox lifts and the win screen comes up (no boss bar left)")
+	await create_timer(2.3).timeout
+	var rows: Array = hud.win_rows.map(func(r: Label) -> String: return r.text)
+	check(rows[1] == "ATTEMPTS  %d" % Game.attempt and rows[2] == "HEARTS LEFT  %d / %d" % [player.hp, Player.MAX_HP] and hud.win_rows.all(func(r: Label) -> bool: return r.modulate.a == 1.0), "its stats tick in: time, attempts, hearts left, bombs thrown")
+	check(hud.rank_label.visible and hud.rank_label.text == Game.rank(Game.attempt, player.hp) and hud.retry.get_parent().modulate.a == 1.0, "...then the rank stamps down and PLAY AGAIN / TITLE appear")
 	player.died.emit()
 	await create_timer(1.4).timeout
 	check(game.helper == helper and boss.state == Boss.State.DEAD and hud.banner.text != "GAME OVER", "a death after the win changes nothing (no game over)")
@@ -785,6 +794,7 @@ func _test_game_over() -> void:
 	check(fresh.attempt_label.visible and fresh.attempt_label.text == "ATTEMPT 2", "...with a big ATTEMPT 2 by the start")
 	fresh.queue_free()
 	Game.attempt = 1
+	check([Game.rank(1, 5), Game.rank(1, 3), Game.rank(3, 1), Game.rank(4, 5)] == ["S", "A", "B", "C"], "the win rank: S first try with 4+ hearts, A first try, B within 3 attempts, C after")
 	await process_frame
 
 

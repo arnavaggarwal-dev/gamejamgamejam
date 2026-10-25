@@ -4,9 +4,12 @@ extends Node2D
 
 const GOAL_HINT := "PULL OUT A BOMB [Z], THROW IT AT THE CORE!  HOLD [A] TO MAKE MORE."
 const HELPER := preload("res://scenes/boss/training_bot.tscn")
+const FIREWORK := preload("res://scenes/fx/firework.tscn")
+const FIREWORK_COLORS := [Color("#db9692"), Color("#dbd991"), Color("#96db91"), Color("#92b5db"), Color("#db91d3"), Color("#b991dc")]
 const WATT_SPOT := Vector2(2450.0, -560.0)  # phase 4: Lil' Watt beams into the rising king from here
 const WATT_SIZE := Vector2(2.0, 2.0)  # phase 4's Lil' Watt is powered up (and readable zoomed out)
 const WATT_DOWN := Vector2(0.0, -102.0)  # Lil' Watt (2x) lying on a ledge, from where the hero would stand
+const CLOSE_UP_ZOOM := 1.25  # the crowning, close up on the hero
 
 @onready var player: Player = $Player
 @onready var boss: Boss = $Boss
@@ -18,11 +21,14 @@ const WATT_DOWN := Vector2(0.0, -102.0)  # Lil' Watt (2x) lying on a ledge, from
 @onready var camera: Camera2D = $Camera2D
 @onready var camera_moves: AnimationPlayer = $Camera2D/Moves  # doom (3x zoom-out), drop / lift (the letterbox view)
 @onready var kings_crown: Sprite2D = $KingsCrown
+@onready var firework_timer: Timer = $FireworkTimer  # the ending's fireworks, one per tick
 @onready var attempt_label: Label = $Attempt  # big "ATTEMPT N" in the world by the start, Geometry Dash style
 
 static var attempt := 1  # this run's try: a game over adds one, the title screen resets it
 
 var helper: TrainingBot  # Lil' Watt powering the giant in phase 4
+var _fighting := false
+var _clock := 0.0  # seconds of fight this attempt (not the tutorial, not pauses): a win screen stat
 
 
 func _ready() -> void:
@@ -37,7 +43,9 @@ func _ready() -> void:
 	boss.phase_changed.connect(_on_boss_phase_changed)
 	boss.defeated.connect(_on_boss_defeated)
 	boss.crown_popped.connect(_on_crown_popped)
-	hud.retry_pressed.connect(get_tree().reload_current_scene)
+	hud.retry_pressed.connect(_play_again)
+	hud.title_pressed.connect(func() -> void: get_tree().change_scene_to_file("res://scenes/title.tscn"))
+	firework_timer.timeout.connect(_launch_firework)
 	hud.skip_phase_pressed.connect(boss.skip_phase)
 	tutorial.setup(player, boss, hud, stage, projectiles)
 	hud.set_hearts(player.hp)
@@ -55,6 +63,12 @@ func _ready() -> void:
 		await tutorial.run()  # Lil' Watt first; the king stays hidden until it breaks
 		hud.show_banner("HERE COMES THE KING!", 1.6)
 	boss.start_fight()
+	_fighting = true
+
+
+func _process(delta: float) -> void:
+	if _fighting:
+		_clock += delta
 
 
 ## F2 skips to the next phase in debug runs (same as the HUD button).
@@ -177,20 +191,73 @@ func _spawn_helper(at: Vector2) -> void:
 
 
 func _on_boss_defeated() -> void:
+	_fighting = false
 	player.hurtbox.set_deferred("monitoring", false)  # deferred: defeated fires inside the WeakPoint physics callback
 	stage.stop()
 	for child in projectiles.get_children():
 		child.queue_free()
+	_knockout_slowmo()
 	await _ending()
 	hud.show_hint("")
 	await hud.show_banner("LONG LIVE THE LITTLE GUY!", 3.0)
-	hud.show_end("YOU WIN!")
+	hud.show_win(PackedStringArray([
+		"TIME  %d:%02d" % [floori(_clock / 60.0), int(_clock) % 60],
+		"ATTEMPTS  %d" % attempt,
+		"HEARTS LEFT  %d / %d" % [player.hp, Player.MAX_HP],
+		"BOMBS THROWN  %d" % player.bombs_thrown,
+	]), rank(attempt, player.hp))
+
+
+## The run's rank on the win screen: S for a first-try win with 4+ hearts left, A for any
+## first-try win, B within three attempts, C after that.
+static func rank(attempts: int, hearts: int) -> String:
+	if attempts == 1:
+		return "S" if hearts >= 4 else "A"
+	return "B" if attempts <= 3 else "C"
+
+
+## The knockout blow lands in slow motion under a big K.O. (once the hit's own freeze is over).
+func _knockout_slowmo() -> void:
+	await get_tree().create_timer(0.15, true, false, true).timeout
+	Engine.time_scale = 0.3
+	hud.show_banner("K.O.!", 0.4)
+	await get_tree().create_timer(1.2, true, false, true).timeout
+	Engine.time_scale = 1.0
+
+
+## The crowning, close up: the camera closes in on the hero (as the crown falls), then pulls back
+## out over the arena of doom.
+func _close_up(on: bool) -> Signal:
+	camera.follow_y = on  # he may still be falling as the crown drops
+	var move := create_tween().set_parallel().set_trans(Tween.TRANS_SINE)
+	move.tween_property(camera, "zoom", Vector2.ONE * (CLOSE_UP_ZOOM if on else 1.0 / 3.0), 0.9)
+	if not on:
+		move.tween_property(camera, "position:y", 360.0, 0.9)
+	return move.finished
+
+
+## A firework bursts somewhere in the top of the view, in a palette colour, sized for the zoom.
+func _launch_firework() -> void:
+	var firework: Node2D = FIREWORK.instantiate()
+	add_child(firework)
+	var view := get_viewport_rect().size / camera.zoom
+	firework.global_position = camera.get_screen_center_position() + Vector2(randf_range(-0.42, 0.42) * view.x, randf_range(-0.38, -0.08) * view.y)
+	firework.modulate = FIREWORK_COLORS.pick_random()
+	firework.scale = Vector2.ONE / camera.zoom
+
+
+## PLAY AGAIN after a win starts a fresh run (attempts back to 1).
+func _play_again() -> void:
+	attempt = 1
+	get_tree().reload_current_scene()
 
 
 ## The knockout, letterboxed. Lil' Watt is knocked out of the sky and the power link snaps; the
 ## king goes limp and comes apart in his moat (his "death" clip), his crown popping off into the
-## sky. Once he is gone the crown drops out of the sky onto the little guy (much too big); Lil'
-## Watt comes round, takes it in, and bows to the new king. The hero stays frozen afterwards.
+## sky. Once he is gone the crown drops out of the sky onto the little guy (much too big), the
+## camera closing in on him; he hops for joy while fireworks go up and confetti rains, then the
+## camera pulls back out and Lil' Watt comes round, takes it in, and bows to the new king. The
+## hero stays frozen afterwards.
 func _ending() -> void:
 	player.frozen = true
 	camera.target = player
@@ -209,11 +276,17 @@ func _ending() -> void:
 	drop.tween_property(kings_crown, "global_position", player.crown.global_position, 0.9).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	drop.tween_property(kings_crown, "rotation", 0.0, 0.9)
 	drop.tween_property(kings_crown, "scale", player.crown.global_scale, 0.9)
+	_close_up(true)
 	await drop.finished
 	kings_crown.hide()
 	player.wear_crown()
 	get_tree().call_group("camera", "shake", 12.0)
-	await _wait(1.0)
+	await _wait(0.4)
+	player.celebrate()
+	hud.celebrate()
+	firework_timer.start()
+	await _wait(2.0)  # the crowned hero hopping under the fireworks, close up
+	await _close_up(false)
 	if is_instance_valid(helper):
 		helper.sit_up()
 		hud.coach("...DAD?")

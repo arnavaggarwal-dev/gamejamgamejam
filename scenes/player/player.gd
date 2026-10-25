@@ -54,6 +54,8 @@ var _air_jump_ready := true  # one jump in mid-air (after a dash, off a ledge, o
 var _dash_dir := Vector2.RIGHT
 var _dash_grounded := false  # started on the floor (and not upward): you can still jump out of it
 var frozen := false  # cutscenes: no control and no harm, he just stands and watches
+var celebrating := false  # the ending: crowned, hopping for joy with his arms up
+var bombs_thrown := 0  # this run's throws (a win screen stat)
 var _thrown: Bomb = null  # the last bomb he threw, for [A] to set off
 var ammo := MAX_AMMO
 var charging := false  # squeezing out a bomb
@@ -170,6 +172,12 @@ func _stand_still(delta: float) -> void:
 	aim.points = PackedVector2Array()
 	prompt.hide()
 	_update_pose(0.0)
+
+
+## The ending: crowned, he hops for joy with his arms up (the Juice "victory" clip).
+func celebrate() -> void:
+	celebrating = true
+	juice.play(&"victory")
 
 
 ## The ending: the king's crown lands on his head (much too big). Clonk.
@@ -371,6 +379,7 @@ func _bomb_target() -> Area2D:
 func _throw() -> void:
 	held_bomb.target = _bomb_target()
 	held_bomb.throw(_throw_velocity())
+	bombs_thrown += 1
 	_thrown = held_bomb
 	held_bomb = null
 	juice.play(&"throw")
@@ -472,7 +481,9 @@ func _squash(s: Vector2) -> void:
 func _update_pose(dir: float) -> void:
 	var moving := is_on_floor() and dir != 0.0
 	var pose := &"idle"
-	if invuln.time_left > invuln.wait_time - 0.25:
+	if celebrating:
+		pose = &"carry"  # arms up for joy
+	elif invuln.time_left > invuln.wait_time - 0.25:
 		pose = &"hurt"
 	elif charging:
 		pose = &"strain"

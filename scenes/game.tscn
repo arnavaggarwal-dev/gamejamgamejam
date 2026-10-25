@@ -1581,6 +1581,9 @@ sprite_frames = ExtResource("24_arrow")
 animation = &"bob"
 autoplay = "bob"
 
+[node name="FireworkTimer" type="Timer" parent="."]
+wait_time = 0.4
+
 [node name="KingsCrown" type="Sprite2D" parent="."]
 visible = false
 z_index = 5

@@ -140,8 +140,38 @@ tracks/0/keys = {
 "values": [Vector2(1.21, 0.8), Vector2(1.11, 0.8), Vector2(1.21, 0.8)]
 }
 
+[sub_resource type="Animation" id="Animation_victory"]
+resource_name = "victory"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Art:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.15, 0.3, 0.6),
+"transitions": PackedFloat32Array(0.5, 2, 1, 1),
+"update": 0,
+"values": [Vector2(0, 42), Vector2(0, 8), Vector2(0, 42), Vector2(0, 42)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Art:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.06, 0.15, 0.28, 0.3, 0.42, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(1.2, 0.82), Vector2(0.88, 1.15), Vector2(1, 1), Vector2(0.92, 1.1), Vector2(1.22, 0.8), Vector2(1, 1), Vector2(1, 1)]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_juice"]
 _data = {
+&"victory": SubResource("Animation_victory"),
 &"strain": SubResource("Animation_strain"),
 &"dash": SubResource("Animation_dash"),
 &"dash_v": SubResource("Animation_dash_v"),

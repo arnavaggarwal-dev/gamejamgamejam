@@ -3,6 +3,7 @@ extends CanvasLayer
 ## Hearts, boss bar, big banners, the goal hint and the end panel. Displays only; owns no game state.
 
 signal retry_pressed
+signal title_pressed
 signal skip_phase_pressed
 
 const HEART_FULL := preload("res://assets/art/ui/heart_full.png")
@@ -29,7 +30,12 @@ var _ammo := -1  # what the ammo row last showed (-1: nothing yet)
 @onready var flash_rect: ColorRect = $Flash
 @onready var end_panel: Control = $EndPanel
 @onready var end_label: Label = $EndPanel/VBox/Label
-@onready var retry: Button = $EndPanel/VBox/Retry
+@onready var retry: Button = $EndPanel/VBox/Buttons/Retry
+@onready var title_button: Button = $EndPanel/VBox/Buttons/Title
+@onready var win_rows: Array[Node] = $EndPanel/VBox/Stats.get_children()
+@onready var rank_label: Label = $Rank
+@onready var win_fx: AnimationPlayer = $WinFx
+@onready var confetti: CPUParticles2D = $Confetti
 @onready var skip_button: Button = $SkipPhase
 @onready var bars: Array = [$Cinema/Top, $Cinema/Bottom]
 @onready var banner_fx: AnimationPlayer = $BannerFx
@@ -42,6 +48,7 @@ var _ammo := -1  # what the ammo row last showed (-1: nothing yet)
 func _ready() -> void:
 	add_to_group("hud")  # get_tree().call_group("hud", "flash", strength, hold)
 	retry.pressed.connect(retry_pressed.emit)
+	title_button.pressed.connect(title_pressed.emit)
 	skip_button.visible = OS.is_debug_build()  # testing aid: never shows in a release export
 	skip_button.pressed.connect(skip_phase_pressed.emit)
 
@@ -147,7 +154,31 @@ func boss_bar_aside() -> void:
 	boss_box.offset_right = -24.0
 
 
-func show_end(text: String) -> void:
-	end_label.text = text
-	end_panel.show()
+## Confetti rains down the screen (the ending, then the win screen).
+func celebrate() -> void:
+	confetti.emitting = true
+
+
+## The win screen: the panel pops in under a crown, the run's stats tick in one by one and its
+## rank slams down like a stamp (the WinFx "win" clip calls _tick, _stamp and _focus_retry).
+func show_win(stats: PackedStringArray, rank: String) -> void:
+	end_label.text = "YOU WIN!"
+	for i in win_rows.size():
+		win_rows[i].text = stats[i]
+	rank_label.text = rank
+	celebrate()
+	win_fx.play(&"win")
+	win_fx.advance(0.0)
+
+
+func _tick() -> void:
+	get_tree().call_group("camera", "shake", 3.0)
+
+
+func _stamp() -> void:
+	flash(0.6)
+	get_tree().call_group("camera", "shake", 14.0)
+
+
+func _focus_retry() -> void:
 	retry.grab_focus()

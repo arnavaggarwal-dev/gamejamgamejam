@@ -77,6 +77,7 @@ func _fx() -> void:
 	_save_sheet("fx/goo_blob.png", [Fx.goo_blob()])
 	_save_sheet("fx/goo_puddle.png", [Fx.goo_puddle()])
 	_save_sheet("fx/screen_goo.png", [Fx.screen_goo()])
+	_save_sheet("fx/ember.png", [Fx.ember()])
 	_save_sheet("hero/sprout.png", [Hero.sprout()])
 	_save_sheet("fx/shockwave.png", Fx.shockwave_frames())
 	_save_sheet("fx/laser_warn.png", Fx.laser_warn_frames())

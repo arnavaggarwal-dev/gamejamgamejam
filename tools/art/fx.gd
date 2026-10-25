@@ -195,6 +195,14 @@ static func screen_goo():
 	return c
 
 
+## A firework spark: a bright plus (tinted by the firework's colour).
+static func ember():
+	var c = Canvas.new(5, 5)
+	c.hline(0, 4, 2, P.CREAM)
+	c.vline(2, 0, 4, P.CREAM)
+	return c
+
+
 ## Bigger puff ring for the player's knock-out (6 frames).
 static func poof_frames() -> Array:
 	var frames := []
