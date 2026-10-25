@@ -704,7 +704,7 @@ tracks/2/keys = {
 
 [sub_resource type="Animation" id="Animation_cheer_2"]
 resource_name = "cheer_2"
-length = 0.8
+length = 1.2
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -713,10 +713,10 @@ tracks/0/path = NodePath("Rig/Upper/Body/FistL:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.45, 0.6, 1.05, 1.2),
+"transitions": PackedFloat32Array(1, -2, 1, -2, 1),
 "update": 0,
-"values": [Vector2(850, 110), Vector2(860, 230), Vector2(850, 110), Vector2(860, 230), Vector2(850, 110)]
+"values": [Vector2(759, 521), Vector2(759, 521), Vector2(759, 139), Vector2(759, 139), Vector2(759, 521)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -725,10 +725,10 @@ tracks/1/path = NodePath("Rig/Upper/Body/FistR:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.45, 0.6, 1.05, 1.2),
+"transitions": PackedFloat32Array(1, -2, 1, -2, 1),
 "update": 0,
-"values": [Vector2(1310, 110), Vector2(1300, 230), Vector2(1310, 110), Vector2(1300, 230), Vector2(1310, 110)]
+"values": [Vector2(1401, 139), Vector2(1401, 139), Vector2(1401, 521), Vector2(1401, 521), Vector2(1401, 139)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -737,7 +737,7 @@ tracks/2/path = NodePath("Rig/Upper/Body:position")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
+"times": PackedFloat32Array(0, 0.3, 0.6, 0.9, 1.2),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
 "values": [Vector2(0, 0), Vector2(0, 12), Vector2(0, 0), Vector2(0, 12), Vector2(0, 0)]
@@ -749,7 +749,7 @@ tracks/3/path = NodePath("Rig/Upper/Head:position")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
+"times": PackedFloat32Array(0, 0.3, 0.6, 0.9, 1.2),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
 "values": [Vector2(1090, 170), Vector2(1090, 182), Vector2(1090, 170), Vector2(1090, 182), Vector2(1090, 170)]

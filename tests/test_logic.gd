@@ -537,9 +537,16 @@ func _test_arms() -> void:
 	boss.celebrate()
 	await process_frame
 	await process_frame  # (process_frame fires before _process, where the IK runs)
+	var arm_dir := func(i: int) -> Vector2: return (boss.wrists[i].global_position - boss.arms[i].global_position).normalized()
+	check(arm_dir.call(0).dot(Vector2(-1, 1).normalized()) > 0.98 and arm_dir.call(1).dot(Vector2(1, -1).normalized()) > 0.98, "stage 2 celebrates with a disco point: one arm up at 45 degrees, the other down at 45, in one line")
+	boss.phase = Boss.FINAL
+	boss.state = Boss.State.IDLE
+	boss.celebrate()
+	await process_frame
+	await process_frame
 	var elbow_l: Node2D = boss.arm_l.get_node("Elbow")
 	var elbow_r: Node2D = boss.arm_r.get_node("Elbow")
-	check(boss.fist_l.position.y < boss.arm_l.position.y and elbow_l.global_position.x < boss.arm_l.global_position.x - 60.0 and elbow_r.global_position.x > boss.arm_r.global_position.x + 60.0, "fists pumped overhead keep the elbows out, not bent in at his head")
+	check(boss.fist_l.position.y < boss.arm_l.position.y and elbow_l.global_position.x < boss.arm_l.global_position.x - 60.0 and elbow_r.global_position.x > boss.arm_r.global_position.x + 60.0, "fists thrown up overhead keep the elbows out, not bent in at his head")
 	boss.queue_free()
 	await process_frame
 
