@@ -1,7 +1,7 @@
 class_name Bomb
 extends RigidBody2D
-## The little guy's bomb: he pulls it out of his ammo, throws it at a core (or sets it off with
-## [A]). Its blast never hurts him: it bounces him away (Player.blast_from), a rocket jump.
+## The little guy's bomb: he pulls it out of his ammo and throws it at a core; left alone, its fuse
+## sets it off. Its blast never hurts him: it bounces him away (Player.blast_from), a rocket jump.
 
 const LAYER_BOMB := 4  # physics layer 3 "bomb"
 const EXPLOSION := preload("res://scenes/fx/explosion.tscn")

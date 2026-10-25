@@ -1,7 +1,7 @@
 class_name Player
 extends CharacterBody2D
 ## The little guy: runs, jumps, and makes his own bombs: [Z] pulls one out of his ammo (5) and
-## throws it; holding [A] squeezes out more (eyes screwed shut); a tap of [A] sets one off.
+## throws it; holding [A] squeezes out more (eyes screwed shut).
 
 signal hp_changed(hp: int)
 signal died
@@ -23,7 +23,7 @@ const GHOST := preload("res://scenes/fx/afterimage.tscn")
 const HARD_LANDING := 1500.0  # px/s fall speed for the biggest landing squash
 const BOMB := preload("res://scenes/boss/bomb.tscn")
 const MAX_AMMO := 5
-const CHARGE_DELAY := 0.2  # s of holding [A] before he starts squeezing (a tap only detonates)
+const CHARGE_DELAY := 0.2  # s of holding [A] before he starts squeezing
 const CHARGE_TIME := 0.1  # s of squeezing per bomb
 const KNOCKBACK := 480.0  # px/s a hit shoves him off whatever hit him
 const KNOCK_HOP := -380.0  # ...with a little hop
@@ -56,7 +56,6 @@ var _dash_grounded := false  # started on the floor (and not upward): you can st
 var frozen := false  # cutscenes: no control and no harm, he just stands and watches
 var celebrating := false  # the ending: crowned, hopping for joy with his arms up
 var bombs_thrown := 0  # this run's throws (a win screen stat)
-var _thrown: Bomb = null  # the last bomb he threw, for [A] to set off
 var ammo := MAX_AMMO
 var charging := false  # squeezing out a bomb
 var projectiles: Node  # where his bombs go (the arena's Projectiles); his parent if unset
@@ -153,8 +152,6 @@ func _physics_process(delta: float) -> void:
 			_throw()
 		else:
 			_grab()
-	if Input.is_action_just_pressed("detonate"):
-		_detonate()
 	if held_bomb:
 		held_bomb.global_position = hold_point.global_position
 		_track_target(delta)
@@ -316,7 +313,7 @@ func _make_bomb() -> Bomb:
 ## Holding [A] with empty hands, on the ground, short of bombs: after CHARGE_DELAY he stops and
 ## squeezes (squashed flat, eyes screwed shut), a new bomb every CHARGE_TIME.
 func _charge(delta: float) -> void:
-	var squeezing := Input.is_action_pressed("detonate") and not is_instance_valid(held_bomb) and is_on_floor() and not dashing and ammo < MAX_AMMO
+	var squeezing := Input.is_action_pressed("squeeze") and not is_instance_valid(held_bomb) and is_on_floor() and not dashing and ammo < MAX_AMMO
 	_charge_held = _charge_held + delta if squeezing else 0.0
 	var was := charging
 	charging = _charge_held >= CHARGE_DELAY
@@ -387,17 +384,8 @@ func _throw() -> void:
 	held_bomb.throw(_throw_velocity())
 	bombs_thrown += 1
 	Sfx.play(&"throw")
-	_thrown = held_bomb
 	held_bomb = null
 	juice.play(&"throw")
-
-
-## [A]: sets a bomb off right now: the one in his hands (overhead, so it rockets him straight
-## up), else the last one he threw.
-func _detonate() -> void:
-	var bomb: Bomb = held_bomb if held_bomb else _thrown
-	if is_instance_valid(bomb) and not bomb.exploded:
-		bomb.explode()
 
 
 ## Bomb blasts never hurt the little guy. One within reach bounces him away from it, always

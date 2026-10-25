@@ -169,7 +169,7 @@ func _process(_delta: float) -> void:
 	if is_instance_valid(held):
 		var fuse: Timer = held.get_node("FuseTimer")
 		if not fuse.is_stopped() and fuse.time_left < 1.3:
-			_tip("hot_bomb", "IT'S ABOUT TO BLOW!  THROW IT, OR [A] TO BOUNCE OFF IT!")
+			_tip("hot_bomb", "IT'S ABOUT TO BLOW!  THROW IT!")
 	if player.ammo == 0 and not is_instance_valid(held):
 		_tip("no_ammo", "OUT OF BOMBS!  HOLD [A] TO SQUEEZE OUT MORE.")
 

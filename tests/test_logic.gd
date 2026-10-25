@@ -135,11 +135,13 @@ func _test_player() -> void:
 	bomb.pick_up()
 	player.held_bomb = bomb
 	player.invuln.stop()
-	Input.action_press("detonate")
+	Input.action_press("squeeze")
 	await physics_frame
 	await physics_frame
-	Input.action_release("detonate")
-	check(bomb.exploded and player.hp == Player.MAX_HP and player.velocity.y < -1000.0, "[A] blows up the bomb in his hands: he rockets up, unhurt")
+	Input.action_release("squeeze")
+	check(not bomb.exploded, "a tap of [A] sets nothing off (it only squeezes out bombs)")
+	bomb.explode()
+	check(player.hp == Player.MAX_HP and player.velocity.y < -1000.0, "a bomb going off in his hands rockets him up, unhurt")
 	player.velocity = Vector2.ZERO
 	player.blast_from(player.global_position + Vector2(100, 40), 150.0)
 	check(player.velocity.x < -300.0 and player.velocity.y < -1000.0, "a blast beside him bounces him up and away from it")
@@ -1036,12 +1038,12 @@ func _test_tutorial_rush() -> void:
 	var hud: HUD = game.get_node("HUD")
 	check(tutorial.bot.hp == TrainingBot.HITS - 1 and hud.coach_label.text.contains("HOLD  A"), "hitting the core early moves the lesson on (to squeezing out more bombs)")
 	var before := player.ammo
-	Input.action_press("detonate")
+	Input.action_press("squeeze")
 	await create_timer(0.27).timeout
 	check(player.charging and player.body.animation == &"strain", "holding [A] squeezes him flat, eyes screwed shut")
 	await create_timer(0.4).timeout
 	check(player.ammo > before and Player.CHARGE_TIME == 0.1, "...and squeezes out a bomb every 0.1 s")
-	Input.action_release("detonate")
+	Input.action_release("squeeze")
 	await create_timer(1.0).timeout
 	check(hud.coach_label.text.begins_with("AGAIN"), "then the lesson moves on")
 	check(player.hp == Player.MAX_HP, "a hit on Lil' Watt never hurts the thrower")
