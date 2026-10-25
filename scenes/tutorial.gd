@@ -2,12 +2,16 @@ class_name Tutorial
 extends Node
 ## Hand-holding first fight: one simple instruction at a time, each waiting until the player
 ## actually does it, against Lil' Watt, a little training bot (the king stays hidden until it
-## breaks). Afterwards it shows a one-time tip the first time each danger appears.
+## breaks). The moves are drills: walk, jump, double jump, dash and an up or diagonal dash, each
+## REPS times, the count on the instruction. Afterwards it shows a one-time tip the first time
+## each danger appears.
 ## Enter (or Tab / gamepad Back) skips the lesson.
 
 const STEP_PAUSE := 0.7
 const ARROW_ABOVE_CORE := Vector2(0, -140)
 const LIFT := 60  # z added to whatever the current step is about, above the Spotlight (z 50)
+const REPS := 3  # times each drill must be done
+const STRETCH := 160.0  # px of walking that counts as one walk
 
 static var done := false  # once per session, so restarts go straight to the fight
 static var seen := {}  # tip keys already shown this session
@@ -19,8 +23,9 @@ var stage: Stage
 var projectiles: Node2D
 
 var _skip := false
-var _start_x := 0.0
-var _recharged := false
+var _counts := {}  # drill -> times done since its step began
+var _last_x := 0.0
+var _walked_px := 0.0
 var _greyed := false
 var _lifted: Array[CanvasItem] = []
 
@@ -47,7 +52,14 @@ func setup(p: Player, b: Boss, h: HUD, s: Stage, proj: Node2D) -> void:
 	for plat in stage.core_platforms:
 		plat.broke.connect(_tip.bind("core_platform", "GLOWING PLATFORMS FALL APART!  THEY COME BACK."))
 	player.hp_changed.connect(_on_hp_changed)
-	player.ammo_changed.connect(func(_ammo: int) -> void: _recharged = _recharged or player.charging)
+	player.ammo_changed.connect(func(_ammo: int) -> void:
+		if player.charging:
+			_count(&"squeeze"))
+	player.jumped.connect(func(midair: bool) -> void: _count(&"air_jump" if midair else &"jump"))
+	player.dashed.connect(func(direction: Vector2) -> void:
+		_count(&"dash")
+		if direction.y < -0.3:
+			_count(&"up_dash"))
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -61,16 +73,20 @@ func run() -> void:
 	hud.set_boss_name("LIL' WATT")
 	hud.set_boss_health(bot.hp, TrainingBot.HITS)
 	bot.hit.connect(hud.set_boss_health.bind(TrainingBot.HITS))
-	_start_x = player.global_position.x
 	_focus([player])
-	await _step("WALK WITH  [ARROWS]", _walked)
-	await _step("JUMP WITH  [X]\nAND AGAIN IN THE AIR!", _jumped)
-	await _step("DASH WITH  [C]\nHOLD  [ARROWS]  TO AIM IT", _dashed)
+	await _drill("WALK WITH  [ARROWS]", &"walk")
+	await _drill("JUMP WITH  [X]", &"jump")
+	await _drill("DOUBLE JUMP!\n[X]  AGAIN IN THE AIR", &"air_jump")
+	await _drill("DASH WITH  [C]", &"dash")
+	await _drill("DASH UP OR DIAGONALLY!\nHOLD  [ARROWS]  AND PRESS  [C]", &"up_dash")
 	await _step("PRESS  [Z]  TO PULL OUT A BOMB", _holding_bomb)
 	core_arrow.show()
 	_focus([player, player.held_bomb, bot, core_arrow])  # the whole bot, so its cracks show
 	await _step("THROW IT AT THE GLOWING CORE!\nFACE THE ROBOT AND PRESS  [Z]", _bot_hit)
-	await _step("HOLD  [A]  TO SQUEEZE OUT MORE BOMBS", _made_bomb)
+	if not _skip:
+		player.ammo = mini(player.ammo, Player.MAX_AMMO - REPS)  # room to squeeze out a few
+		player.ammo_changed.emit(player.ammo)
+	await _drill("RUNNING LOW!\nHOLD  [A]  TO SQUEEZE OUT BOMBS", &"squeeze", _bot_broken)
 	await _step("AGAIN!  BREAK LIL' WATT!", _bot_broken)
 	core_arrow.hide()
 	_focus([])
@@ -84,11 +100,17 @@ func run() -> void:
 	hud.set_boss_health(boss.hits_left(), boss.hits_total())
 
 
-func _step(text: String, is_done: Callable) -> void:
+## One instruction, held until `is_done`. With `progress`, its count shows after the text and the
+## line pops again each time it goes up.
+func _step(text: String, is_done: Callable, progress := Callable()) -> void:
 	if _skip or is_done.call():
 		return  # skipped, or the player already did it
-	hud.coach(text)
+	var shown := ""
 	while not _skip and not is_done.call():
+		var line: String = text + ("   " + progress.call() if progress.is_valid() else "")
+		if line != shown:
+			shown = line
+			hud.coach(line)
 		await get_tree().physics_frame
 	if _skip:
 		return
@@ -97,16 +119,18 @@ func _step(text: String, is_done: Callable) -> void:
 	await get_tree().create_timer(STEP_PAUSE, false).timeout
 
 
-func _walked() -> bool:
-	return absf(player.global_position.x - _start_x) > 160.0
+## A drill: `action` done REPS times from now (or `also_done`, for a player who rushed ahead).
+func _drill(text: String, action: StringName, also_done := Callable()) -> void:
+	_counts[action] = 0
+	if action == &"walk":
+		_walked_px = 0.0
+		_last_x = player.global_position.x
+	await _step(text, func() -> bool: return _counts[action] >= REPS or (also_done.is_valid() and also_done.call()),
+			func() -> String: return "%d/%d" % [mini(_counts[action], REPS), REPS])
 
 
-func _jumped() -> bool:
-	return not player.is_on_floor()
-
-
-func _dashed() -> bool:
-	return player.dashing
+func _count(action: StringName) -> void:
+	_counts[action] = _counts.get(action, 0) + 1
 
 
 func _holding_bomb() -> bool:
@@ -117,11 +141,6 @@ func _holding_bomb() -> bool:
 ## bomb and throws before the lesson asks) never waits on a step they already did.
 func _bot_hit() -> bool:
 	return bot.hp < TrainingBot.HITS
-
-
-## Squeezed out at least one bomb (or already broke the bot).
-func _made_bomb() -> bool:
-	return _recharged or bot.hp <= 0
 
 
 func _bot_broken() -> bool:
@@ -154,6 +173,10 @@ func _finish() -> void:
 
 
 func _process(_delta: float) -> void:
+	if not done and _counts.has(&"walk") and player:  # every STRETCH px walked is one walk
+		_walked_px += absf(player.global_position.x - _last_x)
+		_last_x = player.global_position.x
+		_counts[&"walk"] = int(_walked_px / STRETCH)
 	if core_arrow.visible and is_instance_valid(bot):
 		core_arrow.global_position = bot.core.global_position + ARROW_ABOVE_CORE
 	if not done and not _lifted.is_empty() and is_instance_valid(player.held_bomb) and not _lifted.has(player.held_bomb):

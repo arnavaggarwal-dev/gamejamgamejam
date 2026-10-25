@@ -147,25 +147,6 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "JUMP"
 
-[node name="Key3" type="RichTextLabel" parent="Card/VBox/Controls"]
-custom_minimum_size = Vector2(150, 0)
-layout_mode = 2
-mouse_filter = 2
-theme_override_colors/default_color = Color(0.859, 0.851, 0.569, 1)
-theme_override_font_sizes/normal_font_size = 28
-bbcode_enabled = true
-text = "[img height=32]res://assets/art/ui/key_up.png[/img] + [img height=32]res://assets/art/ui/key_z.png[/img]"
-fit_content = true
-scroll_active = false
-autowrap_mode = 0
-horizontal_alignment = 2
-vertical_alignment = 1
-
-[node name="Action3" type="Label" parent="Card/VBox/Controls"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "LOB"
-
 [node name="Key4" type="RichTextLabel" parent="Card/VBox/Controls"]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2

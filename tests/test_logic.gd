@@ -972,21 +972,8 @@ func _test_tutorial() -> void:
 	check(hud.boss_name.text == "LIL' WATT" and hud.boss_bar.value == TrainingBot.HITS, "the boss bar shows the training bot")
 	var player: Player = game.get_node("Player")
 	check(tutorial.spotlight.visible and player.z_index > tutorial.spotlight.z_index, "the lesson greys out everything but the hero")
-	Input.action_press("move_right")
-	await create_timer(0.8).timeout
-	Input.action_release("move_right")
-	await create_timer(0.8).timeout
-	Input.action_press("jump")
-	await physics_frame
-	await physics_frame
-	Input.action_release("jump")
-	await create_timer(1.0).timeout
-	Input.action_press("dash")
-	await physics_frame
-	await physics_frame
-	Input.action_release("dash")
-	await create_timer(1.2).timeout
-	check(hud.coach_label.text.contains("PULL OUT A BOMB"), "walking, jumping then dashing: next, pull out a bomb")
+	await _drill_moves(hud)
+	check(hud.coach_label.text.contains("PULL OUT A BOMB"), "walking, jumping, double jumping, dashing, then dashing up, three times each: next, pull out a bomb")
 	Input.action_press("grab")
 	await physics_frame
 	await physics_frame
@@ -1006,6 +993,44 @@ func _test_tutorial() -> void:
 	Engine.time_scale = 1.0
 
 
+## Does the tutorial's movement drills with real input: three stretches of walking, three jumps,
+## three double jumps, three dashes, three dashes aimed up. Checks the count shows on the way.
+func _drill_moves(hud: HUD) -> void:
+	Input.action_press("move_right")
+	await create_timer(1.9).timeout
+	Input.action_release("move_right")
+	await create_timer(0.9).timeout
+	for i in Tutorial.REPS:
+		await _tap("jump")
+		await create_timer(0.9).timeout
+		if i == 0:
+			check(hud.coach_label.text.contains("JUMP") and hud.coach_label.text.contains("1/3"), "each drill counts up on the instruction (1/3)")
+	await create_timer(0.8).timeout
+	for i in Tutorial.REPS:
+		await _tap("jump")
+		await create_timer(0.25).timeout
+		await _tap("jump")
+		await create_timer(1.1).timeout
+	await create_timer(0.8).timeout
+	for i in Tutorial.REPS:
+		await _tap("dash")
+		await create_timer(0.6).timeout
+	await create_timer(0.8).timeout
+	for i in Tutorial.REPS:
+		Input.action_press("aim_up")
+		await _tap("dash")
+		Input.action_release("aim_up")
+		await create_timer(1.0).timeout
+	await create_timer(0.8).timeout
+
+
+func _tap(action: String) -> void:
+	Input.action_press(action)
+	await physics_frame
+	await physics_frame
+	Input.action_release(action)
+
+
 ## A player who pulls out a bomb and hits the core before the lesson asks must not get stuck.
 func _test_tutorial_rush() -> void:
 	Tutorial.done = false
@@ -1015,23 +1040,14 @@ func _test_tutorial_rush() -> void:
 	var boss: Boss = game.get_node("Boss")
 	var tutorial: Tutorial = game.get_node("Tutorial")
 	await create_timer(2.3).timeout
-	Input.action_press("move_right")
-	await create_timer(0.8).timeout
-	Input.action_release("move_right")
-	await create_timer(0.8).timeout
-	for action in ["jump", "dash"]:
-		Input.action_press(action)
-		await physics_frame
-		await physics_frame
-		Input.action_release(action)
-		await create_timer(1.0).timeout
+	await _drill_moves(game.get_node("HUD"))
 	player._grab()
 	var bomb := player.held_bomb
 	player._throw()
 	bomb.global_position = tutorial.bot.core.global_position
 	await create_timer(2.0).timeout
 	var hud: HUD = game.get_node("HUD")
-	check(tutorial.bot.hp == TrainingBot.HITS - 1 and hud.coach_label.text.contains("SQUEEZE OUT MORE BOMBS"), "hitting the core early moves the lesson on (to squeezing out more bombs)")
+	check(tutorial.bot.hp == TrainingBot.HITS - 1 and hud.coach_label.text.contains("SQUEEZE OUT BOMBS") and player.ammo <= Player.MAX_AMMO - Tutorial.REPS, "hitting the core early moves the lesson on (to squeezing out bombs, ammo cut so there's room)")
 	var before := player.ammo
 	Input.action_press("squeeze")
 	await create_timer(0.27).timeout

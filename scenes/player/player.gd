@@ -7,6 +7,8 @@ signal hp_changed(hp: int)
 signal died
 signal fell_in_pit
 signal ammo_changed(ammo: int)
+signal jumped(midair: bool)
+signal dashed(direction: Vector2)
 
 const MAX_HP := 5
 const COYOTE_TIME := 0.1
@@ -135,6 +137,7 @@ func _physics_process(delta: float) -> void:
 		_coyote = 0.0
 		juice.play(&"jump")  # squash, then a big stretch off the ground
 		Sfx.play(&"air_jump" if midair else &"jump")
+		jumped.emit(midair)
 		_puff(SLIME if midair else DUST, _feet())  # a slimy splat when he kicks off thin air
 	if Input.is_action_just_released("jump") and velocity.y < 0.0:
 		velocity.y *= 0.5
@@ -235,6 +238,7 @@ func _start_dash() -> void:
 	_dash_grounded = is_on_floor() and _dash_dir.y >= 0.0
 	if not is_on_floor() or _dash_dir.y < 0.0:
 		_air_dash_ready = false  # an upward dash off the ground is the air dash
+	dashed.emit(_dash_dir)
 	dash_timer.start()
 	dash_cooldown.start()
 	trail.rotation = _dash_dir.angle()  # spreads the streaks along the path...
