@@ -1058,7 +1058,7 @@ func _test_tutorial_rush() -> void:
 		next.global_position = tutorial.bot.core.global_position
 		await create_timer(0.3).timeout
 	check(hud.boss_bar.value == 0, "every hit on Lil' Watt shows on the boss bar")
-	await create_timer(1.6).timeout
+	await create_timer(2.6).timeout  # the NICE! pause, then YOU BROKE IT!!
 	check(hud.coach_label.text.contains("SQUEEZE OUT BOMBS") and player.ammo <= Player.MAX_AMMO - Tutorial.REPS and not boss.visible, "with Lil' Watt broken, one last lesson before the king: squeezing out bombs (ammo cut so there's room)")
 	var before := player.ammo
 	Input.action_press("squeeze")
