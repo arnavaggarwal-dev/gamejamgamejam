@@ -788,31 +788,42 @@ max_value = 9.0
 value = 9.0
 show_percentage = false
 
-[node name="Hint" type="Label" parent="."]
+[node name="Hint" type="RichTextLabel" parent="."]
 visible = false
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -42.0
+offset_top = -46.0
 offset_bottom = -2.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_colors/font_color = Color(0.859, 0.851, 0.569, 1)
+mouse_filter = 2
+theme_override_colors/default_color = Color(0.859, 0.851, 0.569, 1)
+theme_override_colors/font_shadow_color = Color(0.1764706, 0.15294118, 0.1882353, 1)
+theme_override_constants/shadow_offset_x = 4
+theme_override_constants/shadow_offset_y = 4
+bbcode_enabled = true
+scroll_active = false
+autowrap_mode = 0
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Coach" type="Label" parent="."]
+[node name="Coach" type="RichTextLabel" parent="."]
 pivot_offset = Vector2(640, 76)
 visible = false
 anchor_right = 1.0
 offset_top = 116.0
 offset_bottom = 268.0
 grow_horizontal = 2
-theme_override_colors/font_color = Color(0.988, 0.984, 0.988, 1)
+mouse_filter = 2
+theme_override_colors/default_color = Color(0.988, 0.984, 0.988, 1)
+theme_override_colors/font_shadow_color = Color(0.1764706, 0.15294118, 0.1882353, 1)
 theme_override_constants/shadow_offset_x = 6
 theme_override_constants/shadow_offset_y = 6
-theme_override_constants/line_spacing = 8
-theme_override_font_sizes/font_size = 54
+theme_override_constants/line_separation = 8
+theme_override_font_sizes/normal_font_size = 54
+bbcode_enabled = true
+scroll_active = false
 horizontal_alignment = 1
 vertical_alignment = 1
 

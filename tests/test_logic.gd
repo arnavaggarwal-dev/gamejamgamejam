@@ -1036,7 +1036,7 @@ func _test_tutorial_rush() -> void:
 	bomb.global_position = tutorial.bot.core.global_position
 	await create_timer(2.0).timeout
 	var hud: HUD = game.get_node("HUD")
-	check(tutorial.bot.hp == TrainingBot.HITS - 1 and hud.coach_label.text.contains("HOLD  A"), "hitting the core early moves the lesson on (to squeezing out more bombs)")
+	check(tutorial.bot.hp == TrainingBot.HITS - 1 and hud.coach_label.text.contains("SQUEEZE OUT MORE BOMBS"), "hitting the core early moves the lesson on (to squeezing out more bombs)")
 	var before := player.ammo
 	Input.action_press("squeeze")
 	await create_timer(0.27).timeout

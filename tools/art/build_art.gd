@@ -91,6 +91,9 @@ func _ui() -> void:
 	_save_sheet("ui/bomb_full.png", [Ui.bomb_icon(true)])
 	_save_sheet("ui/bomb_empty.png", [Ui.bomb_icon(false)])
 	_save_sheet("ui/key_z.png", [Ui.key_cap("Z")])
+	for key in ["X", "C", "A", "UP", "ENTER", "ESC"]:
+		_save_sheet("ui/key_%s.png" % key.to_lower(), [Ui.key_cap(key)])
+	_save_sheet("ui/key_arrows.png", [Ui.arrow_keys()])
 	var font: Array = Ui.font("kilowatt.png")
 	_save("ui/kilowatt.png", font[0])
 	var f := FileAccess.open(OUT + "ui/kilowatt.fnt", FileAccess.WRITE)

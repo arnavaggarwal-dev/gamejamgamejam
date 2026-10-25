@@ -2,7 +2,7 @@ class_name Game
 extends Node2D
 ## Arena root: wires player, boss, stage, backdrop, tutorial and HUD together and handles restarts.
 
-const GOAL_HINT := "PULL OUT A BOMB [Z], THROW IT AT THE CORE!  HOLD [A] TO MAKE MORE."
+const GOAL_HINT := "PULL OUT A BOMB  [Z]  THROW IT AT THE CORE!  HOLD  [A]  TO MAKE MORE."
 const HELPER := preload("res://scenes/boss/training_bot.tscn")
 const FIREWORK := preload("res://scenes/fx/firework.tscn")
 const FIREWORK_COLORS := [Color("#db9692"), Color("#dbd991"), Color("#96db91"), Color("#92b5db"), Color("#db91d3"), Color("#b991dc")]

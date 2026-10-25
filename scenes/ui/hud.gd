@@ -29,8 +29,8 @@ var _ammo := -1  # what the ammo row last showed (-1: nothing yet)
 @onready var danger_fx: AnimationPlayer = $DangerFx
 @onready var boss_name: Label = $BossBar/Name
 @onready var banner: Label = $Banner
-@onready var hint: Label = $Hint
-@onready var coach_label: Label = $Coach
+@onready var hint: RichTextLabel = $Hint
+@onready var coach_label: RichTextLabel = $Coach
 @onready var flash_rect: ColorRect = $Flash
 @onready var end_panel: Control = $EndPanel
 @onready var end_label: Label = $EndPanel/VBox/Label
@@ -121,7 +121,7 @@ func show_banner(text: String, seconds: float) -> void:
 ## Goal reminder along the bottom; an empty string hides it.
 func show_hint(text: String) -> void:
 	_hint_id += 1
-	hint.text = text
+	hint.text = Keys.bbcode(text, 36)  # [Z] and friends show as keycaps
 	hint.visible = text != "" and not _cinema
 
 
@@ -136,14 +136,13 @@ func show_tip(text: String, seconds := 3.5) -> void:
 
 ## Big tutorial instruction under the boss bar; an empty string hides it.
 func coach(text: String) -> void:
-	coach_label.text = text
+	coach_label.text = Keys.bbcode(text, 54)
 	coach_label.visible = text != ""
 	if coach_label.visible:
 		coach_fx.stop()
 		coach_fx.play(&"pop")
 
 
-## White screen flash: `strength` is the starting opacity, `hold` keeps it there before fading.
 ## The hero splattered against the screen, Smash style: gobs of goo slap onto the glass, then
 ## slide down it and fade (the GooFx "splat" clip).
 func splat() -> void:
@@ -152,6 +151,7 @@ func splat() -> void:
 	goo_fx.advance(0.0)
 
 
+## White screen flash: `strength` is the starting opacity, `hold` keeps it there before fading.
 func flash(strength := 0.7, hold := 0.0) -> void:
 	if _flash:
 		_flash.kill()

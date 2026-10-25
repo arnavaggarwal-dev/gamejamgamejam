@@ -134,10 +134,31 @@ static func bomb_icon(full: bool):
 
 
 ## Key cap prompt ("J" by default) shown over a bomb in reach.
-static func key_cap(letter: String):
-	var c = Canvas.new(11, 12)
-	c.rect(1, 1, 9, 10, P.GREY)
-	c.rect(1, 1, 9, 8, P.CREAM)
-	c.grid(3, 2, GLYPHS[letter], {"#": P.INK})
+## A keycap: a cream top over a grey lip, ink outline, its label (letters or an arrow) in ink.
+## Wider for words (ENTER, ESC).
+static func key_cap(label: String):
+	var glyphs: Array = [ARROWS[label]] if ARROWS.has(label) else Array(label.split("")).map(func(ch: String) -> Array: return GLYPHS[ch])
+	var c = Canvas.new(glyphs.size() * 6 + 5, 12)
+	c.rect(1, 1, glyphs.size() * 6 + 3, 10, P.GREY)
+	c.rect(1, 1, glyphs.size() * 6 + 3, 8, P.CREAM)
+	for k in glyphs.size():
+		c.grid(3 + k * 6, 2, glyphs[k], {"#": P.INK})
 	c.outline()
 	return c
+
+
+## The arrow keys as they sit on a keyboard: up over left, down, right.
+static func arrow_keys():
+	var c = Canvas.new(35, 25)
+	c.blit(key_cap("UP"), 12, 0)
+	for k in 3:
+		c.blit(key_cap(["LEFT", "DOWN", "RIGHT"][k]), k * 12, 13)
+	return c
+
+
+const ARROWS := {
+	"LEFT": [".....", "..#..", ".#...", "#####", ".#...", "..#..", "....."],
+	"RIGHT": [".....", "..#..", "...#.", "#####", "...#.", "..#..", "....."],
+	"UP": ["..#..", ".###.", "#.#.#", "..#..", "..#..", "..#..", "....."],
+	"DOWN": ["..#..", "..#..", "..#..", "#.#.#", ".###.", "..#..", "....."],
+}

@@ -60,20 +60,20 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## Returns once Lil' Watt is in pieces, whether the player broke it or skipped the lesson.
 func run() -> void:
-	hud.show_hint("ENTER: SKIP TUTORIAL")
+	hud.show_hint("[ENTER]  SKIP TUTORIAL")
 	hud.set_boss_name("LIL' WATT")
 	hud.set_boss_health(bot.hp, TrainingBot.HITS)
 	bot.hit.connect(hud.set_boss_health.bind(TrainingBot.HITS))
 	_start_x = player.global_position.x
 	_focus([player])
-	await _step("WALK WITH THE  ARROW KEYS", _walked)
-	await _step("JUMP WITH  X\nAND AGAIN IN THE AIR!", _jumped)
-	await _step("DASH WITH  C\nHOLD ARROWS TO AIM IT", _dashed)
-	await _step("PRESS  Z  TO PULL OUT A BOMB", _holding_bomb)
+	await _step("WALK WITH  [ARROWS]", _walked)
+	await _step("JUMP WITH  [X]\nAND AGAIN IN THE AIR!", _jumped)
+	await _step("DASH WITH  [C]\nHOLD  [ARROWS]  TO AIM IT", _dashed)
+	await _step("PRESS  [Z]  TO PULL OUT A BOMB", _holding_bomb)
 	core_arrow.show()
 	_focus([player, player.held_bomb, bot, core_arrow])  # the whole bot, so its cracks show
-	await _step("THROW IT AT THE GLOWING CORE!\nFACE THE ROBOT AND PRESS  Z", _bot_hit)
-	await _step("HOLD  A  TO SQUEEZE OUT MORE BOMBS", _made_bomb)
+	await _step("THROW IT AT THE GLOWING CORE!\nFACE THE ROBOT AND PRESS  [Z]", _bot_hit)
+	await _step("HOLD  [A]  TO SQUEEZE OUT MORE BOMBS", _made_bomb)
 	await _step("AGAIN!  BREAK LIL' WATT!", _bot_broken)
 	core_arrow.hide()
 	_focus([])
@@ -171,7 +171,7 @@ func _process(_delta: float) -> void:
 		if not fuse.is_stopped() and fuse.time_left < 1.3:
 			_tip("hot_bomb", "IT'S ABOUT TO BLOW!  THROW IT!")
 	if player.ammo == 0 and not is_instance_valid(held):
-		_tip("no_ammo", "OUT OF BOMBS!  HOLD [A] TO SQUEEZE OUT MORE.")
+		_tip("no_ammo", "OUT OF BOMBS!  HOLD  [A]  TO SQUEEZE OUT MORE.")
 
 
 func _on_attack_started(attack: StringName) -> void:

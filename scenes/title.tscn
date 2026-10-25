@@ -90,84 +90,133 @@ theme_override_constants/h_separation = 20
 theme_override_constants/v_separation = 6
 columns = 4
 
-[node name="Key0" type="Label" parent="Card/VBox/Controls"]
+[node name="Key0" type="RichTextLabel" parent="Card/VBox/Controls"]
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.859, 0.851, 0.569, 1)
-theme_override_font_sizes/font_size = 28
-text = "ARROWS"
+mouse_filter = 2
+theme_override_colors/default_color = Color(0.859, 0.851, 0.569, 1)
+theme_override_font_sizes/normal_font_size = 28
+bbcode_enabled = true
+text = "[img height=40]res://assets/art/ui/key_arrows.png[/img]"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
 horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="Action0" type="Label" parent="Card/VBox/Controls"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "MOVE"
 
-[node name="Key1" type="Label" parent="Card/VBox/Controls"]
+[node name="Key1" type="RichTextLabel" parent="Card/VBox/Controls"]
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.859, 0.851, 0.569, 1)
-theme_override_font_sizes/font_size = 28
-text = "Z"
+mouse_filter = 2
+theme_override_colors/default_color = Color(0.859, 0.851, 0.569, 1)
+theme_override_font_sizes/normal_font_size = 28
+bbcode_enabled = true
+text = "[img height=32]res://assets/art/ui/key_z.png[/img]"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
 horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="Action1" type="Label" parent="Card/VBox/Controls"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "GRAB/THROW"
 
-[node name="Key2" type="Label" parent="Card/VBox/Controls"]
+[node name="Key2" type="RichTextLabel" parent="Card/VBox/Controls"]
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.859, 0.851, 0.569, 1)
-theme_override_font_sizes/font_size = 28
-text = "X"
+mouse_filter = 2
+theme_override_colors/default_color = Color(0.859, 0.851, 0.569, 1)
+theme_override_font_sizes/normal_font_size = 28
+bbcode_enabled = true
+text = "[img height=32]res://assets/art/ui/key_x.png[/img]"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
 horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="Action2" type="Label" parent="Card/VBox/Controls"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "JUMP"
 
-[node name="Key3" type="Label" parent="Card/VBox/Controls"]
+[node name="Key3" type="RichTextLabel" parent="Card/VBox/Controls"]
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.859, 0.851, 0.569, 1)
-theme_override_font_sizes/font_size = 28
-text = "UP+Z"
+mouse_filter = 2
+theme_override_colors/default_color = Color(0.859, 0.851, 0.569, 1)
+theme_override_font_sizes/normal_font_size = 28
+bbcode_enabled = true
+text = "[img height=32]res://assets/art/ui/key_up.png[/img] + [img height=32]res://assets/art/ui/key_z.png[/img]"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
 horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="Action3" type="Label" parent="Card/VBox/Controls"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "LOB"
 
-[node name="Key4" type="Label" parent="Card/VBox/Controls"]
+[node name="Key4" type="RichTextLabel" parent="Card/VBox/Controls"]
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.859, 0.851, 0.569, 1)
-theme_override_font_sizes/font_size = 28
-text = "C"
+mouse_filter = 2
+theme_override_colors/default_color = Color(0.859, 0.851, 0.569, 1)
+theme_override_font_sizes/normal_font_size = 28
+bbcode_enabled = true
+text = "[img height=32]res://assets/art/ui/key_c.png[/img]"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
 horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="Action4" type="Label" parent="Card/VBox/Controls"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "DASH"
 
-[node name="KeyBoom" type="Label" parent="Card/VBox/Controls"]
+[node name="KeyBoom" type="RichTextLabel" parent="Card/VBox/Controls"]
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.859, 0.851, 0.569, 1)
-theme_override_font_sizes/font_size = 28
-text = "A"
+mouse_filter = 2
+theme_override_colors/default_color = Color(0.859, 0.851, 0.569, 1)
+theme_override_font_sizes/normal_font_size = 28
+bbcode_enabled = true
+text = "[img height=32]res://assets/art/ui/key_a.png[/img]"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
 horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="ActionBoom" type="Label" parent="Card/VBox/Controls"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "BLOW UP BOMB"
+text = "HOLD: MAKE BOMBS"
 
-[node name="Key5" type="Label" parent="Card/VBox/Controls"]
+[node name="Key5" type="RichTextLabel" parent="Card/VBox/Controls"]
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.859, 0.851, 0.569, 1)
-theme_override_font_sizes/font_size = 28
-text = "ESC"
+mouse_filter = 2
+theme_override_colors/default_color = Color(0.859, 0.851, 0.569, 1)
+theme_override_font_sizes/normal_font_size = 28
+bbcode_enabled = true
+text = "[img height=32]res://assets/art/ui/key_esc.png[/img]"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
 horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="Action5" type="Label" parent="Card/VBox/Controls"]
 layout_mode = 2
