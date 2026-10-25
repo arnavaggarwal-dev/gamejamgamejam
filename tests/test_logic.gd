@@ -40,6 +40,7 @@ func _run() -> void:
 	await _test_eye()
 	await _test_roam()
 	await _test_game_wiring()
+	await _test_game_over()
 	await _test_phase_extras()
 	await _test_skip_phase()
 	await _test_final_phase()
@@ -123,8 +124,10 @@ func _test_player() -> void:
 		player.invuln.stop()
 		player.take_hit()
 	check(player.hp == 0 and died[0], "losing the last heart emits died")
-	player.reset(Vector2(100, 100))
-	check(player.hp == Player.MAX_HP and player.visible, "reset refills hearts and shows the player")
+	player.queue_free()  # a death is a game over (the scene restarts), so a fresh hero for the rest
+	player = load("res://scenes/player/player.tscn").instantiate()
+	root.add_child(player)
+	await process_frame
 	var bomb: Bomb = load("res://scenes/boss/bomb.tscn").instantiate()
 	root.add_child(bomb)
 	bomb.global_position = player.hold_point.global_position
@@ -692,7 +695,7 @@ func _test_final_phase() -> void:
 	check(hud.end_panel.visible and hud.end_label.text == "YOU WIN!" and not hud.boss_box.visible, "then the win screen (no boss bar left)")
 	player.died.emit()
 	await create_timer(1.4).timeout
-	check(game.helper == helper and boss.state == Boss.State.DEAD and hud.banner.text != "AGAIN!", "a death after the win changes nothing (no retry, no fresh Lil' Watt)")
+	check(game.helper == helper and boss.state == Boss.State.DEAD and hud.banner.text != "GAME OVER", "a death after the win changes nothing (no game over)")
 	game.queue_free()
 	await process_frame
 	Engine.time_scale = 1.0
@@ -724,6 +727,26 @@ func _test_game_wiring() -> void:
 	game.queue_free()
 	await process_frame
 	Engine.time_scale = 1.0
+
+
+## Losing all five hearts is game over: the whole fight starts again from the beginning.
+func _test_game_over() -> void:
+	var game: Node2D = load("res://scenes/game.tscn").instantiate()
+	root.add_child(game)
+	current_scene = game
+	await process_frame
+	var boss: Boss = game.get_node("Boss")
+	boss.skip_phase()
+	game.get_node("Player").died.emit()
+	await create_timer(1.3).timeout
+	check(boss.phase == 1 and game.get_node("HUD").banner.text == "GAME OVER", "losing all five hearts is game over")
+	await create_timer(1.8).timeout
+	var fresh := current_scene
+	check(not is_instance_valid(game) and is_instance_valid(fresh) and fresh.get_node("Boss").phase == 0 and fresh.get_node("Player").hp == Player.MAX_HP, "...and the fight starts again from the beginning")
+	check(fresh.attempt_label.visible and fresh.attempt_label.text == "ATTEMPT 2", "...with a big ATTEMPT 2 by the start")
+	fresh.queue_free()
+	Game.attempt = 1
+	await process_frame
 
 
 func _test_phase_extras() -> void:

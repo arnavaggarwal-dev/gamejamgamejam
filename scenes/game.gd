@@ -1,3 +1,4 @@
+class_name Game
 extends Node2D
 ## Arena root: wires player, boss, stage, backdrop, tutorial and HUD together and handles restarts.
 
@@ -14,10 +15,12 @@ const WATT_DOWN := Vector2(0.0, -102.0)  # Lil' Watt (2x) lying on a ledge, from
 @onready var backdrop: Node2D = $Backdrop
 @onready var tutorial: Tutorial = $Tutorial
 @onready var projectiles: Node2D = $Projectiles
-@onready var respawn: Marker2D = $RespawnPoint
 @onready var camera: Camera2D = $Camera2D
 @onready var camera_moves: AnimationPlayer = $Camera2D/Moves  # doom (3x zoom-out), drop / lift (the letterbox view)
 @onready var kings_crown: Sprite2D = $KingsCrown
+@onready var attempt_label: Label = $Attempt  # big "ATTEMPT N" in the world by the start, Geometry Dash style
+
+static var attempt := 1  # this run's try: a game over adds one, the title screen resets it
 
 var helper: TrainingBot  # Lil' Watt powering the giant in phase 4
 
@@ -40,7 +43,12 @@ func _ready() -> void:
 	hud.set_hearts(player.hp)
 	hud.set_ammo(player.ammo)
 	hud.set_boss_health(boss.hits_left(), boss.hits_total())
-	await hud.show_banner("LITTLE GUY  vs  BIG GUY", 2.0)
+	if attempt > 1:
+		attempt_label.text = "ATTEMPT %d" % attempt
+		attempt_label.show()
+		await _wait(1.0)
+	else:
+		await hud.show_banner("LITTLE GUY  vs  BIG GUY", 2.0)
 	if Tutorial.done:
 		hud.show_hint(GOAL_HINT)
 	else:
@@ -60,19 +68,15 @@ func _on_first_hit(_hits_left: int, _hits_total: int) -> void:
 		hud.show_hint("")
 
 
+## Losing all five hearts is game over: the whole fight starts again from stage 1 (a finished
+## tutorial is not replayed).
 func _on_player_died() -> void:
 	await get_tree().create_timer(1.0, false).timeout
 	if boss.state == Boss.State.DEAD:
-		return  # he already won: no retry, no fresh Lil' Watt
-	for child in projectiles.get_children():
-		child.queue_free()
-	player.reset(stage.safe_spot(respawn.global_position.x) if boss.phase == Boss.FINAL else respawn.global_position)
-	boss.restart_phase()
-	if boss.phase == Boss.FINAL and boss.state != Boss.State.PHASE_SHIFT:
-		_spawn_helper(Vector2(player.global_position.x + TrainingBot.LEAD, 200.0))  # a fresh Lil' Watt for the retry
-		helper.power_target = boss.weak_point()
-		helper.fight()
-	hud.show_banner("AGAIN!", 1.0)
+		return  # he already won: no game over
+	await hud.show_banner("GAME OVER", 1.6)
+	attempt += 1
+	get_tree().reload_current_scene()
 
 
 ## A pit costs a heart (even mid-blink): the screen goes fully white, the player is put back on

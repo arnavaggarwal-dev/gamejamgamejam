@@ -195,7 +195,7 @@ func _on_attack_started(attack: StringName) -> void:
 
 func _on_hp_changed(hp: int) -> void:
 	if hp == 1:
-		_tip("last_heart", "ONE HEART LEFT!  CAREFUL!")
+		_tip("last_heart", "ONE HEART LEFT!  LOSE IT AND YOU START OVER!")
 
 
 func _tip(key: String, text: String, seconds := 3.5) -> void:

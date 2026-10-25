@@ -255,19 +255,6 @@ func _end_dash() -> void:
 		take_hit(hurtbox.get_overlapping_areas()[0])
 
 
-func reset(at: Vector2) -> void:
-	global_position = at
-	velocity = Vector2.ZERO
-	hp = MAX_HP
-	ammo = MAX_AMMO
-	ammo_changed.emit(ammo)
-	held_bomb = null
-	_dead = false
-	invuln.stop()
-	show()
-	hp_changed.emit(hp)
-
-
 func _die() -> void:
 	_dead = true
 	if is_instance_valid(held_bomb):

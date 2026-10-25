@@ -247,17 +247,6 @@ func take_hit() -> bool:
 	return true
 
 
-func restart_phase() -> void:
-	if state == State.DEAD or state == State.PHASE_SHIFT:  # never cut a stage break short
-		return
-	hp = HITS_PER_PHASE
-	_attack_index = 0
-	_hand_on = [true, true]
-	_show_cracks()
-	health_changed.emit(hits_left(), hits_total())
-	_rest()
-
-
 ## Debug shortcut: jump to the next phase (from the last phase, straight to the knockout).
 func skip_phase() -> void:
 	if state == State.DEAD:

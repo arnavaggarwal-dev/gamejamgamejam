@@ -769,6 +769,19 @@ scale_amount_min = 4.0
 scale_amount_max = 4.0
 color = Color(0.988, 0.984, 0.988, 0.35)
 
+[node name="Attempt" type="Label" parent="."]
+visible = false
+offset_top = 195.0
+offset_right = 720.0
+offset_bottom = 315.0
+theme_override_colors/font_color = Color(0.859, 0.851, 0.569, 1)
+theme_override_constants/shadow_offset_x = 8
+theme_override_constants/shadow_offset_y = 8
+theme_override_font_sizes/font_size = 96
+text = "ATTEMPT 2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Boss" parent="." node_paths=PackedStringArray("projectiles") instance=ExtResource("3_boss")]
 visible = false
 projectiles = NodePath("../Projectiles")
@@ -1521,9 +1534,6 @@ libraries = {
 [node name="Projectiles" type="Node2D" parent="."]
 
 [node name="Player" parent="." instance=ExtResource("4_player")]
-position = Vector2(200, 598)
-
-[node name="RespawnPoint" type="Marker2D" parent="."]
 position = Vector2(200, 598)
 
 [node name="Camera2D" type="Camera2D" parent="." node_paths=PackedStringArray("target")]
