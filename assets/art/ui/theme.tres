@@ -1,6 +1,6 @@
-[gd_resource type="Theme" format=3]
+[gd_resource type="Theme" format=3 uid="uid://4uedvintttkc"]
 
-[ext_resource type="FontFile" path="res://assets/art/ui/kilowatt.fnt" id="1_anb6c"]
+[ext_resource type="FontFile" uid="uid://djhrxlxsqx7sb" path="res://assets/art/ui/kilowatt.fnt" id="1_anb6c"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_anb6c"]
 content_margin_left = 16.0
