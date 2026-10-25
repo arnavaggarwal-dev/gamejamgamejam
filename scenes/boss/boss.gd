@@ -80,6 +80,10 @@ var _hand_dirs := [Vector2.LEFT, Vector2.LEFT]  # where each rocket hand will fl
 var _hand_on := [true, true]  # left, right: still on his wrist
 var _firing: Array[int] = [0]  # the hands this rocket clip fires (0 left, 1 right)
 
+## A clip can flip an elbow's bend (-1) for a pose the outward bend gets wrong (the dab's outer arm).
+@export var flip_l := 1.0
+@export var flip_r := 1.0
+
 @onready var rig: Node2D = $Rig
 @onready var legs: Node2D = $Rig/Legs
 @onready var stomp_anchor: Node2D = $Rig/Legs/StompAnchor
@@ -132,8 +136,8 @@ func _process(_delta: float) -> void:
 	var player := get_tree().get_first_node_in_group("player") as Node2D
 	if player:
 		eye.global_rotation = (player.global_position - eye.global_position).angle() - PI
-	_reach(arm_l, fist_l.position, 1.0)
-	_reach(arm_r, fist_r.position, -1.0)
+	_reach(arm_l, fist_l.position, flip_l)
+	_reach(arm_r, fist_r.position, -flip_r)
 
 
 ## Two-bone IK: turns the shoulder and elbow so the wrist lands on `target` (body space), the
@@ -561,6 +565,8 @@ func _reset_rig() -> void:
 	rig.modulate = Color.WHITE
 	eye.modulate = Color.WHITE
 	body.modulate = Color.WHITE
+	flip_l = 1.0
+	flip_r = 1.0
 	for i in 2:
 		arms[i].z_index = 0  # (the dab draws its crossing arm over his head)
 		var hand: Sprite2D = wrists[i].get_node("Hand")
