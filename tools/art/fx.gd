@@ -178,31 +178,6 @@ static func goo_puddle():
 	return c
 
 
-## A splotch of him slapped onto the screen (Smash style): a glossy blob ringed with smaller
-## gobs, three drips running down from it.
-static func screen_goo():
-	var c = Canvas.new(64, 54)
-	for drip in [[22, 32, 46], [37, 33, 41], [47, 36, 50]]:
-		c.rect(drip[0], drip[1], 2, drip[2] - drip[1], P.TEAL)
-		c.px(drip[0], drip[1], P.MINT)
-		c.shade_ellipse(drip[0] + 0.5, drip[2], 2.4, 2.6, P.HERO, [-0.05, 0.55, 0.9])
-	c.shade_ellipse(30, 21, 18, 15, P.HERO, [-0.05, 0.6, 0.9])
-	for gob in [[11, 9, 5.5, 4.5], [50, 11, 7, 6], [47, 30, 6, 5], [13, 31, 5, 4], [58, 24, 3, 3], [4, 20, 2.5, 2.5], [31, 4, 3, 2.5]]:
-		c.shade_ellipse(gob[0], gob[1], gob[2], gob[3], P.HERO, [-0.05, 0.55, 0.9])
-	c.ellipse(23, 13, 4, 2, P.CREAM)
-	c.ellipse(48, 8, 2, 1, P.CREAM)
-	c.outline()
-	return c
-
-
-## A firework spark: a bright plus (tinted by the firework's colour).
-static func ember():
-	var c = Canvas.new(5, 5)
-	c.hline(0, 4, 2, P.CREAM)
-	c.vline(2, 0, 4, P.CREAM)
-	return c
-
-
 ## Bigger puff ring for the player's knock-out (6 frames).
 static func poof_frames() -> Array:
 	var frames := []

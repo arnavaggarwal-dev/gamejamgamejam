@@ -806,7 +806,8 @@ func _test_game_over() -> void:
 	await process_frame
 	var splats := game.get_children().filter(func(n: Node) -> bool: return n.scene_file_path == "res://scenes/fx/goo_splat.tscn")
 	check(splats.size() == 1 and splats[0].puddle.visible and absf(splats[0].puddle.global_position.y - 640.0) < 30.0, "dying splatters him: goo everywhere, a puddle of him on the floor")
-	check(game.get_node("HUD").goo.visible and game.get_node("HUD").goo_fx.current_animation == &"splat", "...and over the screen, Smash style")
+	var goo: ColorRect = game.get_node("HUD").goo
+	check(goo.visible and game.get_node("HUD").goo_fx.current_animation == &"splat" and (goo.material as ShaderMaterial).get_shader_parameter(&"count") == 30, "...and real goo over the screen, Smash style (three gobs, each with lumps and a spray)")
 	check(boss.state == Boss.State.CHEER and boss.anim.current_animation == &"cheer_2", "the king celebrates (stage 2: fist pumps)")
 	await create_timer(1.3).timeout
 	check(boss.phase == 1 and game.get_node("HUD").banner.text == "GAME OVER", "losing all five hearts is game over")
@@ -1047,16 +1048,7 @@ func _test_tutorial_rush() -> void:
 	bomb.global_position = tutorial.bot.core.global_position
 	await create_timer(2.0).timeout
 	var hud: HUD = game.get_node("HUD")
-	check(tutorial.bot.hp == TrainingBot.HITS - 1 and hud.coach_label.text.contains("SQUEEZE OUT BOMBS") and player.ammo <= Player.MAX_AMMO - Tutorial.REPS, "hitting the core early moves the lesson on (to squeezing out bombs, ammo cut so there's room)")
-	var before := player.ammo
-	Input.action_press("squeeze")
-	await create_timer(0.27).timeout
-	check(player.charging and player.body.animation == &"strain", "holding [A] squeezes him flat, eyes screwed shut")
-	await create_timer(0.4).timeout
-	check(player.ammo > before and Player.CHARGE_TIME == 0.1, "...and squeezes out a bomb every 0.1 s")
-	Input.action_release("squeeze")
-	await create_timer(1.0).timeout
-	check(hud.coach_label.text.begins_with("AGAIN"), "then the lesson moves on")
+	check(tutorial.bot.hp == TrainingBot.HITS - 1 and hud.coach_label.text.begins_with("AGAIN"), "hitting the core early moves the lesson on (break Lil' Watt)")
 	check(player.hp == Player.MAX_HP, "a hit on Lil' Watt never hurts the thrower")
 	check(tutorial.bot.cracks.get_child(0).visible and not tutorial.bot.cracks.get_child(1).visible, "each hit cracks Lil' Watt a little more")
 	for i in TrainingBot.HITS - 1:
@@ -1066,7 +1058,18 @@ func _test_tutorial_rush() -> void:
 		next.global_position = tutorial.bot.core.global_position
 		await create_timer(0.3).timeout
 	check(hud.boss_bar.value == 0, "every hit on Lil' Watt shows on the boss bar")
-	await create_timer(4.5).timeout
+	await create_timer(1.6).timeout
+	check(hud.coach_label.text.contains("SQUEEZE OUT BOMBS") and player.ammo <= Player.MAX_AMMO - Tutorial.REPS and not boss.visible, "with Lil' Watt broken, one last lesson before the king: squeezing out bombs (ammo cut so there's room)")
+	var before := player.ammo
+	Input.action_press("squeeze")
+	await create_timer(0.27).timeout
+	check(player.charging and player.body.animation == &"strain", "holding [A] squeezes him flat, eyes screwed shut")
+	await create_timer(0.4).timeout
+	check(player.ammo > before and Player.CHARGE_TIME == 0.1, "...and squeezes out a bomb every 0.1 s")
+	Input.action_release("squeeze")
+	await create_timer(1.0).timeout
+	check(hud.coach_label.text.begins_with("NOW FOR THE REAL BOSS"), "then the king is next")
+	await create_timer(4.0).timeout
 	check(Tutorial.done and boss.visible and boss.hits_left() == boss.hits_total() and hud.boss_name.text == "KING KILOWATT", "breaking Lil' Watt brings in the king at full health")
 	game.queue_free()
 	await process_frame

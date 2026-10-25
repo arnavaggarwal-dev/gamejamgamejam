@@ -83,16 +83,21 @@ func run() -> void:
 	core_arrow.show()
 	_focus([player, player.held_bomb, bot, core_arrow])  # the whole bot, so its cracks show
 	await _step("THROW IT AT THE GLOWING CORE!\nFACE THE ROBOT AND PRESS  [Z]", _bot_hit)
-	if not _skip:
-		player.ammo = mini(player.ammo, Player.MAX_AMMO - REPS)  # room to squeeze out a few
-		player.ammo_changed.emit(player.ammo)
-	await _drill("RUNNING LOW!\nHOLD  [A]  TO SQUEEZE OUT BOMBS", &"squeeze", _bot_broken)
 	await _step("AGAIN!  BREAK LIL' WATT!", _bot_broken)
 	core_arrow.hide()
+	_focus([player])
+	if not _skip:
+		hud.coach("YOU BROKE IT!!")
+		Sfx.play(&"coin")
+		await get_tree().create_timer(1.6, false).timeout
+	if not _skip:  # one last lesson before the king: making more bombs
+		player.ammo = mini(player.ammo, Player.MAX_AMMO - REPS)  # room to squeeze out a few
+		player.ammo_changed.emit(player.ammo)
+	await _drill("RUNNING LOW!\nHOLD  [A]  TO SQUEEZE OUT BOMBS", &"squeeze")
 	_focus([])
 	if not _skip:
-		hud.coach("YOU BROKE IT!!\nNOW FOR THE REAL BOSS...")
-		await get_tree().create_timer(2.0, false).timeout
+		hud.coach("NOW FOR THE REAL BOSS...")
+		await get_tree().create_timer(1.6, false).timeout
 	_finish()
 	if is_instance_valid(bot):
 		await bot.broken

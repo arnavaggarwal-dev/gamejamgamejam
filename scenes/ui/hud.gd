@@ -46,7 +46,7 @@ var _ammo := -1  # what the ammo row last showed (-1: nothing yet)
 @onready var coach_fx: AnimationPlayer = $CoachFx
 @onready var cinema_fx: AnimationPlayer = $CinemaFx
 @onready var goo_fx: AnimationPlayer = $GooFx
-@onready var goo: Control = $Goo
+@onready var goo: ColorRect = $Goo  # the screen_goo shader draws the goo
 
 
 func _ready() -> void:
@@ -143,10 +143,26 @@ func coach(text: String) -> void:
 		coach_fx.play(&"pop")
 
 
-## The hero splattered against the screen, Smash style: gobs of goo slap onto the glass, then
-## slide down it and fade (the GooFx "splat" clip).
+## The hero splattered against the screen, Smash style: real goo (the screen_goo shader) splashes
+## onto the glass in three gobs, each with a spray of droplets around it, merges, drips, then
+## slides down and fades (the GooFx "splat" clip runs its time). A new layout every time.
 func splat() -> void:
 	Sfx.play(&"squish")
+	var blobs := PackedVector4Array()
+	for k in 3:
+		var at := Vector2(randf_range(160.0, 1120.0), randf_range(90.0, 560.0))
+		var size := randf_range(70.0, 120.0)
+		var land := k * 0.05
+		blobs.append(Vector4(at.x, at.y, size, land))
+		for i in 3:  # lumps around the gob
+			var off := Vector2.from_angle(randf() * TAU) * size * randf_range(0.6, 1.2)
+			blobs.append(Vector4(at.x + off.x, at.y + off.y, size * randf_range(0.3, 0.5), land + 0.02))
+		for i in 6:  # the spray flung out of it
+			var off := Vector2.from_angle(randf() * TAU) * size * randf_range(1.5, 2.8)
+			blobs.append(Vector4(at.x + off.x, at.y + off.y, randf_range(6.0, 16.0), land + randf_range(0.03, 0.1)))
+	var mat := goo.material as ShaderMaterial
+	mat.set_shader_parameter(&"blobs", blobs)
+	mat.set_shader_parameter(&"count", blobs.size())
 	goo_fx.play(&"splat")
 	goo_fx.advance(0.0)
 
