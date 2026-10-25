@@ -537,9 +537,10 @@ func _test_arms() -> void:
 	boss.celebrate()
 	await process_frame
 	await process_frame  # (process_frame fires before _process, where the IK runs)
-	var right_arm := (boss.wrists[1].global_position - boss.arm_r.global_position).normalized()
-	var left_wrist := boss.wrists[0].global_position
-	check(right_arm.dot(Vector2(1, -1).normalized()) > 0.98 and left_wrist.y < boss.arm_l.global_position.y and left_wrist.x > boss.head.global_position.x and boss.arm_l.z_index > boss.head.z_index, "stage 2 celebrates with a dab: one arm straight up at 45 degrees, the other up across his face, over his head")
+	var up_right := Vector2(1, -1).normalized()
+	var arm_line := func(i: int) -> Vector2: return (boss.wrists[i].global_position - boss.arms[i].global_position).normalized()
+	var straight := func(i: int) -> bool: return boss.wrists[i].global_position.distance_to(boss.arms[i].global_position) > 2.0 * Boss.ARM_BONE - 8.0
+	check(arm_line.call(0).dot(up_right) > 0.99 and arm_line.call(1).dot(up_right) > 0.99 and straight.call(0) and straight.call(1) and boss.arm_l.z_index > boss.head.z_index, "stage 2 celebrates with a dab: both arms straight and parallel up the same 45-degree diagonal, one across his face")
 	boss.phase = Boss.FINAL
 	boss.state = Boss.State.IDLE
 	boss.celebrate()
