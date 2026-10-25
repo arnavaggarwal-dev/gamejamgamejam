@@ -126,6 +126,7 @@ func _on_weak_point_body_entered(body: Node2D) -> void:
 	if guard_timer.time_left > 0.0:
 		_guard.call_deferred(true)  # one hit per opening
 	hit.emit(hp)
+	Sfx.play(&"chirp")
 	for i in cracks.get_child_count():
 		cracks.get_child(i).visible = i < HITS - hp
 	if hp > 0:
@@ -144,6 +145,7 @@ func get_angry() -> void:
 ## Phase 4 cutscene: quivering while it beams its power into the wreck.
 func channel() -> void:
 	anim.play(&"channel")
+	Sfx.play(&"charge", 0.6)
 
 
 ## Phase 4: fights beside the king, following the player everywhere and shooting.
@@ -168,6 +170,7 @@ func shoot() -> void:
 	if player == null or hp <= 0:
 		return
 	var ball: Node2D = ZAP_BALL.instantiate()
+	Sfx.play(&"pew", 1.3)
 	(projectiles if projectiles else get_parent()).add_child(ball)
 	ball.global_position = core.global_position
 	ball.velocity = (player.global_position - core.global_position).normalized() * ZAP_SPEED
@@ -203,6 +206,7 @@ func knock_out(spot: Vector2) -> void:
 	roaming = false
 	shot_timer.stop()
 	boom(Vector2.ZERO)
+	Sfx.play(&"konk")
 	anim.play(&"konk")
 	create_tween().tween_property(self, "global_position", spot, 0.9).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 
@@ -232,3 +236,4 @@ func boom(offset: Vector2) -> void:
 	get_parent().add_child(fx)
 	fx.global_position = core.global_position + offset
 	get_tree().call_group("camera", "shake", 8.0)
+	Sfx.play(&"boom", 1.2)

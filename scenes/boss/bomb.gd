@@ -93,6 +93,7 @@ func explode() -> void:
 	get_parent().add_child.call_deferred(boom)
 	boom.position = position
 	get_tree().call_group("camera", "shake", 10.0)
+	Sfx.play(&"boom")
 	get_tree().call_group("player", "blast_from", global_position, BLAST_REACH)
 	await get_tree().create_timer(0.75).timeout
 	queue_free()

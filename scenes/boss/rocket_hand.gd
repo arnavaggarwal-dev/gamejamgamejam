@@ -22,4 +22,5 @@ func _physics_process(delta: float) -> void:
 		global_position.y = SKID_Y
 		velocity = Vector2(signf(velocity.x) * velocity.length(), 0.0)
 		get_tree().call_group("camera", "shake", 6.0)
+		Sfx.play(&"land", 0.6)
 	rotation = velocity.angle()

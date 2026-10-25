@@ -51,6 +51,7 @@ func _ready() -> void:
 	hud.set_hearts(player.hp)
 	hud.set_ammo(player.ammo)
 	hud.set_boss_health(boss.hits_left(), boss.hits_total())
+	Sfx.music(&"title" if attempt == 1 else &"fight")
 	if attempt > 1:
 		attempt_label.text = "ATTEMPT %d" % attempt
 		attempt_label.show()
@@ -63,6 +64,7 @@ func _ready() -> void:
 		await tutorial.run()  # Lil' Watt first; the king stays hidden until it breaks
 		hud.show_banner("HERE COMES THE KING!", 1.6)
 	boss.start_fight()
+	Sfx.music(&"fight")
 	_fighting = true
 
 
@@ -89,6 +91,7 @@ func _on_player_died() -> void:
 	if boss.state != Boss.State.DEAD:
 		hud.splat()
 		boss.celebrate()
+		Sfx.music(&"lose")
 	await get_tree().create_timer(1.0, false).timeout
 	if boss.state == Boss.State.DEAD:
 		return  # he already won: no game over
@@ -125,6 +128,7 @@ func _on_boss_phase_changed(phase: int) -> void:
 ## into the wreck and the king rises again, as tall as the screen. The camera follows Lil' Watt
 ## until the fight resumes, with Lil' Watt fighting beside the king: break it to finish him.
 func _final_phase() -> void:
+	Sfx.music(&"")  # a hush for the cutscene
 	player.frozen = true
 	hud.cinema(true)
 	for child in projectiles.get_children():
@@ -151,6 +155,8 @@ func _final_phase() -> void:
 	helper.power_target = boss.weak_point()
 	boss.revive()
 	await boss.revived
+	Sfx.play(&"roar")
+	Sfx.music(&"final")
 	hud.coach("")
 	hud.boss_bar_aside()
 	hud.cinema(false)
@@ -196,6 +202,7 @@ func _on_boss_defeated() -> void:
 	stage.stop()
 	for child in projectiles.get_children():
 		child.queue_free()
+	Sfx.music(&"")  # the K.O. lands in silence
 	_knockout_slowmo()
 	await _ending()
 	hud.show_hint("")
@@ -206,6 +213,7 @@ func _on_boss_defeated() -> void:
 		"HEARTS LEFT  %d / %d" % [player.hp, Player.MAX_HP],
 		"BOMBS THROWN  %d" % player.bombs_thrown,
 	]), rank(attempt, player.hp))
+	Sfx.music(&"title")
 
 
 ## The run's rank on the win screen: S for a first-try win with 4+ hearts left, A for any
@@ -244,6 +252,8 @@ func _launch_firework() -> void:
 	firework.global_position = camera.get_screen_center_position() + Vector2(randf_range(-0.42, 0.42) * view.x, randf_range(-0.38, -0.08) * view.y)
 	firework.modulate = FIREWORK_COLORS.pick_random()
 	firework.scale = Vector2.ONE / camera.zoom
+	var pitch := randf_range(0.8, 1.3)
+	get_tree().create_timer(0.5).timeout.connect(func() -> void: Sfx.play(&"firework", pitch, -4.0))  # as it bursts
 
 
 ## PLAY AGAIN after a win starts a fresh run (attempts back to 1).
@@ -280,6 +290,7 @@ func _ending() -> void:
 	await drop.finished
 	kings_crown.hide()
 	player.wear_crown()
+	Sfx.music(&"win")
 	get_tree().call_group("camera", "shake", 12.0)
 	await _wait(0.4)
 	player.celebrate()

@@ -414,6 +414,109 @@ _data = {
 &"win": SubResource("Animation_win")
 }
 
+[sub_resource type="Animation" id="Animation_heart_lose"]
+resource_name = "lose"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.08, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1.7, 1.7), Vector2(0.8, 0.8), Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.35, -0.2, 0.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.18),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(3, 3, 3, 1), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_heart"]
+_data = {
+&"lose": SubResource("Animation_heart_lose")
+}
+
+[sub_resource type="Animation" id="Animation_danger_pulse"]
+resource_name = "pulse"
+length = 0.9
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Danger:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.18, 0.3, 0.5, 0.9),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0.3), Color(1, 1, 1, 1), Color(1, 1, 1, 0.45), Color(1, 1, 1, 0.85), Color(1, 1, 1, 0.3), Color(1, 1, 1, 0.3)]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"_heartbeat"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_danger"]
+_data = {
+&"pulse": SubResource("Animation_danger_pulse")
+}
+
+[sub_resource type="Gradient" id="Gradient_danger"]
+offsets = PackedFloat32Array(0, 0.55, 1)
+colors = PackedColorArray(0.62, 0.25, 0.3, 0, 0.62, 0.25, 0.3, 0, 0.62, 0.25, 0.3, 0.8)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_danger"]
+gradient = SubResource("Gradient_danger")
+width = 64
+height = 64
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_bar"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chip"]
+bg_color = Color(0.988, 0.984, 0.988, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.1764706, 0.15294118, 0.1882353, 1)
+
 [node name="HUD" type="CanvasLayer"]
 layer = 10
 script = ExtResource("1_hud")
@@ -427,6 +530,17 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(0.988, 0.984, 0.988, 1)
+
+[node name="Danger" type="TextureRect" parent="."]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_danger")
+expand_mode = 1
 
 [node name="Cinema" type="Control" parent="."]
 layout_mode = 3
@@ -468,33 +582,63 @@ theme_override_constants/separation = 8
 
 [node name="Heart1" type="TextureRect" parent="Hearts"]
 custom_minimum_size = Vector2(44, 40)
+pivot_offset = Vector2(22, 20)
 layout_mode = 2
 texture = ExtResource("2_heart")
 expand_mode = 1
+
+[node name="Lose" type="AnimationPlayer" parent="Hearts/Heart1"]
+libraries = {
+&"": SubResource("AnimationLibrary_heart")
+}
 
 [node name="Heart2" type="TextureRect" parent="Hearts"]
 custom_minimum_size = Vector2(44, 40)
+pivot_offset = Vector2(22, 20)
 layout_mode = 2
 texture = ExtResource("2_heart")
 expand_mode = 1
+
+[node name="Lose" type="AnimationPlayer" parent="Hearts/Heart2"]
+libraries = {
+&"": SubResource("AnimationLibrary_heart")
+}
 
 [node name="Heart3" type="TextureRect" parent="Hearts"]
 custom_minimum_size = Vector2(44, 40)
+pivot_offset = Vector2(22, 20)
 layout_mode = 2
 texture = ExtResource("2_heart")
 expand_mode = 1
+
+[node name="Lose" type="AnimationPlayer" parent="Hearts/Heart3"]
+libraries = {
+&"": SubResource("AnimationLibrary_heart")
+}
 
 [node name="Heart4" type="TextureRect" parent="Hearts"]
 custom_minimum_size = Vector2(44, 40)
+pivot_offset = Vector2(22, 20)
 layout_mode = 2
 texture = ExtResource("2_heart")
 expand_mode = 1
 
+[node name="Lose" type="AnimationPlayer" parent="Hearts/Heart4"]
+libraries = {
+&"": SubResource("AnimationLibrary_heart")
+}
+
 [node name="Heart5" type="TextureRect" parent="Hearts"]
 custom_minimum_size = Vector2(44, 40)
+pivot_offset = Vector2(22, 20)
 layout_mode = 2
 texture = ExtResource("2_heart")
 expand_mode = 1
+
+[node name="Lose" type="AnimationPlayer" parent="Hearts/Heart5"]
+libraries = {
+&"": SubResource("AnimationLibrary_heart")
+}
 
 [node name="Ammo" type="HBoxContainer" parent="."]
 offset_left = 24.0
@@ -625,6 +769,21 @@ horizontal_alignment = 1
 [node name="Bar" type="ProgressBar" parent="BossBar"]
 custom_minimum_size = Vector2(448, 28)
 layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxEmpty_bar")
+max_value = 9.0
+value = 9.0
+show_percentage = false
+
+[node name="Ghost" type="ProgressBar" parent="BossBar/Bar"]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_chip")
 max_value = 9.0
 value = 9.0
 show_percentage = false
@@ -877,6 +1036,11 @@ libraries = {
 [node name="WinFx" type="AnimationPlayer" parent="."]
 libraries = {
 &"": SubResource("AnimationLibrary_win")
+}
+
+[node name="DangerFx" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_danger")
 }
 
 [node name="CinemaFx" type="AnimationPlayer" parent="."]

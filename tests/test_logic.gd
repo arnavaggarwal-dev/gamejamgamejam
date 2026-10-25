@@ -40,6 +40,7 @@ func _run() -> void:
 	await _test_eye()
 	await _test_roam()
 	await _test_game_wiring()
+	await _test_sound()
 	await _test_game_over()
 	await _test_phase_extras()
 	await _test_skip_phase()
@@ -761,13 +762,37 @@ func _test_game_wiring() -> void:
 	check(slot.texture == HUD.BOMB_FULL and slot.get_node("Fill").current_animation == &"fill" and slot.get_node("Poof").visible and not hud.ammo_icons[1].get_node("Poof").visible, "a new bomb pops into its ammo slot with a poof")
 	boss.state = Boss.State.IDLE
 	boss.take_hit()
-	check(hud.boss_bar.value == boss.hits_total() - 1, "a boss hit updates the boss bar")
+	check(hud.boss_bar.value == boss.hits_total() - 1 and hud.boss_ghost.value == boss.hits_total(), "a boss hit updates the boss bar, a chip of it lingering...")
+	await create_timer(0.9).timeout
+	check(hud.boss_ghost.value == hud.boss_bar.value, "...then draining away")
+	check(hud.hearts[Player.MAX_HP - 1].get_node("Lose").current_animation == &"" and not hud.danger.visible, "(no heartbeat with hearts to spare)")
+	hud.set_hearts(1)
+	check(hud.danger.visible and hud.danger_fx.current_animation == &"pulse" and hud.hearts[1].get_node("Lose").is_playing(), "down to the last heart the lost ones pop and the screen's edges pulse red")
+	hud.set_hearts(Player.MAX_HP)
+	check(not hud.danger.visible, "...until the hearts come back")
 	boss.defeated.emit()
 	await process_frame
 	check(not player.hurtbox.monitoring, "player can't be hurt after the knockout")
 	game.queue_free()
 	await process_frame
 	Engine.time_scale = 1.0
+
+
+## The sound player (the running SfxPlayer autoload, which keeps quiet in headless runs: the dummy
+## audio driver never lets go of a sound): voices on the SFX bus, music on its own, every sound
+## loaded, the music looping, and every button gets a blip and a click.
+func _test_sound() -> void:
+	var sfx: Sfx = root.get_node("SfxPlayer")
+	check(Sfx._player == null, "headless runs stay quiet")
+	check(sfx.voices.size() == 12 and sfx.voices.all(func(v: AudioStreamPlayer) -> bool: return v.bus == &"SFX") and sfx.music_player.bus == &"Music" and AudioServer.get_bus_index(&"Music") > 0, "effects play off 12 voices on the SFX bus, music on its own bus")
+	check(sfx._streams.size() == Sfx.SOUNDS.size() and Sfx.SOUNDS.all(func(n: StringName) -> bool: return sfx._streams[n] is AudioStreamWAV), "every sound effect is loaded")
+	var looped := ["title", "fight", "final"].all(func(t: String) -> bool: return (load(Sfx.MUSIC_PATH % t) as AudioStreamWAV).loop_mode == AudioStreamWAV.LOOP_FORWARD)
+	check(looped and ResourceLoader.exists(Sfx.MUSIC_PATH % "win") and ResourceLoader.exists(Sfx.MUSIC_PATH % "lose"), "the title, fight and final music loop; the fanfare and the sting play once")
+	var button := Button.new()
+	root.add_child(button)
+	check(button.focus_entered.get_connections().size() == 1 and button.pressed.get_connections().size() == 1, "every button gets a blip and a click")
+	button.queue_free()
+	await process_frame
 
 
 ## Losing all five hearts is game over: he splatters (goo over the screen too), the king

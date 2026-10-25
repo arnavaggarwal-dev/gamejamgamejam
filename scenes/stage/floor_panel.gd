@@ -46,8 +46,10 @@ func collapse() -> void:
 	if not collapsed:
 		collapsed = true
 		anim.play(&"collapse")
+		Sfx.play(&"crumble", randf_range(0.85, 1.15), -4.0)
 
 
 ## Method-track target in "zap": a small kick when the current goes live.
 func zap_shake() -> void:
 	get_tree().call_group("camera", "shake", 3.0)
+	Sfx.play(&"buzz", 1.0, -4.0)

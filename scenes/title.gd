@@ -4,6 +4,7 @@ extends Control
 
 func _ready() -> void:
 	Game.attempt = 1  # a fresh run
+	Sfx.music(&"title")
 	# Poster pose: the giant fight starts with only his legs in frame, so the title shows him
 	# squashed into one screen instead (torso down, head on his shoulders, no legs).
 	var boss: Boss = $Boss

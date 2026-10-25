@@ -239,6 +239,7 @@ func take_hit() -> bool:
 	get_tree().call_group("hud", "flash", 0.8)
 	get_tree().call_group("camera", "hitstop", 0.12)
 	_fx(SPARK_SCENE, weak_point().global_position)
+	Sfx.play(&"clang")
 	if hp <= 0:
 		_advance_phase()
 	else:
@@ -316,6 +317,7 @@ func open_guard() -> void:
 	if phase != 1:
 		return
 	_guard(false)
+	Sfx.play(&"ping")
 	_fx(SPARK_SCENE, shield.global_position)
 	shake(5.0)
 
@@ -352,6 +354,7 @@ func fire_hands() -> void:
 		kick.tween_property(fists[i], "position", aimed - dir * 130.0, 0.07).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		kick.tween_property(fists[i], "position", aimed, 0.45).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT).set_delay(0.07)
 	shake(16.0)
+	Sfx.play(&"rocket")
 	get_tree().call_group("hud", "flash", 0.3)
 	get_tree().call_group("camera", "hitstop", 0.07)
 
@@ -367,6 +370,7 @@ func rest_hands() -> void:
 ## bolts)...
 func hands_back() -> void:
 	_hand_on = [true, true]
+	Sfx.play(&"ratchet")
 
 
 ## ...and click home: a spark at each wrist, a jolt and a tiny freeze.
@@ -374,6 +378,7 @@ func click_hands() -> void:
 	for wrist in wrists:
 		_fx(SPARK_SCENE, wrist.global_position)
 	shake(8.0)
+	Sfx.play(&"click")
 	get_tree().call_group("camera", "hitstop", 0.05)
 
 
@@ -389,6 +394,7 @@ func aim_dash() -> void:
 ## flies home (the swoop animation flashes it white and keeps the ram hitbox live). Diving at
 ## a spot by the floor, it hits the spot and skids on along the floor instead of into it.
 func swoop() -> void:
+	Sfx.play(&"whoosh", 0.8)
 	var dir := (_dash_target - head.global_position).normalized()
 	var past := _dash_target + dir * DASH_OVERSHOOT
 	var s := anim.speed_scale
@@ -443,6 +449,7 @@ func heal_cracks() -> void:
 
 ## Stage 3: the head spits a crackling zap ball straight at the player.
 func spit_zap() -> void:
+	Sfx.play(&"pew", 0.8)
 	var ball: Node2D = ZAP_SCENE.instantiate()
 	_spawn_parent().add_child(ball)
 	ball.global_position = mouth.global_position
@@ -454,23 +461,27 @@ func spit_zap() -> void:
 func pop_crown() -> void:
 	var crown: Node2D = head.get_node("Crown")
 	crown.hide()
+	Sfx.play(&"coin")
 	crown_popped.emit(crown.global_position)
 
 
 ## A huge moment (the head shattering, re-forming, the giant's roar): full white flash and a freeze.
 func blast() -> void:
 	shake(30.0)
+	Sfx.play(&"blast")
 	get_tree().call_group("hud", "flash", 1.0)
 	get_tree().call_group("camera", "hitstop", 0.15)
 
 
 func laser_fire() -> void:
 	shake(6.0)
+	Sfx.play(&"laser")
 
 
 ## One blast somewhere on a body part (stage breaks and the knockout chain these).
 func boom(part: NodePath) -> void:
 	shake(16.0)
+	Sfx.play(&"boom", 0.8)
 	var at: Vector2 = get_node(part).global_position
 	_fx(EXPLOSION_SCENE, at + Vector2(randf_range(-150.0, 150.0), randf_range(-150.0, 120.0)))
 
@@ -478,6 +489,7 @@ func boom(part: NodePath) -> void:
 ## A body part hitting the floor: a big shake and dust either side.
 func land(part: NodePath) -> void:
 	shake(24.0)
+	Sfx.play(&"quake")
 	var x: float = get_node(part).global_position.x
 	for dir in [-1, 1]:
 		_fx(DUST_SCENE, Vector2(x + dir * 120.0, FLOOR_Y - 16.0))
@@ -495,6 +507,7 @@ func shake(amount: float) -> void:
 
 func _quake(x: float, amount: float) -> void:
 	shake(amount)
+	Sfx.play(&"quake", 1.1)
 	for dir in [-1, 1]:
 		var wave: Shockwave = SHOCKWAVE_SCENE.instantiate()
 		wave.direction = dir
@@ -605,7 +618,12 @@ func _on_rest_timer_timeout() -> void:
 	if state == State.IDLE:
 		var attack := next_attack()
 		attack_started.emit(attack)
-		_play(_clip_for(attack), State.ATTACK)
+		var clip := _clip_for(attack)
+		_play(clip, State.ATTACK)
+		match clip:  # the wind-up whine of the moves with a tell
+			&"laser", &"swoop": Sfx.play(&"charge")
+			&"rocket_l", &"rocket_r", &"rocket_both": Sfx.play(&"charge", 1.4)
+			&"slam": Sfx.play(&"charge", 0.7)
 
 
 ## The clip for an attack. A rocket turn fires the hands still on: the giant fires both at once,

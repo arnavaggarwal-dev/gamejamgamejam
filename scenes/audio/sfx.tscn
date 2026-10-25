@@ -1,0 +1,48 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/audio/sfx.gd" id="1_script"]
+
+[node name="Sfx" type="Node"]
+process_mode = 3
+script = ExtResource("1_script")
+
+[node name="Voices" type="Node" parent="."]
+
+[node name="Voice1" type="AudioStreamPlayer" parent="Voices"]
+bus = &"SFX"
+
+[node name="Voice2" type="AudioStreamPlayer" parent="Voices"]
+bus = &"SFX"
+
+[node name="Voice3" type="AudioStreamPlayer" parent="Voices"]
+bus = &"SFX"
+
+[node name="Voice4" type="AudioStreamPlayer" parent="Voices"]
+bus = &"SFX"
+
+[node name="Voice5" type="AudioStreamPlayer" parent="Voices"]
+bus = &"SFX"
+
+[node name="Voice6" type="AudioStreamPlayer" parent="Voices"]
+bus = &"SFX"
+
+[node name="Voice7" type="AudioStreamPlayer" parent="Voices"]
+bus = &"SFX"
+
+[node name="Voice8" type="AudioStreamPlayer" parent="Voices"]
+bus = &"SFX"
+
+[node name="Voice9" type="AudioStreamPlayer" parent="Voices"]
+bus = &"SFX"
+
+[node name="Voice10" type="AudioStreamPlayer" parent="Voices"]
+bus = &"SFX"
+
+[node name="Voice11" type="AudioStreamPlayer" parent="Voices"]
+bus = &"SFX"
+
+[node name="Voice12" type="AudioStreamPlayer" parent="Voices"]
+bus = &"SFX"
+
+[node name="Music" type="AudioStreamPlayer" parent="."]
+bus = &"Music"

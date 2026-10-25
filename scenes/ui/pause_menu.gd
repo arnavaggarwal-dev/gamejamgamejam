@@ -11,6 +11,7 @@ const TITLE_SCENE := "res://scenes/title.tscn"
 @onready var resume: Button = $Panel/VBox/Resume
 @onready var restart: Button = $Panel/VBox/Restart
 @onready var fullscreen: Button = $Panel/VBox/Fullscreen
+@onready var sound: Button = $Panel/VBox/Sound
 @onready var quit: Button = $Panel/VBox/Quit
 @onready var zs_root: Node2D = $Panel/VBox/HeroBox/Zs
 @onready var pop_fx: AnimationPlayer = $PopFx
@@ -21,6 +22,7 @@ func _ready() -> void:
 	resume.pressed.connect(close)
 	restart.pressed.connect(_restart)
 	fullscreen.pressed.connect(_toggle_fullscreen)
+	sound.pressed.connect(_toggle_sound)
 	quit.pressed.connect(_quit_to_title)
 	hero_box.resized.connect(_place_hero)
 	panel.resized.connect(func() -> void: panel.pivot_offset = panel.size / 2.0)
@@ -45,6 +47,8 @@ func open() -> void:
 	get_tree().paused = true
 	show()
 	_refresh_fullscreen_label()
+	sound.text = "SOUND: OFF" if Sfx.muted else "SOUND: ON"
+	Sfx.play(&"pause")
 	resume.grab_focus()
 	pop_fx.play(&"open")
 	doze.play(&"doze")  # the little guy dozes while you take a break: Zs drift up and fade
@@ -64,6 +68,11 @@ func _restart() -> void:
 func _quit_to_title() -> void:
 	get_tree().paused = false
 	get_tree().change_scene_to_file(TITLE_SCENE)
+
+
+func _toggle_sound() -> void:
+	Sfx.set_muted(not Sfx.muted)
+	sound.text = "SOUND: OFF" if Sfx.muted else "SOUND: ON"
 
 
 func _toggle_fullscreen() -> void:

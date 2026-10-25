@@ -9,6 +9,7 @@ extends Node2D
 
 func _ready() -> void:
 	$Burst.animation_finished.connect($Burst.hide)
+	Sfx.play(&"splat")
 	get_tree().call_group("camera", "shake", 14.0)
 	_land.call_deferred()  # once the spawner has put it in place
 

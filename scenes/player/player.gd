@@ -135,6 +135,7 @@ func _physics_process(delta: float) -> void:
 		_jump_buffer = 0.0
 		_coyote = 0.0
 		juice.play(&"jump")  # squash, then a big stretch off the ground
+		Sfx.play(&"air_jump" if midair else &"jump")
 		_puff(SLIME if midair else DUST, _feet())  # a slimy splat when he kicks off thin air
 	if Input.is_action_just_released("jump") and velocity.y < 0.0:
 		velocity.y *= 0.5
@@ -183,6 +184,7 @@ func celebrate() -> void:
 ## The ending: the king's crown lands on his head (much too big). Clonk.
 func wear_crown() -> void:
 	crown.show()
+	Sfx.play(&"crown")
 	_squash(Vector2(1.4, 0.6))
 	_puff(DUST, _feet())
 
@@ -193,6 +195,7 @@ func take_hit(from: Area2D = null) -> void:
 		return
 	hp -= 1
 	hp_changed.emit(hp)
+	Sfx.play(&"hurt")
 	get_tree().call_group("camera", "shake", 8.0)
 	get_tree().call_group("hud", "flash", 0.85)
 	get_tree().call_group("camera", "hitstop", 0.1)
@@ -244,6 +247,7 @@ func _start_dash() -> void:
 	ghost_timer.start()
 	_spawn_ghost()
 	juice.play(&"dash_v" if absf(_dash_dir.y) > absf(_dash_dir.x) else &"dash")
+	Sfx.play(&"dash")
 	_puff(DUST if is_on_floor() else SLIME, _feet())
 
 
@@ -296,6 +300,7 @@ func _grab() -> void:
 		best.pick_up()
 		held_bomb = best
 		juice.play(&"grab")
+		Sfx.play(&"pull")
 
 
 ## Pulls a new bomb out of his ammo, into his hands.
@@ -329,6 +334,7 @@ func _charge(delta: float) -> void:
 		ammo += 1
 		ammo_changed.emit(ammo)
 		_puff(POOF, hold_point.global_position)
+		Sfx.play(&"pop", 0.8 + 0.12 * ammo)  # each bomb pops a step higher
 
 
 ## A plain throw at an armed core ahead of him is aimed: the usual sideways speed (faster for a far
@@ -380,6 +386,7 @@ func _throw() -> void:
 	held_bomb.target = _bomb_target()
 	held_bomb.throw(_throw_velocity())
 	bombs_thrown += 1
+	Sfx.play(&"throw")
 	_thrown = held_bomb
 	held_bomb = null
 	juice.play(&"throw")
@@ -437,6 +444,7 @@ func _update_prompt() -> void:
 ## kicks up extra dust and bumps the camera.
 func _land(impact: float) -> void:
 	_squash(Vector2(1.1 + 0.3 * impact, 0.9 - 0.25 * impact))
+	Sfx.play(&"land", 1.2 - 0.3 * impact, -10.0 + 8.0 * impact)  # a pat for a hop, a thud for a drop
 	_puff(DUST, _feet())
 	if impact > 0.7:
 		_puff(DUST, _feet() + Vector2(-36, 0))

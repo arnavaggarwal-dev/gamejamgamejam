@@ -96,6 +96,7 @@ func _step(text: String, is_done: Callable) -> void:
 	if _skip:
 		return
 	hud.coach("NICE!")
+	Sfx.play(&"coin")
 	await get_tree().create_timer(STEP_PAUSE, false).timeout
 
 

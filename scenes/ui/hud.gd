@@ -15,6 +15,7 @@ var _banner_id := 0
 var _hint_id := 0
 var _flash: Tween
 var _cinema := false  # letterbox in: hints wait
+var _hp := Player.MAX_HP
 var _ammo := -1  # what the ammo row last showed (-1: nothing yet)
 
 @onready var hearts_row: Control = $Hearts
@@ -23,6 +24,9 @@ var _ammo := -1  # what the ammo row last showed (-1: nothing yet)
 @onready var ammo_icons: Array[Node] = $Ammo.get_children()
 @onready var boss_box: Control = $BossBar
 @onready var boss_bar: ProgressBar = $BossBar/Bar
+@onready var boss_ghost: ProgressBar = $BossBar/Bar/Ghost  # the chip a hit knocks off, draining after it
+@onready var danger: TextureRect = $Danger
+@onready var danger_fx: AnimationPlayer = $DangerFx
 @onready var boss_name: Label = $BossBar/Name
 @onready var banner: Label = $Banner
 @onready var hint: Label = $Hint
@@ -53,9 +57,23 @@ func _ready() -> void:
 	skip_button.pressed.connect(skip_phase_pressed.emit)
 
 
+## Hearts in the row; a lost one pops and wiggles (its "lose" clip). Down to the last heart, the
+## screen's edges pulse red with a heartbeat.
 func set_hearts(hp: int) -> void:
 	for i in hearts.size():
 		hearts[i].texture = HEART_FULL if i < hp else HEART_EMPTY
+		if i >= hp and i < _hp:
+			hearts[i].get_node("Lose").play(&"lose")
+	_hp = hp
+	danger.visible = hp == 1
+	if hp == 1:
+		danger_fx.play(&"pulse")
+	else:
+		danger_fx.stop()
+
+
+func _heartbeat() -> void:
+	Sfx.play(&"heartbeat", 1.0, -4.0)
 
 
 ## Bombs in the row; each new one pops into its slot with a poof (its "fill" clip).
@@ -73,13 +91,22 @@ func set_boss_name(text: String) -> void:
 	boss_name.text = text
 
 
+## The bar drops at once; a pale chip of what was lost lingers behind it, then drains away.
 func set_boss_health(hits_left: int, hits_total: int) -> void:
 	boss_bar.max_value = hits_total
+	boss_ghost.max_value = hits_total
 	boss_bar.value = hits_left
+	if hits_left >= boss_ghost.value:
+		boss_ghost.value = hits_left  # a refill (a new boss on the bar) catches up at once
+		return
+	var drain := create_tween()
+	drain.tween_interval(0.35)
+	drain.tween_property(boss_ghost, "value", float(hits_left), 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 
 
 ## Big centred text; a newer banner cancels the older one's hide timer.
 func show_banner(text: String, seconds: float) -> void:
+	Sfx.play(&"whoosh", 1.3, -6.0)
 	_banner_id += 1
 	var id := _banner_id
 	banner.text = text
@@ -120,6 +147,7 @@ func coach(text: String) -> void:
 ## The hero splattered against the screen, Smash style: gobs of goo slap onto the glass, then
 ## slide down it and fade (the GooFx "splat" clip).
 func splat() -> void:
+	Sfx.play(&"squish")
 	goo_fx.play(&"splat")
 	goo_fx.advance(0.0)
 
@@ -172,10 +200,12 @@ func show_win(stats: PackedStringArray, rank: String) -> void:
 
 
 func _tick() -> void:
+	Sfx.play(&"tick")
 	get_tree().call_group("camera", "shake", 3.0)
 
 
 func _stamp() -> void:
+	Sfx.play(&"stamp")
 	flash(0.6)
 	get_tree().call_group("camera", "shake", 14.0)
 

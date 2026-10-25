@@ -207,6 +207,12 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "FULLSCREEN: ON"
 
+[node name="Sound" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(400, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "SOUND: ON"
+
 [node name="Quit" type="Button" parent="Panel/VBox"]
 custom_minimum_size = Vector2(400, 56)
 layout_mode = 2

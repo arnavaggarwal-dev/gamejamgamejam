@@ -15,6 +15,8 @@ func _ready() -> void:
 
 func shake(amount: float) -> void:
 	_trauma = maxf(_trauma, amount)
+	for pad in Input.get_connected_joypads():  # gamepads rumble along with the screen
+		Input.start_joy_vibration(pad, clampf(amount / 20.0, 0.0, 1.0), clampf(amount / 30.0, 0.0, 1.0), 0.06 + amount * 0.008)
 
 
 func hitstop(seconds: float) -> void:
