@@ -541,7 +541,11 @@ func _test_arms() -> void:
 	var elbows: Array = boss.arms.map(func(a: Node2D) -> Vector2: return a.get_node("Elbow").global_position)
 	var upper := func(i: int) -> Vector2: return (elbows[i] - boss.arms[i].global_position).normalized()
 	var fore := func(i: int) -> Vector2: return (boss.wrists[i].global_position - elbows[i]).normalized()
-	check(upper.call(0).dot(Vector2.LEFT) > 0.99 and upper.call(1).dot(Vector2.RIGHT) > 0.99 and fore.call(0).dot(up_left) > 0.99 and fore.call(1).dot(up_left) > 0.99 and boss.arm_r.z_index > boss.head.z_index, "stage 2 celebrates with a dab: upper arms level out to his sides, both forearms parallel up 30 degrees, one folded over his head")
+	var dab := func() -> bool: return upper.call(0).dot(Vector2.LEFT) > 0.99 and upper.call(1).dot(Vector2.RIGHT) > 0.99 and fore.call(0).dot(up_left) > 0.99 and fore.call(1).dot(up_left) > 0.99
+	check(dab.call() and boss.arm_r.z_index == 0 and boss.head.get_index() > boss.body.get_index(), "stage 2 celebrates with a dab to his left: upper arms level out to his sides, both forearms parallel up 30 degrees, the inner hand behind his head")
+	await create_timer(1.0).timeout
+	elbows = boss.arms.map(func(a: Node2D) -> Vector2: return a.get_node("Elbow").global_position)
+	check(dab.call(), "...and he holds it (no switching sides)")
 	boss.phase = Boss.FINAL
 	boss.state = Boss.State.IDLE
 	boss.celebrate()

@@ -562,7 +562,6 @@ func _reset_rig() -> void:
 	eye.modulate = Color.WHITE
 	body.modulate = Color.WHITE
 	for i in 2:
-		arms[i].z_index = 0  # (the dab draws its crossing arm over his head)
 		var hand: Sprite2D = wrists[i].get_node("Hand")
 		hand.modulate = Color.WHITE
 		hand.position = Vector2(-8.0 if i == 0 else 8.0, 72.0)
