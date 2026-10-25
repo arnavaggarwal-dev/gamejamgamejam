@@ -908,10 +908,10 @@ func _test_tutorial_rush() -> void:
 	check(tutorial.bot.hp == TrainingBot.HITS - 1 and hud.coach_label.text.contains("HOLD  A"), "hitting the core early moves the lesson on (to squeezing out more bombs)")
 	var before := player.ammo
 	Input.action_press("detonate")
-	await create_timer(0.35).timeout
+	await create_timer(0.27).timeout
 	check(player.charging and player.body.animation == &"strain", "holding [A] squeezes him flat, eyes screwed shut")
 	await create_timer(0.4).timeout
-	check(player.ammo > before and Player.CHARGE_TIME == 0.3, "...and squeezes out a bomb every 0.3 s")
+	check(player.ammo > before and Player.CHARGE_TIME == 0.15, "...and squeezes out a bomb every 0.15 s")
 	Input.action_release("detonate")
 	await create_timer(1.0).timeout
 	check(hud.coach_label.text.begins_with("AGAIN"), "then the lesson moves on")
