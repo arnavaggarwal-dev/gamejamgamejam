@@ -9,7 +9,9 @@ extends Node2D
 ## Attacks live in the AnimationPlayer: value tracks move the rig and toggle hitboxes, method
 ## tracks call stomp_* / aim_* / swoop / hop_land / slam_impact / spit_zap / boom / land / shake.
 ## His arms are articulated (shoulder, elbow, wrist): clips move the FistL / FistR wrist targets
-## and two-bone IK (_reach) bends the arms to them every frame.
+## and two-bone IK (_reach) bends the arms to them every frame. Both hands are rocket hands and
+## no new one grows per shot: stage 2 fires them in turn, the giant fires both at once, and once
+## both wrists are bare his rocket turn is a reload (arms up, both hands screw back on).
 ## Moves that chase the player (the stomp's walk, the head's dash) are tweens started there.
 ## Between attacks he roams: he drifts either side of his spot near the player, legs stepping.
 
@@ -73,7 +75,13 @@ var _move: Tween  # the running chase tween (stomp walk / head dash), killed on 
 var _wander := 0.0
 var _stride := 0.0
 var _dash_target := Vector2.ZERO
-var _hand_dir := Vector2.LEFT  # where the rocket hand will fly (set by aim_hand)
+var _hand_dirs := [Vector2.LEFT, Vector2.LEFT]  # where each rocket hand will fly (set by aim_hands)
+var _hand_on := [true, true]  # left, right: still on his wrist
+var _firing: Array[int] = [0]  # the hands this rocket clip fires (0 left, 1 right)
+
+## Which way each elbow bends (+1 out left, -1 out right); the reload clip flips them.
+@export var bend_l := 1.0
+@export var bend_r := -1.0
 
 @onready var rig: Node2D = $Rig
 @onready var legs: Node2D = $Rig/Legs
@@ -93,11 +101,11 @@ var _hand_dir := Vector2.LEFT  # where the rocket hand will fly (set by aim_hand
 @onready var fist_r: Node2D = $Rig/Upper/Body/FistR
 @onready var arm_l: Node2D = $Rig/Upper/Body/ArmL
 @onready var arm_r: Node2D = $Rig/Upper/Body/ArmR
-@onready var wrist_l: Node2D = $Rig/Upper/Body/ArmL/Elbow/Wrist
-@onready var hand_l: Sprite2D = $Rig/Upper/Body/ArmL/Elbow/Wrist/Hand
-@onready var sputter: CPUParticles2D = $Rig/Upper/Body/ArmL/Elbow/Sputter
+@onready var fists: Array[Node2D] = [fist_l, fist_r]
+@onready var arms: Array[Node2D] = [arm_l, arm_r]
+@onready var wrists: Array[Node2D] = [$Rig/Upper/Body/ArmL/Elbow/Wrist, $Rig/Upper/Body/ArmR/Elbow/Wrist]
+@onready var sputters: Array[CPUParticles2D] = [$Rig/Upper/Body/ArmL/Elbow/Sputter, $Rig/Upper/Body/ArmR/Elbow/Sputter]
 @onready var shield: Sprite2D = $Rig/Upper/Body/Core/Shield
-@onready var hand_fx: AnimationPlayer = $HandFx
 @onready var cores: Array = [$Rig/Legs/StompAnchor/LegF/KneeCore, $Rig/Upper/Body/Core, $Rig/Upper/Head/EyeCore]
 @onready var cracks: Array = [$Rig/Legs/StompAnchor/LegF/Cracks, $Rig/Upper/Body/Cracks, $Rig/Upper/Head/Cracks]
 @onready var anim: AnimationPlayer = $AnimationPlayer
@@ -127,8 +135,8 @@ func _process(_delta: float) -> void:
 	var player := get_tree().get_first_node_in_group("player") as Node2D
 	if player:
 		eye.global_rotation = (player.global_position - eye.global_position).angle() - PI
-	_reach(arm_l, fist_l.position, 1.0)
-	_reach(arm_r, fist_r.position, -1.0)
+	_reach(arm_l, fist_l.position, bend_l)
+	_reach(arm_r, fist_r.position, bend_r)
 
 
 ## Two-bone IK: turns the shoulder and elbow so the wrist lands on `target` (body space), the
@@ -244,6 +252,7 @@ func restart_phase() -> void:
 		return
 	hp = HITS_PER_PHASE
 	_attack_index = 0
+	_hand_on = [true, true]
 	_show_cracks()
 	health_changed.emit(hits_left(), hits_total())
 	_rest()
@@ -293,12 +302,13 @@ func step_home() -> void:
 	_chase().tween_property(self, "position:x", FINAL_X, 0.4 / anim.speed_scale).set_trans(Tween.TRANS_SINE)
 
 
-## Stage 2 rocket-hand tell: his arm lowers and points straight at the player (called repeatedly,
-## then it locks).
-func aim_hand() -> void:
-	_hand_dir = (_player_pos() - arm_l.global_position).normalized()
-	var goal := arm_l.position + _hand_dir * ARM_REACH
-	_chase().tween_property(fist_l, "position", goal, 0.12).set_trans(Tween.TRANS_SINE)
+## Rocket-hand tell: each firing arm lowers and points straight at the player (called
+## repeatedly, then it locks).
+func aim_hands() -> void:
+	var aim := _chase().set_parallel()
+	for i in _firing:
+		_hand_dirs[i] = (_player_pos() - arms[i].global_position).normalized()
+		aim.tween_property(fists[i], "position", arms[i].position + _hand_dirs[i] * ARM_REACH, 0.12).set_trans(Tween.TRANS_SINE)
 
 
 ## Stage 2's chest core sits behind a shield (no target, no hits, nothing for the throw to aim
@@ -318,49 +328,55 @@ func _guard(closed: bool) -> void:
 	cores[1].get_node("WeakPoint").set_deferred(&"monitoring", not closed)
 
 
-## The hand blasts off his wrist along the arm: a muzzle blast and sparks at the wrist, a freeze,
-## a flash and a heavy shake; the arm kicks back hard and springs out again; the bare wrist
-## sputters smoke until the new hand screws on. The rocket skids along the floor.
-func fire_hand() -> void:
-	var at := wrist_l.global_position
-	var rocket: Node2D = ROCKET_SCENE.instantiate()
-	_spawn_parent().add_child(rocket)
-	rocket.global_position = hand_l.global_position
-	rocket.scale = rig.scale  # the giant's rocket hand is giant too
-	rocket.launch(_hand_dir * ROCKET_SPEED)
-	wrist_l.hide()
-	sputter.emitting = true
-	var blast: Node2D = EXPLOSION_SCENE.instantiate()
-	_spawn_parent().add_child(blast)
-	blast.global_position = at + _hand_dir * 40.0
-	blast.scale = Vector2(2.4, 2.4)
-	_fx(SPARK_SCENE, at)
-	_fx(DUST_SCENE, at)
+## The hands blast off their wrists along the arms: a muzzle blast and sparks at each wrist, a
+## freeze, a flash and a heavy shake; each arm kicks back hard and springs out again; the bare
+## wrists sputter smoke until the reload. The rockets skid along the floor.
+func fire_hands() -> void:
+	var kick := _chase().set_parallel()
+	for i in _firing:
+		var dir: Vector2 = _hand_dirs[i]
+		var at := wrists[i].global_position
+		var rocket: Node2D = ROCKET_SCENE.instantiate()
+		_spawn_parent().add_child(rocket)
+		rocket.global_position = wrists[i].get_node("Hand").global_position
+		rocket.scale = rig.scale  # the giant's rocket hands are giant too
+		rocket.launch(dir * ROCKET_SPEED)
+		_hand_on[i] = false
+		wrists[i].hide()
+		sputters[i].emitting = true
+		var blast: Node2D = EXPLOSION_SCENE.instantiate()
+		_spawn_parent().add_child(blast)
+		blast.global_position = at + dir * 40.0
+		blast.scale = Vector2(2.4, 2.4)
+		_fx(SPARK_SCENE, at)
+		_fx(DUST_SCENE, at)
+		var aimed := fists[i].position
+		kick.tween_property(fists[i], "position", aimed - dir * 130.0, 0.07).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		kick.tween_property(fists[i], "position", aimed, 0.45).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT).set_delay(0.07)
 	shake(16.0)
 	get_tree().call_group("hud", "flash", 0.3)
 	get_tree().call_group("camera", "hitstop", 0.07)
-	var aimed := fist_l.position
-	var kick := _chase()
-	kick.tween_property(fist_l, "position", aimed - _hand_dir * 130.0, 0.07).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	kick.tween_property(fist_l, "position", aimed, 0.45).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 
 
-## A new hand screws onto his wrist (the HandFx "screw_on" clip: it grows in, flipping like a
-## turning bolt, then clicks home).
-func regrow_hand() -> void:
-	hand_fx.play(&"screw_on")
+## The arms swing back down to his sides.
+func rest_hands() -> void:
+	var back := _chase().set_parallel()
+	for i in _firing:
+		back.tween_property(fists[i], "position", _rest_pose[fists[i]], 0.4).set_trans(Tween.TRANS_SINE)
 
 
-## From "screw_on", the click: a spark at the wrist, a jolt and a tiny freeze.
-func click_hand() -> void:
-	_fx(SPARK_SCENE, wrist_l.global_position)
-	shake(6.0)
+## From "reload": both new hands start screwing on (the clip grows them in, flipping like turning
+## bolts)...
+func hands_back() -> void:
+	_hand_on = [true, true]
+
+
+## ...and click home: a spark at each wrist, a jolt and a tiny freeze.
+func click_hands() -> void:
+	for wrist in wrists:
+		_fx(SPARK_SCENE, wrist.global_position)
+	shake(8.0)
 	get_tree().call_group("camera", "hitstop", 0.05)
-
-
-## The arm swings back down to his side.
-func rest_hand() -> void:
-	_chase().tween_property(fist_l, "position", _rest_pose[fist_l], 0.4).set_trans(Tween.TRANS_SINE)
 
 
 ## Stage 3 tell: aim the dash at the player (called repeatedly, then it locks) and lay the
@@ -416,6 +432,7 @@ func revive() -> void:
 	if phase != FINAL or state != State.PHASE_SHIFT:
 		return
 	position.x = FINAL_X
+	_hand_on = [true, true]  # rebuilt with both hands
 	_play(&"revive", State.PHASE_SHIFT)
 
 
@@ -546,14 +563,17 @@ func _reset_rig() -> void:
 	rig.modulate = Color.WHITE
 	eye.modulate = Color.WHITE
 	body.modulate = Color.WHITE
-	hand_fx.stop()
-	hand_l.modulate = Color.WHITE
-	hand_l.position = Vector2(-8, 72)
+	for i in 2:
+		var hand: Sprite2D = wrists[i].get_node("Hand")
+		hand.modulate = Color.WHITE
+		hand.position = Vector2(-8.0 if i == 0 else 8.0, 72.0)
+		wrists[i].visible = _hand_on[i]
+		wrists[i].scale = Vector2.ONE
+		sputters[i].emitting = not _hand_on[i]  # a bare wrist smokes
+	bend_l = 1.0
+	bend_r = -1.0
 	if phase == 1:
 		_guard(true)  # stage 2: every move starts shielded
-	sputter.emitting = false
-	wrist_l.show()
-	wrist_l.scale = Vector2.ONE
 	stomp_ring.hide()
 	for box in [leg_f.get_node("Hitbox"), fist_l.get_node("Hitbox"), head.get_node("RamHitbox")]:
 		box.get_node("CollisionShape2D").set_deferred("disabled", true)
@@ -566,7 +586,7 @@ func _reset_rig() -> void:
 
 ## Where each part sits at rest in this stage (a stage break moves the torso and head).
 func _capture_rest_pose() -> void:
-	for n: Node2D in [legs, stomp_anchor, leg_f, leg_b, upper, body, head, fist_l]:
+	for n: Node2D in [legs, stomp_anchor, leg_f, leg_b, upper, body, head, fist_l, fist_r]:
 		_rest_pose[n] = n.position
 
 
@@ -589,7 +609,23 @@ func _on_rest_timer_timeout() -> void:
 	if state == State.IDLE:
 		var attack := next_attack()
 		attack_started.emit(attack)
-		_play(attack, State.ATTACK)
+		_play(_clip_for(attack), State.ATTACK)
+
+
+## The clip for an attack. A rocket turn fires the hands still on: the giant fires both at once,
+## stage 2 one at a time (left, then right); with both wrists bare it is a reload instead.
+func _clip_for(attack: StringName) -> StringName:
+	if attack != &"rocket":
+		return attack
+	if phase == FINAL and _hand_on[0] and _hand_on[1]:
+		_firing = [0, 1]
+		return &"rocket_both"
+	var side := 0 if _hand_on[0] else 1
+	if not _hand_on[side]:
+		_firing = [0, 1]
+		return &"reload"
+	_firing = [side]
+	return [&"rocket_l", &"rocket_r"][side]
 
 
 func _on_weak_point_body_entered(body: Node2D) -> void:

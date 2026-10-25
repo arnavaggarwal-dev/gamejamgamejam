@@ -1516,9 +1516,6 @@ libraries = {
 &"": SubResource("AnimationLibrary_doom")
 }
 
-[node name="StrikeTimer" type="Timer" parent="Arena"]
-wait_time = 1.5
-
 [node name="ZapTimer" type="Timer" parent="Arena"]
 
 [node name="Projectiles" type="Node2D" parent="."]

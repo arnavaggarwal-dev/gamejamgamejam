@@ -251,9 +251,9 @@ tracks/2/keys = {
 }]
 }
 
-[sub_resource type="Animation" id="Animation_rocket"]
-resource_name = "rocket"
-length = 2.6
+[sub_resource type="Animation" id="Animation_rocket_l"]
+resource_name = "rocket_l"
+length = 2.2
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -297,41 +297,380 @@ tracks/3/path = NodePath(".")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.58, 0.65, 0.67, 1.5, 2.1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.58, 0.65, 0.67, 1.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "values": [{
 "args": [],
-"method": &"aim_hand"
+"method": &"aim_hands"
 }, {
 "args": [],
-"method": &"aim_hand"
+"method": &"aim_hands"
 }, {
 "args": [],
-"method": &"aim_hand"
+"method": &"aim_hands"
 }, {
 "args": [],
-"method": &"aim_hand"
+"method": &"aim_hands"
 }, {
 "args": [],
-"method": &"aim_hand"
+"method": &"aim_hands"
 }, {
 "args": [],
-"method": &"aim_hand"
+"method": &"aim_hands"
 }, {
 "args": [3.0],
 "method": &"shake"
 }, {
 "args": [],
-"method": &"fire_hand"
+"method": &"fire_hands"
 }, {
 "args": [],
 "method": &"open_guard"
 }, {
 "args": [],
-"method": &"regrow_hand"
+"method": &"rest_hands"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_rocket_r"]
+resource_name = "rocket_r"
+length = 2.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Upper/Body/ArmR/Elbow/Wrist/Hand:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.45, 0.5, 0.55, 0.6, 0.7),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1), Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1), Color(1, 0.45, 0.45, 1), Color(2.2, 2.2, 2.2, 1), Color(1, 0.45, 0.45, 1), Color(2.2, 2.2, 2.2, 1), Color(2.2, 2.2, 2.2, 1), Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig/Upper/Body/ArmR/Elbow/Wrist/Hand:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.4, 0.44, 0.48, 0.52, 0.56, 0.6, 0.64),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Vector2(2, 72), Vector2(14, 72), Vector2(2, 72), Vector2(14, 72), Vector2(2, 72), Vector2(14, 72), Vector2(8, 72)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Rig/Upper/Body/ArmR/Elbow/Wrist:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.5, 0.54, 0.58, 0.62),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [Vector2(0.4, 1), Vector2(-0.3, 1), Vector2(-1, 1), Vector2(1, 1)]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.58, 0.65, 0.67, 1.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"values": [{
+"args": [],
+"method": &"aim_hands"
 }, {
 "args": [],
-"method": &"rest_hand"
+"method": &"aim_hands"
+}, {
+"args": [],
+"method": &"aim_hands"
+}, {
+"args": [],
+"method": &"aim_hands"
+}, {
+"args": [],
+"method": &"aim_hands"
+}, {
+"args": [],
+"method": &"aim_hands"
+}, {
+"args": [3.0],
+"method": &"shake"
+}, {
+"args": [],
+"method": &"fire_hands"
+}, {
+"args": [],
+"method": &"open_guard"
+}, {
+"args": [],
+"method": &"rest_hands"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_rocket_both"]
+resource_name = "rocket_both"
+length = 2.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Upper/Body/ArmL/Elbow/Wrist/Hand:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.45, 0.5, 0.55, 0.6, 0.7),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1), Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1), Color(1, 0.45, 0.45, 1), Color(2.2, 2.2, 2.2, 1), Color(1, 0.45, 0.45, 1), Color(2.2, 2.2, 2.2, 1), Color(2.2, 2.2, 2.2, 1), Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig/Upper/Body/ArmL/Elbow/Wrist/Hand:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.4, 0.44, 0.48, 0.52, 0.56, 0.6, 0.64),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Vector2(-14, 72), Vector2(-2, 72), Vector2(-14, 72), Vector2(-2, 72), Vector2(-14, 72), Vector2(-2, 72), Vector2(-8, 72)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Rig/Upper/Body/ArmL/Elbow/Wrist:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.5, 0.54, 0.58, 0.62),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [Vector2(0.4, 1), Vector2(-0.3, 1), Vector2(-1, 1), Vector2(1, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Rig/Upper/Body/ArmR/Elbow/Wrist/Hand:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.45, 0.5, 0.55, 0.6, 0.7),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1), Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1), Color(1, 0.45, 0.45, 1), Color(2.2, 2.2, 2.2, 1), Color(1, 0.45, 0.45, 1), Color(2.2, 2.2, 2.2, 1), Color(2.2, 2.2, 2.2, 1), Color(1, 1, 1, 1)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Rig/Upper/Body/ArmR/Elbow/Wrist/Hand:position")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0.4, 0.44, 0.48, 0.52, 0.56, 0.6, 0.64),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Vector2(2, 72), Vector2(14, 72), Vector2(2, 72), Vector2(14, 72), Vector2(2, 72), Vector2(14, 72), Vector2(8, 72)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Rig/Upper/Body/ArmR/Elbow/Wrist:scale")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0.5, 0.54, 0.58, 0.62),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [Vector2(0.4, 1), Vector2(-0.3, 1), Vector2(-1, 1), Vector2(1, 1)]
+}
+tracks/6/type = "method"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath(".")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.58, 0.65, 0.67, 1.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"values": [{
+"args": [],
+"method": &"aim_hands"
+}, {
+"args": [],
+"method": &"aim_hands"
+}, {
+"args": [],
+"method": &"aim_hands"
+}, {
+"args": [],
+"method": &"aim_hands"
+}, {
+"args": [],
+"method": &"aim_hands"
+}, {
+"args": [],
+"method": &"aim_hands"
+}, {
+"args": [3.0],
+"method": &"shake"
+}, {
+"args": [],
+"method": &"fire_hands"
+}, {
+"args": [],
+"method": &"open_guard"
+}, {
+"args": [],
+"method": &"rest_hands"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_reload"]
+resource_name = "reload"
+length = 2.3
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Upper/Body/FistL:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 1.75, 2.25),
+"transitions": PackedFloat32Array(-2, 1, -2, 1),
+"update": 0,
+"values": [Vector2(870, 470), Vector2(806, 186), Vector2(806, 186), Vector2(870, 470)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig/Upper/Body/FistR:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5, 1.75, 2.25),
+"transitions": PackedFloat32Array(-2, 1, -2, 1),
+"update": 0,
+"values": [Vector2(1290, 470), Vector2(1354, 186), Vector2(1354, 186), Vector2(1290, 470)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:bend_l")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.5, 1.75, 2.25),
+"transitions": PackedFloat32Array(-2, 1, -2, 1),
+"update": 0,
+"values": [1.0, -1.0, -1.0, 1.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".:bend_r")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.5, 1.75, 2.25),
+"transitions": PackedFloat32Array(-2, 1, -2, 1),
+"update": 0,
+"values": [-1.0, 1.0, 1.0, -1.0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Rig/Upper/Body/ArmL/Elbow/Wrist:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0.85),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Rig/Upper/Body/ArmL/Elbow/Wrist:scale")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0.85, 0.8875, 0.925, 0.9625, 1, 1.0375, 1.075, 1.1125, 1.15, 1.1875, 1.225, 1.2625, 1.3, 1.32, 1.41, 1.51),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0.15, 0.15), Vector2(0, 0.221), Vector2(-0.292, 0.292), Vector2(-0, 0.362), Vector2(0.433, 0.433), Vector2(0, 0.504), Vector2(-0.575, 0.575), Vector2(-0, 0.646), Vector2(0.717, 0.717), Vector2(0, 0.787), Vector2(-0.858, 0.858), Vector2(-0, 0.929), Vector2(1, 1), Vector2(1.3, 0.8), Vector2(0.94, 1.05), Vector2(1, 1)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Rig/Upper/Body/ArmL/Elbow/Sputter:emitting")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0.85),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Rig/Upper/Body/ArmR/Elbow/Wrist:visible")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0.85),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("Rig/Upper/Body/ArmR/Elbow/Wrist:scale")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0.85, 0.8875, 0.925, 0.9625, 1, 1.0375, 1.075, 1.1125, 1.15, 1.1875, 1.225, 1.2625, 1.3, 1.32, 1.41, 1.51),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0.15, 0.15), Vector2(0, 0.221), Vector2(-0.292, 0.292), Vector2(-0, 0.362), Vector2(0.433, 0.433), Vector2(0, 0.504), Vector2(-0.575, 0.575), Vector2(-0, 0.646), Vector2(0.717, 0.717), Vector2(0, 0.787), Vector2(-0.858, 0.858), Vector2(-0, 0.929), Vector2(1, 1), Vector2(1.3, 0.8), Vector2(0.94, 1.05), Vector2(1, 1)]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("Rig/Upper/Body/ArmR/Elbow/Sputter:emitting")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0.85),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/10/type = "method"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath(".")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(0.85, 0.87, 1.32),
+"transitions": PackedFloat32Array(1, 1, 1),
+"values": [{
+"args": [],
+"method": &"hands_back"
+}, {
+"args": [],
+"method": &"open_guard"
+}, {
+"args": [],
+"method": &"click_hands"
 }]
 }
 
@@ -1736,65 +2075,6 @@ tracks/1/keys = {
 "values": [Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1)]
 }
 
-[sub_resource type="Animation" id="Animation_screw_on"]
-resource_name = "screw_on"
-length = 0.66
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Rig/Upper/Body/ArmL/Elbow/Wrist:visible")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Rig/Upper/Body/ArmL/Elbow/Sputter:emitting")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Rig/Upper/Body/ArmL/Elbow/Wrist:scale")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.0375, 0.075, 0.1125, 0.15, 0.1875, 0.225, 0.2625, 0.3, 0.3375, 0.375, 0.4125, 0.45, 0.47, 0.56, 0.66),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(0.15, 0.15), Vector2(0, 0.221), Vector2(-0.292, 0.292), Vector2(-0, 0.362), Vector2(0.433, 0.433), Vector2(0, 0.504), Vector2(-0.575, 0.575), Vector2(-0, 0.646), Vector2(0.717, 0.717), Vector2(0, 0.787), Vector2(-0.858, 0.858), Vector2(-0, 0.929), Vector2(1, 1), Vector2(1.3, 0.8), Vector2(0.94, 1.05), Vector2(1, 1)]
-}
-tracks/3/type = "method"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath(".")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0.47),
-"transitions": PackedFloat32Array(1),
-"values": [{
-"args": [],
-"method": &"click_hand"
-}]
-}
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_handfx"]
-_data = {
-&"screw_on": SubResource("Animation_screw_on")
-}
-
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_boss"]
 _data = {
 &"death": SubResource("Animation_death"),
@@ -1807,8 +2087,11 @@ _data = {
 &"laser": SubResource("Animation_laser"),
 &"phase_2": SubResource("Animation_phase_2"),
 &"phase_3": SubResource("Animation_phase_3"),
+&"reload": SubResource("Animation_reload"),
 &"revive": SubResource("Animation_revive"),
-&"rocket": SubResource("Animation_rocket"),
+&"rocket_both": SubResource("Animation_rocket_both"),
+&"rocket_l": SubResource("Animation_rocket_l"),
+&"rocket_r": SubResource("Animation_rocket_r"),
 &"shatter": SubResource("Animation_shatter"),
 &"slam": SubResource("Animation_slam"),
 &"spit": SubResource("Animation_spit"),
@@ -2279,8 +2562,3 @@ libraries = {
 
 [node name="RestTimer" type="Timer" parent="."]
 one_shot = true
-[node name="HandFx" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_handfx")
-}
-

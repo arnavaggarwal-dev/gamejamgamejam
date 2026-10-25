@@ -385,7 +385,7 @@ func _test_giant_stages() -> void:
 	await create_timer(2.6).timeout
 	check(not boss.legs.visible and is_zero_approx(boss.upper.position.y) and not armed.call(0), "breaking the legs drops the torso into view")
 	check(boss.shield.visible and not armed.call(1) and not boss.cores[1].get_node("Target").visible, "...his chest core shielded: no target, nothing to hit")
-	boss._play(&"rocket", Boss.State.ATTACK)
+	boss._play(boss._clip_for(&"rocket"), Boss.State.ATTACK)
 	await create_timer(0.75).timeout
 	check(not boss.shield.visible and armed.call(1) and boss.cores[1].get_node("Target").visible, "firing the rocket hand leaves his chest open")
 	await create_timer(1.8).timeout
@@ -473,24 +473,52 @@ func _test_boss_moves() -> void:
 	await process_frame
 
 
-## His arms are articulated: two-bone IK lands each wrist on its target. The rocket hand flies
-## off his wrist toward the player, and a new hand screws back on.
+## His arms are articulated: two-bone IK lands each wrist on its target. In stage 2 his rocket
+## hands fire in turn and no new hand grows; with both wrists bare his rocket turn is a reload,
+## both arms raised at right angles while both hands screw back on. The giant fires both at once.
 func _test_arms() -> void:
 	var boss: Boss = load("res://scenes/boss/boss.tscn").instantiate()
 	root.add_child(boss)
 	boss.phase = 1
 	boss.upper.position = Vector2.ZERO
 	await process_frame
-	check(boss.wrist_l.global_position.distance_to(boss.fist_l.global_position) < 2.0 and absf(boss.arm_l.get_node("Elbow").rotation) > 0.2, "his arm bends at the elbow to put the wrist on its target")
-	boss._play(&"rocket", Boss.State.ATTACK)
+	check(boss.wrists[0].global_position.distance_to(boss.fist_l.global_position) < 2.0 and absf(boss.arm_l.get_node("Elbow").rotation) > 0.2, "his arm bends at the elbow to put the wrist on its target")
+	check(boss.wrists[1].global_position.distance_to(boss.fist_r.global_position) < 2.0, "...and so does the other one")
+	var fired := func() -> Array:
+		var rockets := root.get_children().filter(func(n: Node) -> bool: return n.scene_file_path == "res://scenes/boss/rocket_hand.tscn")
+		for r: Node in rockets:
+			r.queue_free()
+		return rockets
+	boss._play(boss._clip_for(&"rocket"), Boss.State.ATTACK)
 	await create_timer(0.8).timeout
-	var rockets := root.get_children().filter(func(n: Node) -> bool: return n.scene_file_path == "res://scenes/boss/rocket_hand.tscn")
-	check(rockets.size() == 1 and not boss.wrist_l.visible, "the rocket hand fires off his wrist")
-	var rocket: Node2D = rockets[0]
-	check(rocket.velocity.x < 0.0 and rocket.velocity.y > 0.0 and boss.sputter.emitting, "...down along his lowered arm toward the player (x 400, on the floor), the bare wrist smoking")
-	await create_timer(1.4).timeout
-	check(boss.wrist_l.visible and boss.wrist_l.scale.is_equal_approx(Vector2.ONE), "a new hand twists back onto his wrist")
-	rocket.queue_free()
+	var rockets: Array = fired.call()
+	check(rockets.size() == 1 and not boss.wrists[0].visible and boss.wrists[1].visible, "the left rocket hand fires off his wrist; the right one stays on")
+	check(rockets[0].velocity.x < 0.0 and rockets[0].velocity.y > 0.0 and boss.sputters[0].emitting, "...down along his lowered arm toward the player (x 400, on the floor), the bare wrist smoking")
+	await create_timer(1.2).timeout
+	check(boss.state == Boss.State.IDLE and not boss.wrists[0].visible and boss.sputters[0].emitting, "no new hand grows after a shot")
+	boss._play(boss._clip_for(&"rocket"), Boss.State.ATTACK)
+	await create_timer(0.8).timeout
+	check(fired.call().size() == 1 and not boss.wrists[1].visible and boss.anim.assigned_animation == &"rocket_r", "his next rocket is the other hand")
+	await create_timer(1.2).timeout
+	var reload := boss._clip_for(&"rocket")
+	check(reload == &"reload", "with both wrists bare, his next rocket turn is a reload")
+	boss._play(reload, Boss.State.ATTACK)
+	await create_timer(0.55).timeout
+	var bones := func(arm: Node2D) -> Array:
+		var elbow: Node2D = arm.get_node("Elbow")
+		return [(elbow.global_position - arm.global_position).normalized(), (elbow.get_node("Wrist").global_position - elbow.global_position).normalized()]
+	var left: Array = bones.call(boss.arm_l)
+	var right: Array = bones.call(boss.arm_r)
+	check(left[0].dot(Vector2.LEFT) > 0.99 and right[0].dot(Vector2.RIGHT) > 0.99 and left[1].dot(Vector2.UP) > 0.99 and right[1].dot(Vector2.UP) > 0.99, "he holds both arms up at right angles: upper arms level, forearms straight up")
+	await create_timer(0.75).timeout
+	check(boss.wrists[0].visible and boss.wrists[1].visible and not boss.shield.visible, "both new hands twist on together, his chest open")
+	await create_timer(1.0).timeout
+	check(boss.state == Boss.State.IDLE and boss.wrists[0].scale.is_equal_approx(Vector2.ONE) and not boss.sputters[1].emitting and boss.fist_r.position.is_equal_approx(boss._rest_pose[boss.fist_r]), "...clicked home, arms back at his sides")
+	boss.phase = Boss.FINAL
+	boss._play(boss._clip_for(&"rocket"), Boss.State.ATTACK)
+	await create_timer(0.8).timeout
+	check(fired.call().size() == 2 and not boss.wrists[0].visible and not boss.wrists[1].visible, "the giant fires both hands at once")
+	check(boss._clip_for(&"rocket") == &"reload", "...and reloads the same way")
 	boss.queue_free()
 	await process_frame
 
@@ -638,8 +666,7 @@ func _test_final_phase() -> void:
 	check(not helper.shield.visible and helper.core.get_node("Target").visible, "a shot pops its shield open")
 	await create_timer(1.5).timeout
 	check(helper.shield.visible, "...and it shuts again after a moment")
-	stage.strike_near_player()
-	check(stage.get_children().any(func(n: Node) -> bool: return n.scene_file_path == "res://scenes/stage/sky_strike.tscn"), "lightning strikes out of the red sky")
+	check(not game.get_node("Arena").has_node("StrikeTimer"), "no lightning clouds over the arena of doom")
 	var won := [false]
 	boss.defeated.connect(func() -> void: won[0] = true)
 	check(helper.shield.visible and not helper.core.get_node("WeakPoint").monitoring and not helper.core.get_node("Target").visible, "Lil' Watt's core is shielded while it fights")

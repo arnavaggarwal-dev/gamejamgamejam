@@ -168,12 +168,8 @@ func _boss() -> void:
 	_save_sheet("world/ledge.png", [World.ledge()])
 	_save_sheet("world/belt_thin.png", World.belt_thin_frames())
 	_save_sheet("world/moon.png", [World.moon()])
-	_save_sheet("world/bolt.png", World.bolt_frames())
-	_save_sheet("world/storm_cloud.png", World.storm_cloud_frames())
-	_save_sheet("world/scorch.png", [World.scorch()])
 	_save_sheet("fx/aim_dot.png", [Fx.aim_dot(true)])
 	_save_sheet("fx/aim_dot_small.png", [Fx.aim_dot(false)])
-	_save_sheet("world/strike_mark.png", [World.strike_mark()])
 	for i in 3:
 		_save_sheet("boss/crack_%d.png" % i, [Boss.crack(31 + i * 17)])
 	_save_sheet("boss/bot.png", Boss.bot_frames())

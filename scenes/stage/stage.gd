@@ -6,8 +6,7 @@ extends Node2D
 ## phase 4 raises the arena of doom: one locked, mirrored screen (0..3840). The castle's
 ## platforms sink away and the whole floor dissolves into acid, the giant standing in it; you
 ## fight on action platforms (floating conveyors, breakers, sliders, flying loops, wall lifts)
-## and thin static ledges (the safe spots a fall puts you back on). Once the fight resumes
-## (start_strikes), lightning strikes near the player instead of the zaps.
+## and thin static ledges (the safe spots a fall puts you back on).
 
 signal zap_started
 signal collapsed
@@ -19,15 +18,12 @@ const ZAP_EVERY := [0.0, 5.0, 4.0]  # seconds between zaps, per phase (none in p
 const ZAP_WIDTH := [2, 2, 3]  # panels per zap, per phase
 const DOOM_W := 3840.0  # the arena of doom's width (phase 4): exactly one zoomed-out screen
 const ARENA_W := 2560.0
-const FLOOR_Y := 640.0
 const ARENA_PANELS := 16  # panels inside the castle walls (the rest only open up in phase 4)
-const SKY_STRIKE := preload("res://scenes/stage/sky_strike.tscn")
 
 var phase := 0
 
 @onready var panels: Array = $Floor.get_children()
 @onready var zap_timer: Timer = $ZapTimer
-@onready var strike_timer: Timer = $StrikeTimer
 @onready var doom: Node2D = $DoomArena
 @onready var breakers: Array = $DoomArena/Set/Breakers.get_children()
 @onready var movers: Array = $DoomArena/Set/Movers.get_children()
@@ -37,12 +33,10 @@ var phase := 0
 
 func _ready() -> void:
 	zap_timer.timeout.connect(zap_near_player)
-	strike_timer.timeout.connect(strike_near_player)
 
 
 func stop() -> void:
 	zap_timer.stop()
-	strike_timer.stop()
 
 
 func set_phase(p: int) -> void:
@@ -72,21 +66,6 @@ func set_phase(p: int) -> void:
 			mover.get_node("AnimationPlayer").play(mover.get_meta(&"move"))
 		return  # (the castle's own platforms sink away in the "reveal" clip)
 	zap_timer.start(ZAP_EVERY[phase])
-
-
-## Phase 4, once the cutscene is over: lightning every StrikeTimer tick.
-func start_strikes() -> void:
-	strike_timer.start()
-
-
-## A bolt out of the red sky somewhere near the player.
-func strike_near_player() -> void:
-	var player := get_tree().get_first_node_in_group("player") as Node2D
-	if player == null:
-		return
-	var strike: Node2D = SKY_STRIKE.instantiate()
-	add_child(strike)
-	strike.global_position = Vector2(clampf(player.global_position.x + randf_range(-300.0, 300.0), 80.0, DOOM_W - 80.0), FLOOR_Y)
 
 
 ## Electrifies a short run of panels around the player's feet.

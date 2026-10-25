@@ -37,8 +37,6 @@ const SHEETS := {
 	"boss/zap_ball_frames.tres": [Vector2i(12, 12), {"spark": ["boss/zap_ball.png", 2, 12.0, true]}],
 	"world/acid_frames.tres": [Vector2i(40, 20), {"bubble": ["world/acid.png", 3, 5.0, true]}],
 	"world/belt_thin_frames.tres": [Vector2i(40, 10), {"roll": ["world/belt_thin.png", 4, 12.0, true]}],
-	"world/bolt_frames.tres": [Vector2i(48, 540), {"flash": ["world/bolt.png", 3, 30.0, true]}],
-	"world/storm_cloud_frames.tres": [Vector2i(60, 26), {"dark": ["world/storm_cloud.png", 1, 1.0, true, 0], "lit": ["world/storm_cloud.png", 2, 14.0, true]}],
 	"boss/core_frames.tres": [Vector2i(32, 32), {"pulse": ["boss/core.png", 4, 8.0, true]}],
 	"boss/target_frames.tres": [Vector2i(44, 44), {"blink": ["boss/target.png", 2, 3.0, true]}],
 	"world/gear_frames.tres": [Vector2i(104, 104), {"turn": ["world/gear.png", 6, 3.0, true]}],

@@ -136,7 +136,6 @@ func _final_phase() -> void:
 	camera.target = player
 	player.frozen = false
 	helper.fight()
-	stage.start_strikes()
 	hud.show_banner("FINAL PHASE", 1.4)
 	hud.show_tip("LIL' WATT POWERS THE KING!  HIT ITS CORE RIGHT AFTER IT SHOOTS.", 5.0)
 
