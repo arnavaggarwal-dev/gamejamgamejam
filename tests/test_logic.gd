@@ -683,6 +683,10 @@ func _test_game_wiring() -> void:
 	var hud: HUD = game.get_node("HUD")
 	player.take_hit()
 	check(hud.hearts.size() == Player.MAX_HP and hud.hearts[Player.MAX_HP - 1].texture == HUD.HEART_EMPTY and hud.hearts[Player.MAX_HP - 2].texture == HUD.HEART_FULL, "losing a heart updates the HUD")
+	hud.set_ammo(2)
+	hud.set_ammo(3)
+	var slot: Control = hud.ammo_icons[2]
+	check(slot.texture == HUD.BOMB_FULL and slot.get_node("Fill").current_animation == &"fill" and slot.get_node("Poof").visible and not hud.ammo_icons[1].get_node("Poof").visible, "a new bomb pops into its ammo slot with a poof")
 	boss.state = Boss.State.IDLE
 	boss.take_hit()
 	check(hud.boss_bar.value == boss.hits_total() - 1, "a boss hit updates the boss bar")
@@ -911,7 +915,7 @@ func _test_tutorial_rush() -> void:
 	await create_timer(0.27).timeout
 	check(player.charging and player.body.animation == &"strain", "holding [A] squeezes him flat, eyes screwed shut")
 	await create_timer(0.4).timeout
-	check(player.ammo > before and Player.CHARGE_TIME == 0.15, "...and squeezes out a bomb every 0.15 s")
+	check(player.ammo > before and Player.CHARGE_TIME == 0.1, "...and squeezes out a bomb every 0.1 s")
 	Input.action_release("detonate")
 	await create_timer(1.0).timeout
 	check(hud.coach_label.text.begins_with("AGAIN"), "then the lesson moves on")

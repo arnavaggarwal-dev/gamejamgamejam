@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scenes/ui/hud.gd" id="1_hud"]
 [ext_resource type="Texture2D" path="res://assets/art/ui/heart_full.png" id="2_heart"]
 [ext_resource type="Texture2D" path="res://assets/art/ui/bomb_full.png" id="3_bomb"]
+[ext_resource type="SpriteFrames" path="res://assets/art/fx/poof_frames.tres" id="4_poof"]
 
 [sub_resource type="Animation" id="Animation_banner_pop"]
 resource_name = "pop"
@@ -108,6 +109,53 @@ _data = {
 &"out": SubResource("Animation_cinema_out")
 }
 
+[sub_resource type="Animation" id="Animation_fill"]
+resource_name = "fill"
+length = 0.45
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.12, 0.25),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0.3, 0.3), Vector2(1.25, 1.25), Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Poof:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.43),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Poof")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [&"play"],
+"method": &"play"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_fill"]
+_data = {
+&"fill": SubResource("Animation_fill")
+}
+
 [node name="HUD" type="CanvasLayer"]
 layer = 10
 script = ExtResource("1_hud")
@@ -199,33 +247,98 @@ theme_override_constants/separation = 6
 
 [node name="Bomb1" type="TextureRect" parent="Ammo"]
 custom_minimum_size = Vector2(33, 36)
+pivot_offset = Vector2(16.5, 18)
 layout_mode = 2
 texture = ExtResource("3_bomb")
 expand_mode = 1
+
+[node name="Poof" type="AnimatedSprite2D" parent="Ammo/Bomb1"]
+visible = false
+position = Vector2(16.5, 18)
+scale = Vector2(2.5, 2.5)
+sprite_frames = ExtResource("4_poof")
+animation = &"play"
+
+[node name="Fill" type="AnimationPlayer" parent="Ammo/Bomb1"]
+libraries = {
+&"": SubResource("AnimationLibrary_fill")
+}
 
 [node name="Bomb2" type="TextureRect" parent="Ammo"]
 custom_minimum_size = Vector2(33, 36)
+pivot_offset = Vector2(16.5, 18)
 layout_mode = 2
 texture = ExtResource("3_bomb")
 expand_mode = 1
+
+[node name="Poof" type="AnimatedSprite2D" parent="Ammo/Bomb2"]
+visible = false
+position = Vector2(16.5, 18)
+scale = Vector2(2.5, 2.5)
+sprite_frames = ExtResource("4_poof")
+animation = &"play"
+
+[node name="Fill" type="AnimationPlayer" parent="Ammo/Bomb2"]
+libraries = {
+&"": SubResource("AnimationLibrary_fill")
+}
 
 [node name="Bomb3" type="TextureRect" parent="Ammo"]
 custom_minimum_size = Vector2(33, 36)
+pivot_offset = Vector2(16.5, 18)
 layout_mode = 2
 texture = ExtResource("3_bomb")
 expand_mode = 1
+
+[node name="Poof" type="AnimatedSprite2D" parent="Ammo/Bomb3"]
+visible = false
+position = Vector2(16.5, 18)
+scale = Vector2(2.5, 2.5)
+sprite_frames = ExtResource("4_poof")
+animation = &"play"
+
+[node name="Fill" type="AnimationPlayer" parent="Ammo/Bomb3"]
+libraries = {
+&"": SubResource("AnimationLibrary_fill")
+}
 
 [node name="Bomb4" type="TextureRect" parent="Ammo"]
 custom_minimum_size = Vector2(33, 36)
+pivot_offset = Vector2(16.5, 18)
 layout_mode = 2
 texture = ExtResource("3_bomb")
 expand_mode = 1
 
+[node name="Poof" type="AnimatedSprite2D" parent="Ammo/Bomb4"]
+visible = false
+position = Vector2(16.5, 18)
+scale = Vector2(2.5, 2.5)
+sprite_frames = ExtResource("4_poof")
+animation = &"play"
+
+[node name="Fill" type="AnimationPlayer" parent="Ammo/Bomb4"]
+libraries = {
+&"": SubResource("AnimationLibrary_fill")
+}
+
 [node name="Bomb5" type="TextureRect" parent="Ammo"]
 custom_minimum_size = Vector2(33, 36)
+pivot_offset = Vector2(16.5, 18)
 layout_mode = 2
 texture = ExtResource("3_bomb")
 expand_mode = 1
+
+[node name="Poof" type="AnimatedSprite2D" parent="Ammo/Bomb5"]
+visible = false
+position = Vector2(16.5, 18)
+scale = Vector2(2.5, 2.5)
+sprite_frames = ExtResource("4_poof")
+animation = &"play"
+
+[node name="Fill" type="AnimationPlayer" parent="Ammo/Bomb5"]
+libraries = {
+&"": SubResource("AnimationLibrary_fill")
+}
 
 [node name="SkipPhase" type="Button" parent="."]
 visible = false

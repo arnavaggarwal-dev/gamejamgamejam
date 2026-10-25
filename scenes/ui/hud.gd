@@ -14,11 +14,12 @@ var _banner_id := 0
 var _hint_id := 0
 var _flash: Tween
 var _cinema := false  # letterbox in: hints wait
+var _ammo := -1  # what the ammo row last showed (-1: nothing yet)
 
 @onready var hearts_row: Control = $Hearts
 @onready var hearts: Array = $Hearts.get_children()
 @onready var ammo_row: Control = $Ammo
-@onready var ammo_icons: Array = $Ammo.get_children()
+@onready var ammo_icons: Array[Node] = $Ammo.get_children()
 @onready var boss_box: Control = $BossBar
 @onready var boss_bar: ProgressBar = $BossBar/Bar
 @onready var boss_name: Label = $BossBar/Name
@@ -48,9 +49,15 @@ func set_hearts(hp: int) -> void:
 		hearts[i].texture = HEART_FULL if i < hp else HEART_EMPTY
 
 
+## Bombs in the row; each new one pops into its slot with a poof (its "fill" clip).
 func set_ammo(ammo: int) -> void:
 	for i in ammo_icons.size():
 		ammo_icons[i].texture = BOMB_FULL if i < ammo else BOMB_EMPTY
+		if _ammo >= 0 and i >= _ammo and i < ammo:
+			var fill: AnimationPlayer = ammo_icons[i].get_node("Fill")
+			fill.play(&"fill")
+			fill.advance(0.0)  # pop and poof start this frame
+	_ammo = ammo
 
 
 func set_boss_name(text: String) -> void:
