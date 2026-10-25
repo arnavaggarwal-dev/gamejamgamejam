@@ -13,10 +13,8 @@ const TITLE_SCENE := "res://scenes/title.tscn"
 @onready var fullscreen: Button = $Panel/VBox/Fullscreen
 @onready var quit: Button = $Panel/VBox/Quit
 @onready var zs_root: Node2D = $Panel/VBox/HeroBox/Zs
-@onready var zs: Array = $Panel/VBox/HeroBox/Zs.get_children()
-
-var _z_tweens: Array[Tween] = []
-
+@onready var pop_fx: AnimationPlayer = $PopFx
+@onready var doze: AnimationPlayer = $Doze
 
 func _ready() -> void:
 	hide()
@@ -48,33 +46,14 @@ func open() -> void:
 	show()
 	_refresh_fullscreen_label()
 	resume.grab_focus()
-	dim.modulate.a = 0.0
-	panel.scale = Vector2(0.6, 0.6)
-	var tw := create_tween().set_parallel()
-	tw.tween_property(dim, "modulate:a", 1.0, 0.15)
-	tw.tween_property(panel, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	_float_zs()
+	pop_fx.play(&"open")
+	doze.play(&"doze")  # the little guy dozes while you take a break: Zs drift up and fade
 
 
 func close() -> void:
-	for t in _z_tweens:
-		t.kill()
-	_z_tweens.clear()
+	doze.stop()
 	hide()
 	get_tree().paused = false
-
-
-## The little guy dozes while you take a break: Zs drift up and fade, staggered, forever.
-func _float_zs() -> void:
-	for i in zs.size():
-		var z: Label = zs[i]
-		z.modulate.a = 0.0
-		var t := create_tween().set_loops()
-		t.tween_interval(i * 0.45)
-		t.tween_property(z, "position", Vector2(12 + i * 14, -40 - i * 8), 1.35).from(Vector2(0, 0))
-		t.parallel().tween_property(z, "modulate:a", 0.0, 1.35).from(1.0)
-		t.tween_interval((zs.size() - 1 - i) * 0.45)
-		_z_tweens.append(t)
 
 
 func _restart() -> void:

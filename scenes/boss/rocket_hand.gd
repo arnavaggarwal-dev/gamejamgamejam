@@ -9,15 +9,10 @@ const THRUST_TIME := 0.18  # s from the slow pop off the wrist to full speed
 var velocity := Vector2.ZERO
 var _age := 0.0
 
-@onready var look: Node2D = $Look
-
-
-## Pops off stretched along its flight, then springs back to shape.
+## Sets it flying (its "launch" clip pops it off stretched along its flight, springing back).
 func launch(v: Vector2) -> void:
 	velocity = v
 	rotation = v.angle()
-	look.scale = Vector2(1.6, 0.65)
-	create_tween().tween_property(look, "scale", Vector2.ONE, 0.35).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 
 
 func _physics_process(delta: float) -> void:

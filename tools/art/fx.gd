@@ -235,3 +235,14 @@ static func laser_beam_frames() -> Array:
 		c.glow_disc(632, 6, 6.0 + f % 2, [P.PINK, P.CREAM, P.CREAM])
 		frames.append(c)
 	return frames
+
+
+## A dot of the throw-aim arc (it alternates big and small): ink edge, cream heart on the big one.
+static func aim_dot(big: bool):
+	var c = Canvas.new(4 if big else 2, 4 if big else 2)
+	if big:
+		c.rect(0, 0, 4, 4, P.INK)
+		c.rect(1, 1, 2, 2, P.CREAM)
+	else:
+		c.rect(0, 0, 2, 2, P.INK)
+	return c

@@ -3,10 +3,8 @@ extends Node2D
 
 const GOAL_HINT := "PULL OUT A BOMB [Z], THROW IT AT THE CORE!  HOLD [A] TO MAKE MORE."
 const HELPER := preload("res://scenes/boss/training_bot.tscn")
-const DOOM_ZOOM := Vector2.ONE / 3.0  # phase 4 pulls the camera back threefold
 const WATT_SPOT := Vector2(2450.0, -560.0)  # phase 4: Lil' Watt beams into the rising king from here
 const WATT_SIZE := Vector2(2.0, 2.0)  # phase 4's Lil' Watt is powered up (and readable zoomed out)
-const CINEMA_DROP := 240  # world px the view drops during the letterbox, so the floor clears the bottom bar
 const WATT_DOWN := Vector2(0.0, -102.0)  # Lil' Watt (2x) lying on a ledge, from where the hero would stand
 
 @onready var player: Player = $Player
@@ -18,6 +16,7 @@ const WATT_DOWN := Vector2(0.0, -102.0)  # Lil' Watt (2x) lying on a ledge, from
 @onready var projectiles: Node2D = $Projectiles
 @onready var respawn: Marker2D = $RespawnPoint
 @onready var camera: Camera2D = $Camera2D
+@onready var camera_moves: AnimationPlayer = $Camera2D/Moves  # doom (3x zoom-out), drop / lift (the letterbox view)
 @onready var kings_crown: Sprite2D = $KingsCrown
 
 var helper: TrainingBot  # Lil' Watt powering the giant in phase 4
@@ -108,10 +107,7 @@ func _final_phase() -> void:
 	hud.cinema(true)
 	for child in projectiles.get_children():
 		child.queue_free()
-	camera.limit_top = -1440  # 720 x 3 tall, floor still at the bottom of the view
-	camera.limit_right = int(Stage.DOOM_W)
-	camera.limit_bottom = 720 + CINEMA_DROP
-	create_tween().tween_property(camera, "zoom", DOOM_ZOOM, 2.5).set_trans(Tween.TRANS_SINE)
+	camera_moves.play(&"doom")  # 3x zoom-out over 0..3840 x -1440..720, the view dropped for the letterbox
 	await _wait(2.6)
 	if boss.state == Boss.State.DEAD:
 		return  # (debug skip) knocked out mid-cutscene
@@ -136,7 +132,7 @@ func _final_phase() -> void:
 	hud.coach("")
 	hud.boss_bar_aside()
 	hud.cinema(false)
-	create_tween().tween_property(camera, "limit_bottom", 720, 0.5).set_trans(Tween.TRANS_SINE)
+	camera_moves.play(&"lift")
 	camera.target = player
 	player.frozen = false
 	helper.fight()
@@ -191,7 +187,7 @@ func _on_boss_defeated() -> void:
 func _ending() -> void:
 	player.frozen = true
 	camera.target = player
-	camera.limit_bottom = 720 + CINEMA_DROP
+	camera_moves.play(&"drop")
 	hud.cinema(true)
 	hud.coach("")
 	hud.flash(1.0, 0.1)
@@ -221,7 +217,7 @@ func _ending() -> void:
 	hud.coach("")
 	hud.cinema(false)
 	hud.boss_box.hide()  # nobody left to fight
-	create_tween().tween_property(camera, "limit_bottom", 720, 0.5).set_trans(Tween.TRANS_SINE)
+	camera_moves.play(&"lift")
 	# he stays frozen (and unhurtable) from here on: the fight is won
 
 

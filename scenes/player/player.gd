@@ -319,10 +319,12 @@ func _charge(delta: float) -> void:
 	charging = _charge_held >= CHARGE_DELAY
 	if not charging:
 		if was:
+			juice.stop()
 			_squash(Vector2(0.85, 1.2))  # pops back up
 		return
 	if not was:
 		_charge_left = CHARGE_TIME
+		juice.play(&"strain")
 	_charge_left -= delta
 	if _charge_left <= 0.0:
 		_charge_left = CHARGE_TIME
@@ -465,7 +467,6 @@ func _update_pose(dir: float) -> void:
 		pose = &"hurt"
 	elif charging:
 		pose = &"strain"
-		art.scale = Vector2(1.16 + sin(Time.get_ticks_msec() * 0.04) * 0.05, 0.8)  # squeezing
 	elif dashing and not held_bomb and absf(_dash_dir.x) >= absf(_dash_dir.y):
 		pose = &"dash"  # steep dashes fall through to the jump / fall poses
 	elif held_bomb:

@@ -97,6 +97,7 @@ var _hand_dir := Vector2.LEFT  # where the rocket hand will fly (set by aim_hand
 @onready var hand_l: Sprite2D = $Rig/Upper/Body/ArmL/Elbow/Wrist/Hand
 @onready var sputter: CPUParticles2D = $Rig/Upper/Body/ArmL/Elbow/Sputter
 @onready var shield: Sprite2D = $Rig/Upper/Body/Core/Shield
+@onready var hand_fx: AnimationPlayer = $HandFx
 @onready var cores: Array = [$Rig/Legs/StompAnchor/LegF/KneeCore, $Rig/Upper/Body/Core, $Rig/Upper/Head/EyeCore]
 @onready var cracks: Array = [$Rig/Legs/StompAnchor/LegF/Cracks, $Rig/Upper/Body/Cracks, $Rig/Upper/Head/Cracks]
 @onready var anim: AnimationPlayer = $AnimationPlayer
@@ -344,24 +345,14 @@ func fire_hand() -> void:
 	kick.tween_property(fist_l, "position", aimed, 0.45).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 
 
-## A new hand screws onto his wrist: it grows in, flipping like a turning bolt, then clicks home.
+## A new hand screws onto his wrist (the HandFx "screw_on" clip: it grows in, flipping like a
+## turning bolt, then clicks home).
 func regrow_hand() -> void:
-	sputter.emitting = false
-	wrist_l.show()
-	var screw := create_tween()
-	screw.tween_method(_twist_hand, 0.0, 1.0, 0.45)
-	screw.tween_callback(_click_hand)
+	hand_fx.play(&"screw_on")
 
 
-func _twist_hand(t: float) -> void:
-	var size := lerpf(0.15, 1.0, t)
-	wrist_l.scale = Vector2(cos(t * 3.0 * TAU) * size, size)
-
-
-## The click: a snap past full size, a spark at the wrist, a jolt.
-func _click_hand() -> void:
-	wrist_l.scale = Vector2(1.3, 0.8)
-	create_tween().tween_property(wrist_l, "scale", Vector2.ONE, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+## From "screw_on", the click: a spark at the wrist, a jolt and a tiny freeze.
+func click_hand() -> void:
 	_fx(SPARK_SCENE, wrist_l.global_position)
 	shake(6.0)
 	get_tree().call_group("camera", "hitstop", 0.05)
@@ -555,6 +546,7 @@ func _reset_rig() -> void:
 	rig.modulate = Color.WHITE
 	eye.modulate = Color.WHITE
 	body.modulate = Color.WHITE
+	hand_fx.stop()
 	hand_l.modulate = Color.WHITE
 	hand_l.position = Vector2(-8, 72)
 	if phase == 1:

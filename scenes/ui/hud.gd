@@ -31,6 +31,9 @@ var _cinema := false  # letterbox in: hints wait
 @onready var retry: Button = $EndPanel/VBox/Retry
 @onready var skip_button: Button = $SkipPhase
 @onready var bars: Array = [$Cinema/Top, $Cinema/Bottom]
+@onready var banner_fx: AnimationPlayer = $BannerFx
+@onready var coach_fx: AnimationPlayer = $CoachFx
+@onready var cinema_fx: AnimationPlayer = $CinemaFx
 
 
 func _ready() -> void:
@@ -64,10 +67,9 @@ func show_banner(text: String, seconds: float) -> void:
 	_banner_id += 1
 	var id := _banner_id
 	banner.text = text
-	banner.pivot_offset = banner.size / 2.0
-	banner.scale = Vector2(0.2, 0.2)
 	banner.show()
-	create_tween().tween_property(banner, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	banner_fx.stop()
+	banner_fx.play(&"pop")
 	await get_tree().create_timer(seconds).timeout
 	if id == _banner_id:
 		banner.hide()
@@ -94,9 +96,8 @@ func coach(text: String) -> void:
 	coach_label.text = text
 	coach_label.visible = text != ""
 	if coach_label.visible:
-		coach_label.pivot_offset = coach_label.size / 2.0
-		coach_label.scale = Vector2(0.7, 0.7)
-		create_tween().tween_property(coach_label, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		coach_fx.stop()
+		coach_fx.play(&"pop")
 
 
 ## White screen flash: `strength` is the starting opacity, `hold` keeps it there before fading.
@@ -118,9 +119,7 @@ func cinema(on: bool) -> void:
 	boss_box.visible = not on
 	if on:
 		show_hint("")
-	var slide := create_tween().set_parallel()
-	for bar: Control in bars:
-		slide.tween_property(bar, "scale:y", 1.0 if on else 0.0, 0.5).set_trans(Tween.TRANS_SINE)
+	cinema_fx.play(&"in" if on else &"out")
 
 
 ## Phase 4: the boss bar moves to the top-right corner (open sky), so the screen-tall king's

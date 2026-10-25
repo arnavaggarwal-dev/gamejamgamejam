@@ -1,26 +1,27 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://t1vc3n4i4lf7"]
 
-[ext_resource type="Script" path="res://scenes/player/player.gd" id="1_player"]
-[ext_resource type="SpriteFrames" path="res://assets/art/hero/hero_frames.tres" id="2_frames"]
-[ext_resource type="Script" path="res://scenes/player/aim.gd" id="3_aim"]
-[ext_resource type="Texture2D" path="res://assets/art/ui/key_z.png" id="4_key"]
-[ext_resource type="Texture2D" path="res://assets/art/fx/streak.png" id="5_streak"]
-[ext_resource type="Texture2D" path="res://assets/art/boss/crown.png" id="6_crown"]
+[ext_resource type="Script" uid="uid://dv5wm2lnpkmem" path="res://scenes/player/player.gd" id="1_player"]
+[ext_resource type="SpriteFrames" uid="uid://2deltkikr0y2" path="res://assets/art/hero/hero_frames.tres" id="2_frames"]
+[ext_resource type="Script" uid="uid://dv07ywkedk1j4" path="res://scenes/player/aim.gd" id="3_aim"]
+[ext_resource type="Texture2D" uid="uid://brwqni243dedp" path="res://assets/art/ui/key_z.png" id="4_key"]
+[ext_resource type="Texture2D" uid="uid://d1sy6hpy1mdf0" path="res://assets/art/fx/streak.png" id="5_streak"]
+[ext_resource type="Texture2D" uid="uid://dcyuxb81k1m3k" path="res://assets/art/boss/crown.png" id="6_crown"]
+[ext_resource type="Texture2D" path="res://assets/art/fx/aim_dot.png" id="7_dot"]
+[ext_resource type="Texture2D" path="res://assets/art/fx/aim_dot_small.png" id="8_dot_small"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
-radius = 22.0
-height = 84.0
+radius = 23.0
+height = 78.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_pickup"]
-radius = 56.0
+radius = 61.400326
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hurt"]
-radius = 16.0
-height = 70.0
+radius = 20.0
+height = 48.0
 
 [sub_resource type="Animation" id="Animation_hurt"]
 resource_name = "hurt"
-length = 1.0
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -33,6 +34,14 @@ tracks/0/keys = {
 "update": 1,
 "values": [Color(1, 1, 1, 0.25), Color(1, 1, 1, 1), Color(1, 1, 1, 0.25), Color(1, 1, 1, 1), Color(1, 1, 1, 0.25), Color(1, 1, 1, 1), Color(1, 1, 1, 0.25), Color(1, 1, 1, 1), Color(1, 1, 1, 0.25), Color(1, 1, 1, 1), Color(1, 1, 1, 1)]
 }
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_player"]
+_data = {
+&"hurt": SubResource("Animation_hurt")
+}
+
+[sub_resource type="Gradient" id="Gradient_trail"]
+colors = PackedColorArray(0.988, 0.984, 0.988, 0.9, 0.588, 0.859, 0.569, 0)
 
 [sub_resource type="Animation" id="Animation_dash"]
 resource_name = "dash"
@@ -66,22 +75,6 @@ tracks/0/keys = {
 "values": [Vector2(0.75, 1.3), Vector2(1, 1)]
 }
 
-[sub_resource type="Animation" id="Animation_jump"]
-resource_name = "jump"
-length = 0.28
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Art:scale")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.03, 0.16, 0.28),
-"transitions": PackedFloat32Array(1, 0.5, 1, 1),
-"update": 0,
-"values": [Vector2(1.3, 0.7), Vector2(0.7, 1.35), Vector2(1.06, 0.95), Vector2(1, 1)]
-}
-
 [sub_resource type="Animation" id="Animation_grab"]
 resource_name = "grab"
 length = 0.18
@@ -96,6 +89,22 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(0.5, 1),
 "update": 0,
 "values": [Vector2(1.25, 0.8), Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_jump"]
+resource_name = "jump"
+length = 0.28
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Art:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.03, 0.16, 0.28),
+"transitions": PackedFloat32Array(1, 0.5, 1, 1),
+"update": 0,
+"values": [Vector2(1.3, 0.7), Vector2(0.7, 1.35), Vector2(1.06, 0.95), Vector2(1, 1)]
 }
 
 [sub_resource type="Animation" id="Animation_throw"]
@@ -114,8 +123,26 @@ tracks/0/keys = {
 "values": [Vector2(0.8, 1.2), Vector2(1.12, 0.92), Vector2(1, 1)]
 }
 
+[sub_resource type="Animation" id="Animation_strain"]
+resource_name = "strain"
+length = 0.16
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Art:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.08, 0.16),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1.21, 0.8), Vector2(1.11, 0.8), Vector2(1.21, 0.8)]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_juice"]
 _data = {
+&"strain": SubResource("Animation_strain"),
 &"dash": SubResource("Animation_dash"),
 &"dash_v": SubResource("Animation_dash_v"),
 &"grab": SubResource("Animation_grab"),
@@ -123,97 +150,158 @@ _data = {
 &"throw": SubResource("Animation_throw")
 }
 
-[sub_resource type="Gradient" id="Gradient_trail"]
-colors = PackedColorArray(0.988, 0.984, 0.988, 0.9, 0.588, 0.859, 0.569, 0)
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_player"]
-_data = {
-&"hurt": SubResource("Animation_hurt")
-}
-
-[node name="Player" type="CharacterBody2D"]
-floor_snap_length = 8.0
-platform_on_leave = 2
+[node name="Player" type="CharacterBody2D" unique_id=637273531]
 z_index = 2
 collision_layer = 2
+floor_snap_length = 8.0
+platform_on_leave = 2
 script = ExtResource("1_player")
 
-[node name="Art" type="Node2D" parent="."]
+[node name="Art" type="Node2D" parent="." unique_id=100760983]
 position = Vector2(0, 42)
 
-[node name="Flip" type="Node2D" parent="Art"]
+[node name="Flip" type="Node2D" parent="Art" unique_id=346306722]
 
-[node name="Body" type="AnimatedSprite2D" parent="Art/Flip"]
+[node name="Body" type="AnimatedSprite2D" parent="Art/Flip" unique_id=2062043159]
 position = Vector2(0, -44)
 scale = Vector2(4, 4)
 sprite_frames = ExtResource("2_frames")
 animation = &"idle"
 autoplay = "idle"
 
-[node name="Crown" type="Sprite2D" parent="Art"]
+[node name="Crown" type="Sprite2D" parent="Art" unique_id=846594581]
 visible = false
 z_index = 1
 position = Vector2(0, -66)
 scale = Vector2(4.5, 4.5)
 texture = ExtResource("6_crown")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=267797453]
+visible = false
 shape = SubResource("CapsuleShape2D_body")
 
-[node name="HoldPoint" type="Marker2D" parent="."]
+[node name="HoldPoint" type="Marker2D" parent="." unique_id=801614637]
 position = Vector2(0, -60)
 
-[node name="PickupArea" type="Area2D" parent="."]
+[node name="PickupArea" type="Area2D" parent="." unique_id=1739545790]
 collision_layer = 0
 collision_mask = 4
 monitorable = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea" unique_id=1442229833]
+visible = false
 shape = SubResource("CircleShape2D_pickup")
 
-[node name="Hurtbox" type="Area2D" parent="."]
+[node name="Hurtbox" type="Area2D" parent="." unique_id=37190551]
 collision_layer = 0
 collision_mask = 8
 monitorable = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=421522232]
 shape = SubResource("CapsuleShape2D_hurt")
 
-[node name="InvulnTimer" type="Timer" parent="."]
+[node name="InvulnTimer" type="Timer" parent="." unique_id=1155082933]
 one_shot = true
 
-[node name="Aim" type="Node2D" parent="."]
+[node name="Aim" type="Node2D" parent="." unique_id=1139138584]
 top_level = true
 z_index = 4
 script = ExtResource("3_aim")
 
-[node name="Prompt" type="Sprite2D" parent="."]
+[node name="Dot1" type="Sprite2D" parent="Aim"]
+visible = false
+scale = Vector2(4, 4)
+texture = ExtResource("7_dot")
+
+[node name="Dot2" type="Sprite2D" parent="Aim"]
+visible = false
+scale = Vector2(4, 4)
+texture = ExtResource("8_dot_small")
+
+[node name="Dot3" type="Sprite2D" parent="Aim"]
+visible = false
+scale = Vector2(4, 4)
+texture = ExtResource("7_dot")
+
+[node name="Dot4" type="Sprite2D" parent="Aim"]
+visible = false
+scale = Vector2(4, 4)
+texture = ExtResource("8_dot_small")
+
+[node name="Dot5" type="Sprite2D" parent="Aim"]
+visible = false
+scale = Vector2(4, 4)
+texture = ExtResource("7_dot")
+
+[node name="Dot6" type="Sprite2D" parent="Aim"]
+visible = false
+scale = Vector2(4, 4)
+texture = ExtResource("8_dot_small")
+
+[node name="Dot7" type="Sprite2D" parent="Aim"]
+visible = false
+scale = Vector2(4, 4)
+texture = ExtResource("7_dot")
+
+[node name="Dot8" type="Sprite2D" parent="Aim"]
+visible = false
+scale = Vector2(4, 4)
+texture = ExtResource("8_dot_small")
+
+[node name="Dot9" type="Sprite2D" parent="Aim"]
+visible = false
+scale = Vector2(4, 4)
+texture = ExtResource("7_dot")
+
+[node name="Dot10" type="Sprite2D" parent="Aim"]
+visible = false
+scale = Vector2(4, 4)
+texture = ExtResource("8_dot_small")
+
+[node name="Dot11" type="Sprite2D" parent="Aim"]
+visible = false
+scale = Vector2(4, 4)
+texture = ExtResource("7_dot")
+
+[node name="Dot12" type="Sprite2D" parent="Aim"]
+visible = false
+scale = Vector2(4, 4)
+texture = ExtResource("8_dot_small")
+
+[node name="Dot13" type="Sprite2D" parent="Aim"]
+visible = false
+scale = Vector2(4, 4)
+texture = ExtResource("7_dot")
+
+[node name="Dot14" type="Sprite2D" parent="Aim"]
+visible = false
+scale = Vector2(4, 4)
+texture = ExtResource("8_dot_small")
+
+[node name="Prompt" type="Sprite2D" parent="." unique_id=2124281772]
 visible = false
 top_level = true
 z_index = 6
 scale = Vector2(4, 4)
 texture = ExtResource("4_key")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_player")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=663025475]
+libraries/ = SubResource("AnimationLibrary_player")
 
-[node name="DashTimer" type="Timer" parent="."]
+[node name="DashTimer" type="Timer" parent="." unique_id=1193353262]
 wait_time = 0.16
 one_shot = true
 
-[node name="DashCooldown" type="Timer" parent="."]
+[node name="DashCooldown" type="Timer" parent="." unique_id=558481405]
 wait_time = 0.45
 one_shot = true
 
-[node name="Trail" type="CPUParticles2D" parent="."]
+[node name="Trail" type="CPUParticles2D" parent="." unique_id=1918573790]
 z_index = -1
 emitting = false
 amount = 10
-lifetime = 0.22
-local_coords = false
 texture = ExtResource("5_streak")
+lifetime = 0.22
 emission_shape = 3
 emission_rect_extents = Vector2(12, 30)
 gravity = Vector2(0, 0)
@@ -221,14 +309,12 @@ scale_amount_min = 4.0
 scale_amount_max = 4.0
 color_ramp = SubResource("Gradient_trail")
 
-[node name="Juice" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_juice")
-}
+[node name="Juice" type="AnimationPlayer" parent="." unique_id=1634984173]
+libraries/ = SubResource("AnimationLibrary_juice")
 
-[node name="GhostTimer" type="Timer" parent="."]
+[node name="GhostTimer" type="Timer" parent="." unique_id=1936514629]
 wait_time = 0.035
 
+[connection signal="frame_changed" from="Art/Flip/Body" to="." method="_on_body_frame_changed"]
 [connection signal="timeout" from="DashTimer" to="." method="_end_dash"]
 [connection signal="timeout" from="GhostTimer" to="." method="_spawn_ghost"]
-[connection signal="frame_changed" from="Art/Flip/Body" to="." method="_on_body_frame_changed"]

@@ -4,6 +4,110 @@
 [ext_resource type="Texture2D" path="res://assets/art/ui/heart_full.png" id="2_heart"]
 [ext_resource type="Texture2D" path="res://assets/art/ui/bomb_full.png" id="3_bomb"]
 
+[sub_resource type="Animation" id="Animation_banner_pop"]
+resource_name = "pop"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Banner:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0.2, 0.2), Vector2(1.1, 1.1), Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_coach_pop"]
+resource_name = "pop"
+length = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Coach:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.16, 0.25),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0.7, 0.7), Vector2(1.06, 1.06), Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_cinema_in"]
+resource_name = "in"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Cinema/Top:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(-2, 1),
+"update": 0,
+"values": [Vector2(1, 0), Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Cinema/Bottom:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(-2, 1),
+"update": 0,
+"values": [Vector2(1, 0), Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_cinema_out"]
+resource_name = "out"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Cinema/Top:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(-2, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Cinema/Bottom:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(-2, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_banner"]
+_data = {
+&"pop": SubResource("Animation_banner_pop")
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_coach"]
+_data = {
+&"pop": SubResource("Animation_coach_pop")
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_cinema"]
+_data = {
+&"in": SubResource("Animation_cinema_in"),
+&"out": SubResource("Animation_cinema_out")
+}
+
 [node name="HUD" type="CanvasLayer"]
 layer = 10
 script = ExtResource("1_hud")
@@ -168,6 +272,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Coach" type="Label" parent="."]
+pivot_offset = Vector2(640, 76)
 visible = false
 anchor_right = 1.0
 offset_top = 116.0
@@ -182,6 +287,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Banner" type="Label" parent="."]
+pivot_offset = Vector2(640, 60)
 visible = false
 anchor_top = 0.5
 anchor_right = 1.0
@@ -226,3 +332,19 @@ horizontal_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 4
 text = "PLAY AGAIN"
+
+[node name="BannerFx" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_banner")
+}
+
+[node name="CoachFx" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_coach")
+}
+
+[node name="CinemaFx" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_cinema")
+}
+

@@ -70,23 +70,13 @@ func set_phase(p: int) -> void:
 			breaker.armed = true
 		for mover: Node in movers:
 			mover.get_node("AnimationPlayer").play(mover.get_meta(&"move"))
-		for piece: Node2D in get_tree().get_nodes_in_group(&"castle_set"):
-			_sink(piece)
-		return
+		return  # (the castle's own platforms sink away in the "reveal" clip)
 	zap_timer.start(ZAP_EVERY[phase])
 
 
 ## Phase 4, once the cutscene is over: lightning every StrikeTimer tick.
 func start_strikes() -> void:
 	strike_timer.start()
-
-
-## Phase 4: a castle platform drops out of sight and stops colliding.
-func _sink(piece: Node2D) -> void:
-	var drop := create_tween()
-	drop.tween_property(piece, "position:y", piece.position.y + 900.0, 1.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
-	drop.tween_callback(piece.hide)
-	drop.tween_callback(piece.set.bind(&"process_mode", Node.PROCESS_MODE_DISABLED))
 
 
 ## A bolt out of the red sky somewhere near the player.

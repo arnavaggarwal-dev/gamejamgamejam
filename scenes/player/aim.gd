@@ -1,19 +1,14 @@
 extends Node2D
-## Dotted throw arc shown while the player carries a bomb. Dots snap to the 4-px art grid.
+## Dotted throw arc shown while the player carries a bomb: its dot sprites (alternating big and
+## small) sit along the arc, snapped to the 4-px art grid; the ones not needed hide.
 
-const DOT := Color("#fcfbfc")
-const EDGE := Color("#2d2730")
+@onready var dots: Array = get_children()
 
 ## Global positions along the arc; set every physics frame by the player.
 var points := PackedVector2Array():
 	set(value):
 		points = value
-		queue_redraw()
-
-
-func _draw() -> void:
-	for i in points.size():
-		var p := (points[i] / 4.0).floor() * 4.0
-		var half := 8.0 if i % 2 == 0 else 4.0
-		draw_rect(Rect2(p - Vector2(half, half), Vector2(half, half) * 2.0), EDGE)
-		draw_rect(Rect2(p - Vector2(half - 4.0, half - 4.0), Vector2(half - 4.0, half - 4.0) * 2.0), DOT)
+		for i in dots.size():
+			dots[i].visible = i < points.size()
+			if dots[i].visible:
+				dots[i].position = (points[i] / 4.0).floor() * 4.0

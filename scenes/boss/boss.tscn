@@ -1736,6 +1736,65 @@ tracks/1/keys = {
 "values": [Color(1, 0.45, 0.45, 1), Color(1, 1, 1, 1)]
 }
 
+[sub_resource type="Animation" id="Animation_screw_on"]
+resource_name = "screw_on"
+length = 0.66
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Upper/Body/ArmL/Elbow/Wrist:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rig/Upper/Body/ArmL/Elbow/Sputter:emitting")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Rig/Upper/Body/ArmL/Elbow/Wrist:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.0375, 0.075, 0.1125, 0.15, 0.1875, 0.225, 0.2625, 0.3, 0.3375, 0.375, 0.4125, 0.45, 0.47, 0.56, 0.66),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0.15, 0.15), Vector2(0, 0.221), Vector2(-0.292, 0.292), Vector2(-0, 0.362), Vector2(0.433, 0.433), Vector2(0, 0.504), Vector2(-0.575, 0.575), Vector2(-0, 0.646), Vector2(0.717, 0.717), Vector2(0, 0.787), Vector2(-0.858, 0.858), Vector2(-0, 0.929), Vector2(1, 1), Vector2(1.3, 0.8), Vector2(0.94, 1.05), Vector2(1, 1)]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.47),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"click_hand"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_handfx"]
+_data = {
+&"screw_on": SubResource("Animation_screw_on")
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_boss"]
 _data = {
 &"death": SubResource("Animation_death"),
@@ -2220,3 +2279,8 @@ libraries = {
 
 [node name="RestTimer" type="Timer" parent="."]
 one_shot = true
+[node name="HandFx" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_handfx")
+}
+

@@ -21,11 +21,13 @@ var projectiles: Node2D
 var _skip := false
 var _start_x := 0.0
 var _recharged := false
+var _greyed := false
 var _lifted: Array[CanvasItem] = []
 
 @onready var core_arrow: AnimatedSprite2D = $CoreArrow
 @onready var spotlight: ColorRect = $Spotlight
 @onready var bot: TrainingBot = $TrainingBot
+@onready var grey: AnimationPlayer = $Grey
 
 
 func _ready() -> void:
@@ -138,11 +140,9 @@ func _focus(nodes: Array) -> void:
 		if is_instance_valid(n):
 			n.z_index += LIFT
 			_lifted.append(n)
-	spotlight.show()
-	var fade := create_tween()
-	fade.tween_property(spotlight, "material:shader_parameter/amount", 1.0 if _lifted else 0.0, 0.25)
-	if _lifted.is_empty():
-		fade.tween_callback(spotlight.hide)
+	if _greyed != not _lifted.is_empty():
+		_greyed = not _lifted.is_empty()
+		grey.play(&"in" if _greyed else &"out")
 
 
 func _finish() -> void:

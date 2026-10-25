@@ -184,10 +184,415 @@ tracks/5/keys = {
 "update": 1,
 "values": [false, true]
 }
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("../PlatL:position")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.35, 1.4),
+"transitions": PackedFloat32Array(-2, 2.5, 1),
+"update": 0,
+"values": [Vector2(360, 480), Vector2(360, 450), Vector2(360, 1380)]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("../PlatL:visible")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0, 1.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("../PlatL:process_mode")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0, 1.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [0, 4]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("../PlatML:position")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0, 0.35, 1.4),
+"transitions": PackedFloat32Array(-2, 2.5, 1),
+"update": 0,
+"values": [Vector2(980, 500), Vector2(980, 470), Vector2(980, 1400)]
+}
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("../PlatML:visible")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(0, 1.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/11/type = "value"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("../PlatML:process_mode")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
+"times": PackedFloat32Array(0, 1.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [0, 4]
+}
+tracks/12/type = "value"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("../PlatM:position")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
+"times": PackedFloat32Array(0, 0.35, 1.4),
+"transitions": PackedFloat32Array(-2, 2.5, 1),
+"update": 0,
+"values": [Vector2(1180, 380), Vector2(1180, 350), Vector2(1180, 1280)]
+}
+tracks/13/type = "value"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("../PlatM:visible")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = {
+"times": PackedFloat32Array(0, 1.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/14/type = "value"
+tracks/14/imported = false
+tracks/14/enabled = true
+tracks/14/path = NodePath("../PlatM:process_mode")
+tracks/14/interp = 1
+tracks/14/loop_wrap = true
+tracks/14/keys = {
+"times": PackedFloat32Array(0, 1.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [0, 4]
+}
+tracks/15/type = "value"
+tracks/15/imported = false
+tracks/15/enabled = true
+tracks/15/path = NodePath("../PlatR:position")
+tracks/15/interp = 1
+tracks/15/loop_wrap = true
+tracks/15/keys = {
+"times": PackedFloat32Array(0, 0.35, 1.4),
+"transitions": PackedFloat32Array(-2, 2.5, 1),
+"update": 0,
+"values": [Vector2(2250, 480), Vector2(2250, 450), Vector2(2250, 1380)]
+}
+tracks/16/type = "value"
+tracks/16/imported = false
+tracks/16/enabled = true
+tracks/16/path = NodePath("../PlatR:visible")
+tracks/16/interp = 1
+tracks/16/loop_wrap = true
+tracks/16/keys = {
+"times": PackedFloat32Array(0, 1.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/17/type = "value"
+tracks/17/imported = false
+tracks/17/enabled = true
+tracks/17/path = NodePath("../PlatR:process_mode")
+tracks/17/interp = 1
+tracks/17/loop_wrap = true
+tracks/17/keys = {
+"times": PackedFloat32Array(0, 1.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [0, 4]
+}
+tracks/18/type = "value"
+tracks/18/imported = false
+tracks/18/enabled = true
+tracks/18/path = NodePath("../Piston:position")
+tracks/18/interp = 1
+tracks/18/loop_wrap = true
+tracks/18/keys = {
+"times": PackedFloat32Array(0, 0.35, 1.4),
+"transitions": PackedFloat32Array(-2, 2.5, 1),
+"update": 0,
+"values": [Vector2(760, 560), Vector2(760, 530), Vector2(760, 1460)]
+}
+tracks/19/type = "value"
+tracks/19/imported = false
+tracks/19/enabled = true
+tracks/19/path = NodePath("../Piston:visible")
+tracks/19/interp = 1
+tracks/19/loop_wrap = true
+tracks/19/keys = {
+"times": PackedFloat32Array(0, 1.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/20/type = "value"
+tracks/20/imported = false
+tracks/20/enabled = true
+tracks/20/path = NodePath("../Piston:process_mode")
+tracks/20/interp = 1
+tracks/20/loop_wrap = true
+tracks/20/keys = {
+"times": PackedFloat32Array(0, 1.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [0, 4]
+}
+tracks/21/type = "value"
+tracks/21/imported = false
+tracks/21/enabled = true
+tracks/21/path = NodePath("../Slider:position")
+tracks/21/interp = 1
+tracks/21/loop_wrap = true
+tracks/21/keys = {
+"times": PackedFloat32Array(0, 0.35, 1.4),
+"transitions": PackedFloat32Array(-2, 2.5, 1),
+"update": 0,
+"values": [Vector2(1500, 470), Vector2(1500, 440), Vector2(1500, 1370)]
+}
+tracks/22/type = "value"
+tracks/22/imported = false
+tracks/22/enabled = true
+tracks/22/path = NodePath("../Slider:visible")
+tracks/22/interp = 1
+tracks/22/loop_wrap = true
+tracks/22/keys = {
+"times": PackedFloat32Array(0, 1.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/23/type = "value"
+tracks/23/imported = false
+tracks/23/enabled = true
+tracks/23/path = NodePath("../Slider:process_mode")
+tracks/23/interp = 1
+tracks/23/loop_wrap = true
+tracks/23/keys = {
+"times": PackedFloat32Array(0, 1.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [0, 4]
+}
+tracks/24/type = "value"
+tracks/24/imported = false
+tracks/24/enabled = true
+tracks/24/path = NodePath("../CorePlatforms:position")
+tracks/24/interp = 1
+tracks/24/loop_wrap = true
+tracks/24/keys = {
+"times": PackedFloat32Array(0, 0.35, 1.4),
+"transitions": PackedFloat32Array(-2, 2.5, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, -30), Vector2(0, 900)]
+}
+tracks/25/type = "value"
+tracks/25/imported = false
+tracks/25/enabled = true
+tracks/25/path = NodePath("../CorePlatforms:visible")
+tracks/25/interp = 1
+tracks/25/loop_wrap = true
+tracks/25/keys = {
+"times": PackedFloat32Array(0, 1.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/26/type = "value"
+tracks/26/imported = false
+tracks/26/enabled = true
+tracks/26/path = NodePath("../CorePlatforms:process_mode")
+tracks/26/interp = 1
+tracks/26/loop_wrap = true
+tracks/26/keys = {
+"times": PackedFloat32Array(0, 1.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [0, 4]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_doom"]
 _data = {
 &"reveal": SubResource("Animation_reveal")
+}
+
+[sub_resource type="Animation" id="Animation_grey_in"]
+resource_name = "in"
+length = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Spotlight:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Spotlight:material:shader_parameter/amount")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.25),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+
+[sub_resource type="Animation" id="Animation_grey_out"]
+resource_name = "out"
+length = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Spotlight:material:shader_parameter/amount")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.25),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Spotlight:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.25),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_grey"]
+_data = {
+&"in": SubResource("Animation_grey_in"),
+&"out": SubResource("Animation_grey_out")
+}
+
+[sub_resource type="Animation" id="Animation_camera_doom"]
+resource_name = "doom"
+length = 2.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:limit_top")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [-1440]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:limit_right")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [3840]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:limit_bottom")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [960]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".:zoom")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 2.5),
+"transitions": PackedFloat32Array(-2, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(0.333333, 0.333333)]
+}
+
+[sub_resource type="Animation" id="Animation_camera_drop"]
+resource_name = "drop"
+length = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:limit_bottom")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [960]
+}
+
+[sub_resource type="Animation" id="Animation_camera_lift"]
+resource_name = "lift"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:limit_bottom")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(-2, 1),
+"update": 0,
+"values": [960, 720]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_camera"]
+_data = {
+&"doom": SubResource("Animation_camera_doom"),
+&"drop": SubResource("Animation_camera_drop"),
+&"lift": SubResource("Animation_camera_lift")
 }
 
 [node name="Game" type="Node2D"]
@@ -464,7 +869,7 @@ position = Vector2(2580, 360)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/WallR"]
 shape = SubResource("RectangleShape2D_wall")
 
-[node name="PlatL" type="StaticBody2D" parent="Arena" groups=["castle_set"]]
+[node name="PlatL" type="StaticBody2D" parent="Arena"]
 position = Vector2(360, 480)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/PlatL"]
@@ -475,7 +880,7 @@ one_way_collision = true
 scale = Vector2(4, 4)
 texture = ExtResource("10_platform")
 
-[node name="PlatML" type="StaticBody2D" parent="Arena" groups=["castle_set"]]
+[node name="PlatML" type="StaticBody2D" parent="Arena"]
 position = Vector2(980, 500)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/PlatML"]
@@ -486,7 +891,7 @@ one_way_collision = true
 scale = Vector2(4, 4)
 texture = ExtResource("10_platform")
 
-[node name="PlatM" type="StaticBody2D" parent="Arena" groups=["castle_set"]]
+[node name="PlatM" type="StaticBody2D" parent="Arena"]
 position = Vector2(1180, 380)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/PlatM"]
@@ -497,7 +902,7 @@ one_way_collision = true
 scale = Vector2(4, 4)
 texture = ExtResource("10_platform")
 
-[node name="PlatR" type="StaticBody2D" parent="Arena" groups=["castle_set"]]
+[node name="PlatR" type="StaticBody2D" parent="Arena"]
 position = Vector2(2250, 480)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Arena/PlatR"]
@@ -508,14 +913,14 @@ one_way_collision = true
 scale = Vector2(4, 4)
 texture = ExtResource("10_platform")
 
-[node name="Piston" parent="Arena" groups=["castle_set"] instance=ExtResource("9_lift")]
+[node name="Piston" parent="Arena" instance=ExtResource("9_lift")]
 position = Vector2(760, 560)
 
-[node name="Slider" parent="Arena" groups=["castle_set"] instance=ExtResource("9_lift")]
+[node name="Slider" parent="Arena" instance=ExtResource("9_lift")]
 position = Vector2(1500, 470)
 curve = SubResource("Curve2D_slide")
 
-[node name="CorePlatforms" type="Node2D" parent="Arena" groups=["castle_set"]]
+[node name="CorePlatforms" type="Node2D" parent="Arena"]
 
 [node name="CoreL" parent="Arena/CorePlatforms" instance=ExtResource("27_coreplat")]
 position = Vector2(540, 330)
@@ -1135,8 +1540,18 @@ position_smoothing_speed = 6.0
 script = ExtResource("2_cam")
 target = NodePath("../Player")
 
+[node name="Moves" type="AnimationPlayer" parent="Camera2D"]
+libraries = {
+&"": SubResource("AnimationLibrary_camera")
+}
+
 [node name="Tutorial" type="Node" parent="."]
 script = ExtResource("23_tutorial")
+
+[node name="Grey" type="AnimationPlayer" parent="Tutorial"]
+libraries = {
+&"": SubResource("AnimationLibrary_grey")
+}
 
 [node name="TrainingBot" parent="Tutorial" instance=ExtResource("26_bot")]
 position = Vector2(740, 420)

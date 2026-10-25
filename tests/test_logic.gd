@@ -787,12 +787,13 @@ func _ride_lift(player: Player, body: Node2D) -> void:
 	player.velocity = Vector2.ZERO
 	var off := 0
 	var worst_gap := 0.0
+	var feet: float = (player.get_node("CollisionShape2D").shape as CapsuleShape2D).height / 2.0  # his feet, below his middle
 	var max_up := 0.0
 	for i in 200:
 		await physics_frame
 		if i > 20:
 			off += 0 if player.is_on_floor() else 1
-			worst_gap = maxf(worst_gap, absf((body.global_position.y - 12.0) - (player.global_position.y + 42.0)))
+			worst_gap = maxf(worst_gap, absf((body.global_position.y - 12.0) - (player.global_position.y + feet)))
 			max_up = minf(max_up, player.velocity.y)
 	check(off < 4 and worst_gap < 6.0, "the player rides a moving lift (off %d frames, gap %.1f px)" % [off, worst_gap])
 	check(max_up > -400.0, "a lift never launches the player (peak vy %.0f)" % max_up)
