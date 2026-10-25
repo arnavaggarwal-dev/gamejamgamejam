@@ -24,6 +24,8 @@ const BOMB := preload("res://scenes/boss/bomb.tscn")
 const MAX_AMMO := 5
 const CHARGE_DELAY := 0.2  # s of holding [A] before he starts squeezing (a tap only detonates)
 const CHARGE_TIME := 0.6  # s of squeezing per bomb
+const KNOCKBACK := 480.0  # px/s a hit shoves him off whatever hit him
+const KNOCK_HOP := -380.0  # ...with a little hop
 const BOMB_BOUNCE := Vector2(650.0, -1150.0)  # off a blast: sideways away from it (at most), always this fast up
 const AIM_AHEAD := Vector2(100.0, 2400.0)  # a throw aims at a core this far ahead of him (min, max px)
 const MAX_FLIGHT := 1.5  # s: a far core gets a faster throw instead of a sky-high one
@@ -78,7 +80,7 @@ var _charge_left := 0.0
 
 func _ready() -> void:
 	add_to_group("player")
-	hurtbox.area_entered.connect(func(_area: Area2D) -> void: take_hit())
+	hurtbox.area_entered.connect(take_hit)
 	invuln.timeout.connect(_on_invuln_timeout)
 
 
@@ -172,7 +174,8 @@ func wear_crown() -> void:
 	_puff(DUST, _feet())
 
 
-func take_hit() -> void:
+## `from` is the hazard that hit him (null for a fall): he is knocked back off it.
+func take_hit(from: Area2D = null) -> void:
 	if _dead or frozen or dashing or not invuln.is_stopped():
 		return
 	hp -= 1
@@ -186,7 +189,26 @@ func take_hit() -> void:
 	invuln.start()
 	anim.play(&"hurt")
 	_squash(Vector2(1.3, 0.7))
-	velocity = Vector2(-facing * 260.0, -380.0)
+	velocity = _knockback(from)
+
+
+## A small shove away from what hit him, with a little hop. A beam (a hazard more than 4x
+## longer than wide: the eye laser, a lightning column, a zapped floor strip) shoves him off its
+## line instead, toward whichever side of it he is on.
+func _knockback(from: Area2D) -> Vector2:
+	var away := Vector2(-facing, 0.0)
+	if from:
+		away = global_position - from.global_position
+		var box := from.get_node_or_null("CollisionShape2D") as CollisionShape2D
+		var rect: RectangleShape2D = box.shape as RectangleShape2D if box else null
+		if rect and maxf(rect.size.x, rect.size.y) > 4.0 * minf(rect.size.x, rect.size.y):
+			var along := (box.global_transform.x if rect.size.x > rect.size.y else box.global_transform.y).normalized()
+			var off := global_position - box.global_position
+			away = off - along * off.dot(along)
+	if away.length() < 1.0:
+		away = Vector2(-facing, 0.0)
+	var shove := away.normalized() * KNOCKBACK
+	return Vector2(shove.x, minf(shove.y, 0.0) + KNOCK_HOP)
 
 
 ## Short burst with i-frames, a stretch and a streak trail, in any of 8 directions: the held
@@ -226,7 +248,7 @@ func _end_dash() -> void:
 	trail.emitting = false
 	velocity = _dash_dir * speed  # a little carry, not the full burst
 	if hurtbox.monitoring and hurtbox.has_overlapping_areas():
-		take_hit()
+		take_hit(hurtbox.get_overlapping_areas()[0])
 
 
 func reset(at: Vector2) -> void:
@@ -428,7 +450,7 @@ func _puff(scene: PackedScene, at: Vector2) -> void:
 
 func _on_invuln_timeout() -> void:
 	if hurtbox.monitoring and hurtbox.has_overlapping_areas():
-		take_hit()
+		take_hit(hurtbox.get_overlapping_areas()[0])
 
 
 func _squash(s: Vector2) -> void:

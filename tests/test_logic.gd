@@ -28,6 +28,7 @@ func _run() -> void:
 	Tutorial.done = true  # fight-logic tests skip the lesson; _test_tutorial runs it on its own
 	_test_bomb()
 	await _test_player()
+	await _test_knockback()
 	await _test_arena()
 	await _test_hero_juice()
 	await _test_boss()
@@ -121,6 +122,45 @@ func _test_player() -> void:
 	check(player.held_bomb == null, "out of ammo, [Z] pulls out nothing")
 	player.queue_free()
 	await process_frame
+
+
+## A hit shoves him off the hazard; a beam shoves him to whichever side of its line he is on.
+func _test_knockback() -> void:
+	var player: Player = load("res://scenes/player/player.tscn").instantiate()
+	root.add_child(player)
+	player.global_position = Vector2(500, 300)
+	await process_frame
+	var hazard := func(at: Vector2, size: Vector2, turn: float) -> Area2D:
+		var area := Area2D.new()
+		var box := CollisionShape2D.new()
+		box.name = "CollisionShape2D"
+		var rect := RectangleShape2D.new()
+		rect.size = size
+		box.shape = rect
+		area.add_child(box)
+		root.add_child(area)
+		area.global_position = at
+		area.rotation = turn
+		return area
+	var hit_by := func(area: Area2D) -> Vector2:
+		player.invuln.stop()
+		player.take_hit(area)
+		area.queue_free()
+		return player.velocity
+	var knock: Vector2 = hit_by.call(hazard.call(Vector2(560, 300), Vector2(60, 60), 0.0))
+	check(knock.x < -300.0 and knock.y < 0.0, "a hit knocks him back off the hazard, with a little hop")
+	knock = hit_by.call(hazard.call(Vector2(512, 0), Vector2(96, 2160), 0.0))
+	check(knock.x < -300.0, "a lightning column just right of his middle shoves him left, off it")
+	knock = hit_by.call(hazard.call(Vector2(488, 0), Vector2(96, 2160), 0.0))
+	check(knock.x > 300.0, "...just left of it, right")
+	knock = hit_by.call(hazard.call(Vector2(900, 120), Vector2(2560, 30), 0.4))
+	var side := Vector2.from_angle(0.4).orthogonal()
+	if (player.global_position - Vector2(900, 120)).dot(side) < 0.0:
+		side = -side
+	check(Vector2(knock.x, 0.0).dot(Vector2(side.x, 0.0)) > 0.0, "an angled laser shoves him toward his own side of its line")
+	player.queue_free()
+	await process_frame
+	Engine.time_scale = 1.0
 
 
 func _test_arena() -> void:
