@@ -560,106 +560,82 @@ tracks/1/keys = {
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath(".:bend_l")
+tracks/2/path = NodePath("Rig/Upper/Body/ArmL/Elbow/Wrist:visible")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.5, 1.75, 2.25),
-"transitions": PackedFloat32Array(-2, 1, -2, 1),
-"update": 0,
-"values": [1.0, -1.0, -1.0, 1.0]
+"times": PackedFloat32Array(0.85),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath(".:bend_r")
+tracks/3/path = NodePath("Rig/Upper/Body/ArmL/Elbow/Wrist:scale")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.5, 1.75, 2.25),
-"transitions": PackedFloat32Array(-2, 1, -2, 1),
+"times": PackedFloat32Array(0.85, 0.8875, 0.925, 0.9625, 1, 1.0375, 1.075, 1.1125, 1.15, 1.1875, 1.225, 1.2625, 1.3, 1.32, 1.41, 1.51),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [-1.0, 1.0, 1.0, -1.0]
+"values": [Vector2(0.15, 0.15), Vector2(0, 0.221), Vector2(-0.292, 0.292), Vector2(-0, 0.362), Vector2(0.433, 0.433), Vector2(0, 0.504), Vector2(-0.575, 0.575), Vector2(-0, 0.646), Vector2(0.717, 0.717), Vector2(0, 0.787), Vector2(-0.858, 0.858), Vector2(-0, 0.929), Vector2(1, 1), Vector2(1.3, 0.8), Vector2(0.94, 1.05), Vector2(1, 1)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Rig/Upper/Body/ArmL/Elbow/Wrist:visible")
+tracks/4/path = NodePath("Rig/Upper/Body/ArmL/Elbow/Sputter:emitting")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0.85),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [true]
+"values": [false]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("Rig/Upper/Body/ArmL/Elbow/Wrist:scale")
+tracks/5/path = NodePath("Rig/Upper/Body/ArmR/Elbow/Wrist:visible")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
+"times": PackedFloat32Array(0.85),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Rig/Upper/Body/ArmR/Elbow/Wrist:scale")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
 "times": PackedFloat32Array(0.85, 0.8875, 0.925, 0.9625, 1, 1.0375, 1.075, 1.1125, 1.15, 1.1875, 1.225, 1.2625, 1.3, 1.32, 1.41, 1.51),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "update": 0,
 "values": [Vector2(0.15, 0.15), Vector2(0, 0.221), Vector2(-0.292, 0.292), Vector2(-0, 0.362), Vector2(0.433, 0.433), Vector2(0, 0.504), Vector2(-0.575, 0.575), Vector2(-0, 0.646), Vector2(0.717, 0.717), Vector2(0, 0.787), Vector2(-0.858, 0.858), Vector2(-0, 0.929), Vector2(1, 1), Vector2(1.3, 0.8), Vector2(0.94, 1.05), Vector2(1, 1)]
 }
-tracks/6/type = "value"
-tracks/6/imported = false
-tracks/6/enabled = true
-tracks/6/path = NodePath("Rig/Upper/Body/ArmL/Elbow/Sputter:emitting")
-tracks/6/interp = 1
-tracks/6/loop_wrap = true
-tracks/6/keys = {
-"times": PackedFloat32Array(0.85),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
-}
 tracks/7/type = "value"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("Rig/Upper/Body/ArmR/Elbow/Wrist:visible")
+tracks/7/path = NodePath("Rig/Upper/Body/ArmR/Elbow/Sputter:emitting")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
 "times": PackedFloat32Array(0.85),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [true]
+"values": [false]
 }
-tracks/8/type = "value"
+tracks/8/type = "method"
 tracks/8/imported = false
 tracks/8/enabled = true
-tracks/8/path = NodePath("Rig/Upper/Body/ArmR/Elbow/Wrist:scale")
+tracks/8/path = NodePath(".")
 tracks/8/interp = 1
 tracks/8/loop_wrap = true
 tracks/8/keys = {
-"times": PackedFloat32Array(0.85, 0.8875, 0.925, 0.9625, 1, 1.0375, 1.075, 1.1125, 1.15, 1.1875, 1.225, 1.2625, 1.3, 1.32, 1.41, 1.51),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-"update": 0,
-"values": [Vector2(0.15, 0.15), Vector2(0, 0.221), Vector2(-0.292, 0.292), Vector2(-0, 0.362), Vector2(0.433, 0.433), Vector2(0, 0.504), Vector2(-0.575, 0.575), Vector2(-0, 0.646), Vector2(0.717, 0.717), Vector2(0, 0.787), Vector2(-0.858, 0.858), Vector2(-0, 0.929), Vector2(1, 1), Vector2(1.3, 0.8), Vector2(0.94, 1.05), Vector2(1, 1)]
-}
-tracks/9/type = "value"
-tracks/9/imported = false
-tracks/9/enabled = true
-tracks/9/path = NodePath("Rig/Upper/Body/ArmR/Elbow/Sputter:emitting")
-tracks/9/interp = 1
-tracks/9/loop_wrap = true
-tracks/9/keys = {
-"times": PackedFloat32Array(0.85),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
-}
-tracks/10/type = "method"
-tracks/10/imported = false
-tracks/10/enabled = true
-tracks/10/path = NodePath(".")
-tracks/10/interp = 1
-tracks/10/loop_wrap = true
-tracks/10/keys = {
 "times": PackedFloat32Array(0.85, 0.87, 1.32),
 "transitions": PackedFloat32Array(1, 1, 1),
 "values": [{
@@ -740,7 +716,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(900, 110), Vector2(900, 230), Vector2(900, 110), Vector2(900, 230), Vector2(900, 110)]
+"values": [Vector2(850, 110), Vector2(860, 230), Vector2(850, 110), Vector2(860, 230), Vector2(850, 110)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -752,7 +728,7 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(1260, 110), Vector2(1260, 230), Vector2(1260, 110), Vector2(1260, 230), Vector2(1260, 110)]
+"values": [Vector2(1310, 110), Vector2(1300, 230), Vector2(1310, 110), Vector2(1300, 230), Vector2(1310, 110)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false

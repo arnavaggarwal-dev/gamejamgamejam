@@ -36,6 +36,7 @@ const ZAP_SPEED := 600.0
 const ROCKET_SPEED := 1100.0
 const ARM_BONE := 144.0  # upper arm and forearm length (36 art px at 4x)
 const ARM_REACH := 270.0  # how far the aiming wrist sits from the shoulder (arm nearly straight)
+const BEND_FLIP := 60.0  # px of wrist height around the shoulder over which a rising elbow swings over
 const PHASES := [
 	{attacks = [&"stomp", &"hop"], speed = 1.0, rest = 1.2},  # legs
 	{attacks = [&"rocket", &"slam"], speed = 1.2, rest = 0.9},  # torso (moves by roaming, no charge)
@@ -78,10 +79,6 @@ var _dash_target := Vector2.ZERO
 var _hand_dirs := [Vector2.LEFT, Vector2.LEFT]  # where each rocket hand will fly (set by aim_hands)
 var _hand_on := [true, true]  # left, right: still on his wrist
 var _firing: Array[int] = [0]  # the hands this rocket clip fires (0 left, 1 right)
-
-## Which way each elbow bends (+1 out left, -1 out right); the reload clip flips them.
-@export var bend_l := 1.0
-@export var bend_r := -1.0
 
 @onready var rig: Node2D = $Rig
 @onready var legs: Node2D = $Rig/Legs
@@ -135,18 +132,20 @@ func _process(_delta: float) -> void:
 	var player := get_tree().get_first_node_in_group("player") as Node2D
 	if player:
 		eye.global_rotation = (player.global_position - eye.global_position).angle() - PI
-	_reach(arm_l, fist_l.position, bend_l)
-	_reach(arm_r, fist_r.position, bend_r)
+	_reach(arm_l, fist_l.position, 1.0)
+	_reach(arm_r, fist_r.position, -1.0)
 
 
 ## Two-bone IK: turns the shoulder and elbow so the wrist lands on `target` (body space), the
-## elbow bending out to the side `out` (+1 left, -1 right). Bones hang down (+y) at rotation 0.
+## elbow pointing out to his side `out` (+1 left, -1 right), away from his head. The bend that
+## does that flips as the wrist rises past the shoulder, so the arm swings through straight there
+## (over BEND_FLIP px) and a raised arm's elbow still points out. Bones hang down (+y) at rotation 0.
 func _reach(shoulder: Node2D, target: Vector2, out: float) -> void:
 	var to := target - shoulder.position
 	var d := clampf(to.length(), 1.0, ARM_BONE * 2.0 - 0.5)
-	var open := acos(d / (2.0 * ARM_BONE))  # equal bones: the upper arm's swing off the straight line
-	shoulder.rotation = to.angle() - PI / 2.0 + out * open
-	shoulder.get_node("Elbow").rotation = -out * 2.0 * open
+	var open := acos(d / (2.0 * ARM_BONE)) * out * clampf(to.y / BEND_FLIP, -1.0, 1.0)  # equal bones: the upper arm's swing off the straight line
+	shoulder.rotation = to.angle() - PI / 2.0 + open
+	shoulder.get_node("Elbow").rotation = -2.0 * open
 
 
 ## Rides the rail while resting, roaming either side of his spot near the player so attacks
@@ -569,8 +568,6 @@ func _reset_rig() -> void:
 		wrists[i].visible = _hand_on[i]
 		wrists[i].scale = Vector2.ONE
 		sputters[i].emitting = not _hand_on[i]  # a bare wrist smokes
-	bend_l = 1.0
-	bend_r = -1.0
 	if phase == 1:
 		_guard(true)  # stage 2: every move starts shielded
 	stomp_ring.hide()

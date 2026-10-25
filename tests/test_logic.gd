@@ -532,6 +532,14 @@ func _test_arms() -> void:
 	boss.state = Boss.State.DEAD
 	boss.celebrate()
 	check(boss.anim.current_animation == &"cheer_4" and boss.state == Boss.State.DEAD, "a beaten king never celebrates")
+	boss.phase = 1
+	boss.state = Boss.State.IDLE
+	boss.celebrate()
+	await process_frame
+	await process_frame  # (process_frame fires before _process, where the IK runs)
+	var elbow_l: Node2D = boss.arm_l.get_node("Elbow")
+	var elbow_r: Node2D = boss.arm_r.get_node("Elbow")
+	check(boss.fist_l.position.y < boss.arm_l.position.y and elbow_l.global_position.x < boss.arm_l.global_position.x - 60.0 and elbow_r.global_position.x > boss.arm_r.global_position.x + 60.0, "fists pumped overhead keep the elbows out, not bent in at his head")
 	boss.queue_free()
 	await process_frame
 
